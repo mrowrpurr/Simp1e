@@ -2,4 +2,4 @@
 
 # Simplisitic
 
-> The simplest game engine I could think of.
+> The simplest game logic engine I could think of.
