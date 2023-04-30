@@ -1,21 +1,12 @@
-#include <Windows.h>
-
-#include <QApplication>
-
-#include "mainwindow.h"
+#include <QGuiApplication>
+#include <QQmlApplicationEngine>
 
 int main(int argc, char* argv[]) {
-    QApplication app(argc, argv);
+    QGuiApplication app(argc, argv);
 
-    MainWindow mainWindow;
-    mainWindow.show();
+    QQmlApplicationEngine engine;
+    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+    if (engine.rootObjects().isEmpty()) return -1;
 
     return app.exec();
-}
-
-int CALLBACK WinMain(
-    _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine,
-    _In_ int nCmdShow
-) {
-    main(__argc, __argv);
 }
