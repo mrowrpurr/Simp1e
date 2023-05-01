@@ -1,4 +1,4 @@
-<!-- <img src="https://raw.githubusercontent.com/mrowrpurr/Simp1e/main/Resources/Images/Simplistic.png" align=left width=256 /> -->
+<!-- <img src="https://raw.githubusercontent.com/mrowrpurr/Simp1e/main/Resources/Images/Logo/Simp1e%20256.png" align=left /> -->
 
 # Simp1e
 
