@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Simp1e/Data/JsonDataStore.h>
 #include <string_format.h>
 
 #include <QApplication>
@@ -27,7 +26,7 @@ namespace Simp1e::Editor {
         QFileSystemWatcher* _qssChangeWatcher;
 
         Data::JsonDataStore    _dataStore;
-        Data::JsonDataFile     _activeDataFile;
+        Data::JsonDataFile     _activeDataFile;  // Not used yet...
         Windows::WindowManager _windowManager{this};
 
         void LoadFont(const std::string& fontName) {
@@ -56,6 +55,9 @@ namespace Simp1e::Editor {
         }
 
     public:
+        Data::JsonDataStore& GetDataStore() override { return _dataStore; }
+        Data::JsonDataFile&  GetActiveDataFile() override { return _activeDataFile; }
+
         int Run(int argc, char* argv[]) {
             LoadFont(":/Fonts/fredericka-the-great.regular.ttf");
             LoadFont(":/Fonts/yoster-island.regular.ttf");
@@ -73,27 +75,12 @@ namespace Simp1e::Editor {
 
         void StartUpUsingDataFiles(const std::vector<std::pair<std::string, bool>>& dataFilePaths
         ) override {
-            std::string summary = "SUMMARY: \n";
             for (auto& [path, active] : dataFilePaths) {
-                summary += string_format("loading {}\n", path);
                 Data::JsonDataFile dataFile{path};
                 _dataStore.InsertDataFile(dataFile);
-                // if (active) _activeDataFile = dataFile;
+                if (active) _activeDataFile = Data::JsonDataFile{path};
             }
-
-            QWidget* newWidget = new QWidget();
-            newWidget->setWindowTitle("Next Window!");
-
-            summary +=
-                string_format("The data store has {} records\n", _dataStore.GetAllRecords().size());
-            for (auto& record : _dataStore.GetAllRecords())
-                summary += string_format("{}\n", record->GetFullIdentifier());
-            QLabel* label = new QLabel(summary.c_str());
-            label->setAlignment(Qt::AlignCenter);
-            QVBoxLayout* layout = new QVBoxLayout();
-            layout->addWidget(label);
-            newWidget->setLayout(layout);
-            newWidget->show();
+            _windowManager.ShowDataRecordBrowser();
             _windowManager.CloseDataFilesSelector();
         }
     };
