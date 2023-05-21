@@ -6,7 +6,7 @@
 
 //
 // include test files
-// #include "EntityDefinition.Spec.h"
+#include "Foo.Spec.h"
 //
 //
 
