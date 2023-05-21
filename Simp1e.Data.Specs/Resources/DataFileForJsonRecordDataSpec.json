@@ -1,0 +1,127 @@
+{
+    "data": {
+        "Cool.Record1": {
+            "type": "whatever",
+            "data": {
+                "topLevelString": "hello!",
+                "topLevelInteger": 69,
+                "topLevelFloat": 123.456,
+                "topLevelStringNumber": "12345",
+                "topLevelBoolean": true,
+                "topLevelFalseBoolean": false,
+                "topLevelNull": null,
+                "topLevelIntegerArray": [
+                    1,
+                    2,
+                    3
+                ],
+                "topLevelFloatArray": [
+                    1.1,
+                    2.2,
+                    3.3
+                ],
+                "topLevelStringArray": [
+                    "a",
+                    "b",
+                    "c"
+                ],
+                "topLevelBooleanArray": [
+                    true,
+                    false,
+                    true
+                ],
+                "topLevelNullArray": [
+                    null,
+                    null,
+                    null
+                ],
+                "topLevelSimpleStringMap": {
+                    "a": "hello!",
+                    "b": "world!"
+                },
+                "topLevelMiscStuffList": [
+                    "hello!",
+                    123,
+                    123.456,
+                    true,
+                    null,
+                    {
+                        "a": "hello!",
+                        "b": "world!"
+                    },
+                    [
+                        1,
+                        2,
+                        3
+                    ],
+                    [
+                        1.1,
+                        2.2,
+                        3.3
+                    ],
+                    [
+                        "a",
+                        "b",
+                        "c"
+                    ],
+                    [
+                        true,
+                        false,
+                        true
+                    ],
+                    [
+                        null,
+                        null,
+                        null
+                    ],
+                    {
+                        "a": "hello!",
+                        "b": "world!"
+                    }
+                ],
+                "a": {
+                    "few": {
+                        "nested": {
+                            "levels": {
+                                "nestedString": "nested!",
+                                "nestedInteger": 420,
+                                "nestedFloat": 69420.123,
+                                "nestedBoolean": true,
+                                "nestedNull": null,
+                                "nestedIntegerArray": [
+                                    1,
+                                    2,
+                                    3
+                                ],
+                                "nestedFloatArray": [
+                                    1.1,
+                                    2.2,
+                                    3.3
+                                ],
+                                "nestedStringArray": [
+                                    "a",
+                                    "b",
+                                    "c"
+                                ],
+                                "nestedBooleanArray": [
+                                    true,
+                                    false,
+                                    true
+                                ],
+                                "nestedNullArray": [
+                                    null,
+                                    null,
+                                    null
+                                ],
+                                "nestedSimpleStringMap": {
+                                    "a": "hello!",
+                                    "b": "world!"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
