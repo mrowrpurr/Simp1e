@@ -3,6 +3,5 @@
 <qresource>
     <file alias="logo.png">Images/Logo/Simp1e 256.png</file>
     <file alias="icon.png">Images/Logo/Simp1e 512.png</file>
-    <file alias="data1.json">Data/DataFile1.json</file>
 </qresource>
 </RCC>
