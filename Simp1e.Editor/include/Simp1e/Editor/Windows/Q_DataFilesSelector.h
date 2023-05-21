@@ -5,6 +5,7 @@
 #include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QGroupBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QLabel>
@@ -30,6 +31,11 @@ class DataFilesSelectorWindow : public QWidget {
 #pragma region Widget Variables
     QVBoxLayout                    _layout_Window;
     QHBoxLayout                    _layout_DataFolder;
+    QLabel                         _lbl_WindowTitle{"Simp1e"};
+    QLabel                         _lbl_WindowTitleImage;
+    QPixmap                        _pixmap_WindowTitleImage{":/logo.png"};
+    QGroupBox                      _grp_DataFiles;
+    QVBoxLayout                    _layout_grp_DataFiles;
     QLineEdit                      _txt_DataFolder;
     QPushButton                    _btn_SelectFolder{"Select Folder"};
     QTreeView                      _tree_DataFiles;
@@ -41,6 +47,7 @@ class DataFilesSelectorWindow : public QWidget {
 
 public:
     DataFilesSelectorWindow(QWidget* parent = nullptr) : QWidget(parent) {
+        IDs();
         Configure();
         Layout();
         Events();
@@ -50,25 +57,44 @@ public:
 private:
 #pragma region Widget Setup
 
-    void Layout() {
-        _layout_Window.setObjectName("DataFilesWindow_Layout");
-        _layout_DataFolder.setObjectName("DataFilesWindow_DataFolder_Layout");
-        _layout_DataFiles_Buttons.setObjectName("DataFilesWindow_DataFiles_Buttons_Layout");
+    void IDs() {
+        setObjectName("DataFilesSelectorWindow");
+        _lbl_WindowTitle.setObjectName("WindowTitle");
+        _lbl_WindowTitle.setProperty("class", "title");
+        _lbl_WindowTitleImage.setObjectName("WindowTitleImage");
+        _lbl_WindowTitleImage.setProperty("class", "image");
+        _btn_Continue.setObjectName("Continue");
+        _btn_Continue.setProperty("class", "primary");
+        _btn_SelectFolder.setObjectName("SelectFolder");
+        _btn_SelectFolder.setProperty("class", "primary");
+        _btn_DataFiles_SetActive.setObjectName("DataFiles_SetActive");
+        _btn_DataFiles_SetActive.setProperty("class", "secondary");
+    }
 
+    void Layout() {
         _layout_DataFolder.addWidget(new QLabel("Data Folder:"));
         _layout_DataFolder.addWidget(&_txt_DataFolder);
         _layout_DataFolder.setStretchFactor(&_txt_DataFolder, 1);
-        _layout_Window.addLayout(&_layout_DataFolder);
-        _layout_Window.addLayout(&_layout_DataFolder);
-        _layout_Window.addWidget(&_btn_SelectFolder);
-        _layout_Window.addWidget(&_tree_DataFiles);
+
         _layout_DataFiles_Buttons.addWidget(&_btn_DataFiles_SetActive);
         _layout_DataFiles_Buttons.addWidget(&_btn_Continue);
-        _layout_Window.addLayout(&_layout_DataFiles_Buttons);
+
+        _grp_DataFiles.setLayout(&_layout_grp_DataFiles);
+        _layout_grp_DataFiles.addLayout(&_layout_DataFolder);
+        _layout_grp_DataFiles.addWidget(&_btn_SelectFolder);
+        _layout_grp_DataFiles.addWidget(&_tree_DataFiles);
+        _layout_grp_DataFiles.addLayout(&_layout_DataFiles_Buttons);
+
+        _layout_Window.addWidget(&_lbl_WindowTitleImage, 0, Qt::AlignCenter);
+        _layout_Window.addWidget(&_lbl_WindowTitle, 0, Qt::AlignCenter);
+        _layout_Window.addWidget(&_grp_DataFiles);
+
         setLayout(&_layout_Window);
     }
 
     void Configure() {
+        _lbl_WindowTitleImage.setPixmap(_pixmap_WindowTitleImage);
+        _lbl_WindowTitleImage.setScaledContents(true);
         _tree_DataFiles.setModel(&_model_DataFiles);
         _tree_DataFiles.setSortingEnabled(true);
         _tree_DataFiles.setDragDropMode(QAbstractItemView::InternalMove);
