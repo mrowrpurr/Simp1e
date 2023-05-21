@@ -203,8 +203,13 @@ namespace Simp1e::Editor::Windows {
                     auto loadOrder = _model_DataFiles.item(i, 1)->data(Qt::DisplayRole).toInt();
                     auto isActive  = _model_DataFiles.item(i, 2)->data(Qt::DisplayRole).toBool();
                     if (isActive)
-                        selectedDataFiles.emplace_back(rootPath / name.toStdString(), true);
-                    else selectedDataFiles.emplace_back(rootPath / name.toStdString(), false);
+                        selectedDataFiles.emplace_back(
+                            (rootPath / name.toStdString()).string(), true
+                        );
+                    else
+                        selectedDataFiles.emplace_back(
+                            (rootPath / name.toStdString()).string(), false
+                        );
                 }
             }
             _app->StartUpUsingDataFiles(selectedDataFiles);
