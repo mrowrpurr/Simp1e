@@ -11,7 +11,7 @@ namespace Simp1e::Editor::Windows {
     class WindowManager {
         IApp*                                             _app;
         std::unique_ptr<Windows::DataFilesSelectorWindow> _dataFilesSelectorWindow;
-        std::unique_ptr<Windows::DataRecordBrowser>       _dataRecordBrowser;
+        std::unique_ptr<Windows::DataRecordBrowserWindow> _dataRecordBrowser;
 
     public:
         WindowManager(IApp* app) : _app(app) {}
@@ -25,7 +25,7 @@ namespace Simp1e::Editor::Windows {
 
         void ShowDataRecordBrowser() {
             if (!_dataRecordBrowser)
-                _dataRecordBrowser = std::make_unique<Windows::DataRecordBrowser>(_app);
+                _dataRecordBrowser = std::make_unique<Windows::DataRecordBrowserWindow>(_app);
             _dataRecordBrowser->show();
         }
         void CloseDataRecordBrowser() { _dataRecordBrowser->close(); }

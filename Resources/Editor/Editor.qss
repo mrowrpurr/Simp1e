@@ -1,9 +1,14 @@
-QLabel[class=title] {
+#DataFilesSelectorWindow QLabel[class=title] {
     font-size: 96px;
     font-family: "Fredericka the Great";
 }
 
 QLineEdit[invalid=true] { color: red; }
+
+#DataFilesSelectorWindow QWidget {
+    font-family: "Yoster Island";
+    font-size: 20px;
+}
 
 QWidget {
     font-family: "Yoster Island";
