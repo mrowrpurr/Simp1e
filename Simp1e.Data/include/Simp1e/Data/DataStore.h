@@ -16,6 +16,8 @@ namespace Simp1e::Data {
 
         virtual bool DeleteRecord(const char* fullIdentifier) = 0;
 
+        virtual size_t GetRecordCount() = 0;
+
         virtual std::vector<Record*> GetAllRecords()                             = 0;
         virtual std::vector<Record*> GetAllRecordsOfOwner(const char* ownerName) = 0;
         virtual std::vector<Record*> GetAllRecordsOfType(const char* typeName)   = 0;
