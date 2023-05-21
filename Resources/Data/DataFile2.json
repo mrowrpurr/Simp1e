@@ -1,5 +1,7 @@
 {
     "data": {
-        "OtherDataFile.OtherEditorId": {
-            //...
-        },
+        "DataFile1.donkey": {
+            "description": "CHANGED DONKEY DESCRIPTION"
+        }
+    }
+}

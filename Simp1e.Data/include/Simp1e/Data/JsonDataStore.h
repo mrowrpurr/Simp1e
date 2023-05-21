@@ -56,6 +56,7 @@ namespace Simp1e::Data {
         }
 
         void MergeRecord(JsonRecord& jsonRecord) {
+            _Log_("MergeRecord: '{}'", jsonRecord.GetFullIdentifier());
             auto  fullIdentifier = jsonRecord.GetFullIdentifier();
             auto& incomingJson   = jsonRecord.GetJsonDocument();
             auto& existingJson   = _recordJsons[fullIdentifier];
@@ -76,6 +77,7 @@ namespace Simp1e::Data {
             return GetRecord(string_format("{}.{}", ownerName, relativeIdentifier).c_str());
         }
         bool DeleteRecord(const char* fullIdentifier) override {
+            _Log_("DeleteRecord: '{}'", fullIdentifier);
             if (_records.contains(fullIdentifier)) {
                 _records.erase(fullIdentifier);
                 _recordJsons.erase(fullIdentifier);
@@ -93,6 +95,7 @@ namespace Simp1e::Data {
 
         bool InsertRecord(JsonRecord& jsonRecord) {
             auto fullIdentifier = jsonRecord.GetFullIdentifier();
+            _Log_("InsertRecord: '{}'", fullIdentifier);
             if (_records.contains(fullIdentifier)) {
                 MergeRecord(jsonRecord);
                 return true;
@@ -108,6 +111,7 @@ namespace Simp1e::Data {
         }
 
         bool InsertDataFile(JsonDataFile& jsonFile) {
+            _Log_("InsertDataFile: '{}'", jsonFile.GetPath().string());
             auto records = jsonFile.GetAllRecords();
             for (auto& record : records) {
                 auto jsonRecord = static_cast<JsonRecord*>(record);

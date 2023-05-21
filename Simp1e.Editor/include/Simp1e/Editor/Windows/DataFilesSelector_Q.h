@@ -17,7 +17,12 @@
 #include <QTextEdit>
 #include <QTreeView>
 #include <QVBoxLayout>
+#include <QWidget>
 #include <QtGlobal>
+#include <filesystem>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "../IApp.h"
 #include "DataFilesSelector/DataFilesListStandardItemModel_Q.h"
@@ -141,25 +146,10 @@ namespace Simp1e::Editor::Windows {
                 &_model_DataFiles, &DataFilesSelector::DataFilesListStandardItemModel::itemChanged,
                 this, &DataFilesSelectorWindow::on_model_DataFiles_itemChanged
             );
-            connect(&_btn_Continue, &QPushButton::clicked, [&]() {
-                QString message = "Data Files to Load:\n";
-                for (int i = 0; i < _model_DataFiles.rowCount(); ++i) {
-                    if (_model_DataFiles.item(i, 0)->checkState() == Qt::Checked) {
-                        auto name      = _model_DataFiles.item(i, 0)->text();
-                        auto loadOrder = _model_DataFiles.item(i, 1)->data(Qt::DisplayRole).toInt();
-                        auto isActive = _model_DataFiles.item(i, 2)->data(Qt::DisplayRole).toBool();
-                        if (isActive)
-                            message +=
-                                string_format("{} [{}] (Active)\n", name.toStdString(), loadOrder)
-                                    .c_str();
-                        else
-                            message +=
-                                string_format("{} [{}]\n", name.toStdString(), loadOrder).c_str();
-                    }
-                }
-                QMessageBox::information(this, "Data Files", message);
-                _app->StartUpUsingDataFiles({"A", "B"});
-            });
+            connect(
+                &_btn_Continue, &QPushButton::clicked, this,
+                &DataFilesSelectorWindow::on_btn_Continue_clicked
+            );
         }
 
 #pragma endregion
@@ -199,6 +189,25 @@ namespace Simp1e::Editor::Windows {
                 }
             }
             _btn_Continue.setDisabled(true);
+        }
+
+        void on_btn_Continue_clicked() {
+            // root folder path
+            std::filesystem::path rootPath = _txt_DataFolder.text().toStdString();
+
+            // Hacky way to pass along the selected data files (and which one is active, if any)
+            std::vector<std::pair<std::string, bool>> selectedDataFiles;
+            for (int i = 0; i < _model_DataFiles.rowCount(); ++i) {
+                if (_model_DataFiles.item(i, 0)->checkState() == Qt::Checked) {
+                    auto name      = _model_DataFiles.item(i, 0)->text();
+                    auto loadOrder = _model_DataFiles.item(i, 1)->data(Qt::DisplayRole).toInt();
+                    auto isActive  = _model_DataFiles.item(i, 2)->data(Qt::DisplayRole).toBool();
+                    if (isActive)
+                        selectedDataFiles.emplace_back(rootPath / name.toStdString(), true);
+                    else selectedDataFiles.emplace_back(rootPath / name.toStdString(), false);
+                }
+            }
+            _app->StartUpUsingDataFiles(selectedDataFiles);
         }
 
 #pragma endregion

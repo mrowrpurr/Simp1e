@@ -1,9 +1,17 @@
 #pragma once
 
+#include <Simp1e/Data/JsonDataStore.h>
+#include <string_format.h>
+
 #include <QApplication>
 #include <QFile>
 #include <QFontDatabase>
 #include <QIcon>
+#include <QString>
+#include <QWidget>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "IApp.h"
 #include "Windows/WindowManager.h"
@@ -15,6 +23,8 @@ namespace Simp1e::Editor {
         char**       argv = nullptr;
         QApplication app{argc, argv};
 
+        Data::JsonDataStore    _dataStore;
+        Data::JsonDataFile     _activeDataFile;
         Windows::WindowManager _windowManager{this};
 
         void LoadFont(const std::string& fontName) {
@@ -45,11 +55,30 @@ namespace Simp1e::Editor {
             return 0;
         }
 
-        void StartUpUsingDataFiles(const std::vector<std::string>& dataFilePaths) override {
-            _windowManager.CloseDataFilesSelector();
+        void StartUpUsingDataFiles(const std::vector<std::pair<std::string, bool>>& dataFilePaths
+        ) override {
+            std::string summary = "SUMMARY: \n";
+            for (auto& [path, active] : dataFilePaths) {
+                summary += string_format("loading {}\n", path);
+                Data::JsonDataFile dataFile{path};
+                _dataStore.InsertDataFile(dataFile);
+                // if (active) _activeDataFile = dataFile;
+            }
+
             QWidget* newWidget = new QWidget();
-            newWidget->setWindowTitle("Hello...");
+            newWidget->setWindowTitle("Next Window!");
+
+            summary +=
+                string_format("The data store has {} records\n", _dataStore.GetAllRecords().size());
+            for (auto& record : _dataStore.GetAllRecords())
+                summary += string_format("{}\n", record->GetFullIdentifier());
+            QLabel* label = new QLabel(summary.c_str());
+            label->setAlignment(Qt::AlignCenter);
+            QVBoxLayout* layout = new QVBoxLayout();
+            layout->addWidget(label);
+            newWidget->setLayout(layout);
             newWidget->show();
+            _windowManager.CloseDataFilesSelector();
         }
     };
 }

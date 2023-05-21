@@ -33,9 +33,14 @@ namespace Simp1e::Data {
         }
 
     public:
+        JsonDataFile() = default;
         JsonDataFile(const std::filesystem::path& path) : _path(path) {}
 
         nlohmann::json& GetJsonDocument() {
+            if (!_path.has_filename()) {
+                _Log_("Path {} does not have a filename", _path.string());
+                return _json;
+            }
             if (!_json.is_null()) return _json;
             std::ifstream file(_path.string());
             if (!file.is_open()) {
@@ -59,7 +64,8 @@ namespace Simp1e::Data {
             return std::ref(json[JsonDataFileKeys::Data]);
         }
 
-        std::string GetIdentifier() override { return _path.stem().string(); }
+        std::string           GetIdentifier() override { return _path.stem().string(); }
+        std::filesystem::path GetPath() override { return _path; }
 
         Record* GetRecord(const char* identifier) override {
             auto found = _records.find(identifier);
