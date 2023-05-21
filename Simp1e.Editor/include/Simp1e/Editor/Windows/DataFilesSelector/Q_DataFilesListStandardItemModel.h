@@ -50,10 +50,7 @@ public:
 
 public slots:
     void updateOrder() {
-        for (int i = 0; i < rowCount(); ++i) {
-            qDebug() << "Setting row" << i << "to" << i;
-            item(i, 1)->setData(i, Qt::DisplayRole);
-        }
+        for (int i = 0; i < rowCount(); ++i) item(i, 1)->setData(i, Qt::DisplayRole);
         _isPerformingReorder = false;
     }
 
