@@ -1,18 +1,21 @@
 #pragma once
 
 #include <QApplication>
+#include <QFile>
 #include <QFontDatabase>
 #include <QIcon>
 
-#include "Strings.h"
-#include "Windows/DataFilesSelector_Q.h"
+#include "IApp.h"
+#include "Windows/WindowManager.h"
 
 namespace Simp1e::Editor {
 
-    class App {
+    class App : public IApp {
         int          argc = 0;
         char**       argv = nullptr;
         QApplication app{argc, argv};
+
+        Windows::WindowManager _windowManager{this};
 
         void LoadFont(const std::string& fontName) {
             int fontId = QFontDatabase::addApplicationFont(QString::fromStdString(fontName));
@@ -37,12 +40,16 @@ namespace Simp1e::Editor {
             file.open(QFile::ReadOnly);
             QString styleSheet = QLatin1String(file.readAll());
             app.setStyleSheet(styleSheet);
-            Windows::DataFilesSelectorWindow window;
-            window.setWindowTitle(Strings::WindowTitle);
-            window.setMinimumWidth(800);
-            window.show();
+            _windowManager.ShowDataFilesSelector();
             app.exec();
             return 0;
+        }
+
+        void StartUpUsingDataFiles(const std::vector<std::string>& dataFilePaths) override {
+            _windowManager.CloseDataFilesSelector();
+            QWidget* newWidget = new QWidget();
+            newWidget->setWindowTitle("Hello...");
+            newWidget->show();
         }
     };
 }

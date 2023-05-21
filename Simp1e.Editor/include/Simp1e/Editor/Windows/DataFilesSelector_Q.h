@@ -19,16 +19,20 @@
 #include <QVBoxLayout>
 #include <QtGlobal>
 
+#include "../IApp.h"
 #include "DataFilesSelector/DataFilesListStandardItemModel_Q.h"
 
 #ifndef Q_MOC_RUN
     #include "../Paths.h"
+    #include "../Strings.h"
 #endif
 
 namespace Simp1e::Editor::Windows {
 
     class DataFilesSelectorWindow : public QWidget {
         Q_OBJECT
+
+        IApp* _app;
 
 #pragma region Widget Variables
         QVBoxLayout*                                      _layout_Window;
@@ -48,12 +52,11 @@ namespace Simp1e::Editor::Windows {
 #pragma endregion
 
     public:
-        DataFilesSelectorWindow(QWidget* parent = nullptr) : QWidget(parent) {
+        DataFilesSelectorWindow(IApp* app) : _app(app), QWidget(nullptr) {
             IDs();
-            Configure();
             Layout();
             Events();
-            _txt_DataFolder.setText(GetDefaultFolderChooserPath().string().c_str());
+            Configure();
         }
 
     private:
@@ -100,6 +103,8 @@ namespace Simp1e::Editor::Windows {
         }
 
         void Configure() {
+            setWindowTitle(Strings::WindowTitle);
+            setMinimumWidth(800);
             _lbl_WindowTitleImage.setPixmap(_pixmap_WindowTitleImage);
             _lbl_WindowTitleImage.setScaledContents(true);
             _tree_DataFiles.setModel(&_model_DataFiles);
@@ -112,6 +117,7 @@ namespace Simp1e::Editor::Windows {
             _tree_DataFiles.header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
             _btn_DataFiles_SetActive.setDisabled(true);
             _btn_Continue.setDisabled(true);
+            _txt_DataFolder.setText(GetDefaultFolderChooserPath().string().c_str());
         }
 
         void Events() {
@@ -152,6 +158,7 @@ namespace Simp1e::Editor::Windows {
                     }
                 }
                 QMessageBox::information(this, "Data Files", message);
+                _app->StartUpUsingDataFiles({"A", "B"});
             });
         }
 
