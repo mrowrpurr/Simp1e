@@ -31,7 +31,7 @@ class DataFilesSelectorWindow : public QWidget {
 #pragma region Widget Variables
     QVBoxLayout                    _layout_Window;
     QHBoxLayout                    _layout_DataFolder;
-    QLabel                         _lbl_WindowTitle;
+    QLabel                         _lbl_WindowTitle{"Simp1e"};
     QLabel                         _lbl_WindowTitleImage;
     QPixmap                        _pixmap_WindowTitleImage{":/logo.png"};
     QGroupBox                      _grp_DataFiles;
@@ -93,7 +93,6 @@ private:
     }
 
     void Configure() {
-        _lbl_WindowTitle.setText("Simp1e");
         _lbl_WindowTitleImage.setPixmap(_pixmap_WindowTitleImage);
         _lbl_WindowTitleImage.setScaledContents(true);
         _tree_DataFiles.setModel(&_model_DataFiles);
