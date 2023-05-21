@@ -7,5 +7,5 @@ function add_logging()
 end
 
 function add_logging_support_for_binaries()
-    add_packages("spdlog")
+    add_packages("_Log_", "spdlog")
 end
