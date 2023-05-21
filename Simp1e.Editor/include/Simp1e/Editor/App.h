@@ -5,7 +5,7 @@
 #include <QIcon>
 
 #include "Strings.h"
-#include "Windows/Q_DataFilesSelector.h"
+#include "Windows/DataFilesSelector_Q.h"
 
 namespace Simp1e::Editor {
 
@@ -37,7 +37,7 @@ namespace Simp1e::Editor {
             file.open(QFile::ReadOnly);
             QString styleSheet = QLatin1String(file.readAll());
             app.setStyleSheet(styleSheet);
-            DataFilesSelectorWindow window;
+            Windows::DataFilesSelectorWindow window;
             window.setWindowTitle(Strings::WindowTitle);
             window.setMinimumWidth(800);
             window.show();
