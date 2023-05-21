@@ -1,7 +1,8 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
 <qresource>
-    <file alias="logo.png">Images/Logo/Simp1e 256.png</file>
-    <file alias="icon.png">Images/Logo/Simp1e 512.png</file>
+    <file alias="Editor.qss">Editor/Editor.qss</file>
+    <file alias="logo.png">Images/Logo/Simp1e 196.png</file>
+    <file alias="icon.png">Images/Logo/Simp1e 256.png</file>
 </qresource>
 </RCC>

@@ -20,10 +20,13 @@ namespace Simp1e::Editor {
 #ifdef _WIN32
             app.setStyle("fusion");
 #endif
-            app.setStyleSheet("QLineEdit[invalid=true] { color: red; }");
+            QFile file(":/Editor.qss");
+            file.open(QFile::ReadOnly);
+            QString styleSheet = QLatin1String(file.readAll());
+            app.setStyleSheet(styleSheet);
             DataFilesSelectorWindow window;
             window.setWindowTitle(Strings::WindowTitle);
-            window.setMinimumWidth(600);
+            window.setMinimumWidth(800);
             window.show();
             app.exec();
             return 0;
