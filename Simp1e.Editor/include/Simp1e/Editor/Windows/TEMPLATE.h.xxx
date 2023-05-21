@@ -1,0 +1,42 @@
+#pragma once
+
+#include <QWidget>
+
+#include "../IApp.h"
+
+namespace Simp1e::Editor::Windows {
+
+    class DataRecordBrowser : public QWidget {
+        Q_OBJECT
+
+        IApp* _app;
+
+#pragma region Widget Variables
+#pragma endregion
+
+    public:
+        DataRecordBrowser(IApp* app) : _app(app), QWidget(nullptr) {
+            IDs();
+            Layout();
+            Events();
+            Configure();
+        }
+
+    private:
+#pragma region Widget Setup
+        void IDs() { setObjectName("DataRecordBrowser"); }
+
+        void Layout() {}
+
+        void Configure() {}
+
+        void Events() {}
+#pragma endregion
+
+#pragma region Event Handlers
+#pragma endregion
+
+#pragma region Private Functions
+#pragma endregion
+    };
+}
