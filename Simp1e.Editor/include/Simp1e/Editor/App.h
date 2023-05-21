@@ -5,6 +5,7 @@
 
 #include <QApplication>
 #include <QFile>
+#include <QFileSystemWatcher>
 #include <QFontDatabase>
 #include <QIcon>
 #include <QString>
@@ -14,14 +15,16 @@
 #include <vector>
 
 #include "IApp.h"
+#include "Paths.h"
 #include "Windows/WindowManager.h"
 
 namespace Simp1e::Editor {
 
     class App : public IApp {
-        int          argc = 0;
-        char**       argv = nullptr;
-        QApplication app{argc, argv};
+        int                 argc = 0;
+        char**              argv = nullptr;
+        QApplication        app{argc, argv};
+        QFileSystemWatcher* _qssChangeWatcher;
 
         Data::JsonDataStore    _dataStore;
         Data::JsonDataFile     _activeDataFile;
@@ -37,6 +40,21 @@ namespace Simp1e::Editor {
             app.setFont(font);
         }
 
+        void ReloadStylesheet() {
+            QFile file(Paths::Development::QssFile);
+            file.open(QFile::ReadOnly);
+            QString styleSheet = QLatin1String(file.readAll());
+            app.setStyleSheet(styleSheet);
+        }
+
+        void WatchForQssChangesAndReloadStylesheet() {
+            _qssChangeWatcher = new QFileSystemWatcher();
+            _qssChangeWatcher->addPath(Paths::Development::QssFile.string().c_str());
+            QObject::connect(_qssChangeWatcher, &QFileSystemWatcher::fileChanged, [this]() {
+                ReloadStylesheet();
+            });
+        }
+
     public:
         int Run(int argc, char* argv[]) {
             LoadFont(":/Fonts/fredericka-the-great.regular.ttf");
@@ -46,10 +64,8 @@ namespace Simp1e::Editor {
 #ifdef _WIN32
             app.setStyle("fusion");
 #endif
-            QFile file(":/Editor.qss");
-            file.open(QFile::ReadOnly);
-            QString styleSheet = QLatin1String(file.readAll());
-            app.setStyleSheet(styleSheet);
+            ReloadStylesheet();
+            WatchForQssChangesAndReloadStylesheet();
             _windowManager.ShowDataFilesSelector();
             app.exec();
             return 0;
