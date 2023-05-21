@@ -29,18 +29,18 @@ class DataFilesSelectorWindow : public QWidget {
     Q_OBJECT
 
 #pragma region Widget Variables
-    QVBoxLayout                    _layout_Window;
-    QHBoxLayout                    _layout_DataFolder;
+    QVBoxLayout*                   _layout_Window;
+    QHBoxLayout*                   _layout_DataFolder;
+    QHBoxLayout*                   _layout_DataFiles_Buttons;
+    QVBoxLayout*                   _layout_grp_DataFiles;
     QLabel                         _lbl_WindowTitle{"Simp1e"};
     QLabel                         _lbl_WindowTitleImage;
     QPixmap                        _pixmap_WindowTitleImage{":/logo.png"};
     QGroupBox                      _grp_DataFiles;
-    QVBoxLayout                    _layout_grp_DataFiles;
     QLineEdit                      _txt_DataFolder;
     QPushButton                    _btn_SelectFolder{"Select Folder"};
     QTreeView                      _tree_DataFiles;
     DataFilesListStandardItemModel _model_DataFiles;
-    QHBoxLayout                    _layout_DataFiles_Buttons;
     QPushButton                    _btn_DataFiles_SetActive{"Set Active"};
     QPushButton                    _btn_Continue{"Continue"};
 #pragma endregion
@@ -72,24 +72,29 @@ private:
     }
 
     void Layout() {
-        _layout_DataFolder.addWidget(new QLabel("Data Folder:"));
-        _layout_DataFolder.addWidget(&_txt_DataFolder);
-        _layout_DataFolder.setStretchFactor(&_txt_DataFolder, 1);
+        _layout_Window            = new QVBoxLayout();
+        _layout_DataFolder        = new QHBoxLayout();
+        _layout_DataFiles_Buttons = new QHBoxLayout();
+        _layout_grp_DataFiles     = new QVBoxLayout();
 
-        _layout_DataFiles_Buttons.addWidget(&_btn_DataFiles_SetActive);
-        _layout_DataFiles_Buttons.addWidget(&_btn_Continue);
+        _layout_DataFolder->addWidget(new QLabel("Data Folder:"));
+        _layout_DataFolder->addWidget(&_txt_DataFolder);
+        _layout_DataFolder->setStretchFactor(&_txt_DataFolder, 1);
 
-        _grp_DataFiles.setLayout(&_layout_grp_DataFiles);
-        _layout_grp_DataFiles.addLayout(&_layout_DataFolder);
-        _layout_grp_DataFiles.addWidget(&_btn_SelectFolder);
-        _layout_grp_DataFiles.addWidget(&_tree_DataFiles);
-        _layout_grp_DataFiles.addLayout(&_layout_DataFiles_Buttons);
+        _layout_DataFiles_Buttons->addWidget(&_btn_DataFiles_SetActive);
+        _layout_DataFiles_Buttons->addWidget(&_btn_Continue);
 
-        _layout_Window.addWidget(&_lbl_WindowTitleImage, 0, Qt::AlignCenter);
-        _layout_Window.addWidget(&_lbl_WindowTitle, 0, Qt::AlignCenter);
-        _layout_Window.addWidget(&_grp_DataFiles);
+        _grp_DataFiles.setLayout(_layout_grp_DataFiles);
+        _layout_grp_DataFiles->addLayout(_layout_DataFolder);
+        _layout_grp_DataFiles->addWidget(&_btn_SelectFolder);
+        _layout_grp_DataFiles->addWidget(&_tree_DataFiles);
+        _layout_grp_DataFiles->addLayout(_layout_DataFiles_Buttons);
 
-        setLayout(&_layout_Window);
+        _layout_Window->addWidget(&_lbl_WindowTitleImage, 0, Qt::AlignCenter);
+        _layout_Window->addWidget(&_lbl_WindowTitle, 0, Qt::AlignCenter);
+        _layout_Window->addWidget(&_grp_DataFiles);
+
+        setLayout(_layout_Window);
     }
 
     void Configure() {
