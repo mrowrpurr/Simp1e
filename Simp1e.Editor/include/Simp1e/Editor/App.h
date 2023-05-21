@@ -80,8 +80,8 @@ namespace Simp1e::Editor {
                 _dataStore.InsertDataFile(dataFile);
                 if (active) _activeDataFile = Data::JsonDataFile{path};
             }
-            _windowManager.ShowDataRecordBrowser();
             _windowManager.CloseDataFilesSelector();
+            _windowManager.ShowDataRecordBrowser();
         }
     };
 }
