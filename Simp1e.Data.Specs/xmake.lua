@@ -1,0 +1,7 @@
+target("Simp1e.Data.Specs")
+    add_specs()
+    add_logging_support_for_binaries()
+    set_kind("binary")
+    add_deps("Simp1e.Data")
+    add_files("*.cpp")
+    add_includedirs(".")
