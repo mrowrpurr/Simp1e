@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Simp1e/Data/Record.h>
+#include <Simp1e/Data/RecordData.h>
 #include <string_format.h>
 
 #include <QLabel>
@@ -37,6 +38,7 @@ namespace Simp1e::Editor::Windows {
             Layout();
             Events();
             Configure();
+            RenderMap();
         }
 
     private:
@@ -59,16 +61,6 @@ namespace Simp1e::Editor::Windows {
                                    .c_str());
 
             _mapGraphicsView.setScene(&_mapGraphicsScene);
-
-            // Add some rows/columns just for testing
-            for (int i = 0; i < _mapRecord->GetCols(); i++) {
-                for (int j = 0; j < _mapRecord->GetRows(); j++) {
-                    auto* rect = new MapView::MapCellGraphicsRectItem(
-                        i * _cellSize, j * _cellSize, _cellSize - _padding, _cellSize - _padding
-                    );
-                    _mapGraphicsScene.addItem(rect);
-                }
-            }
         }
 
         void Events() {}
@@ -78,6 +70,20 @@ namespace Simp1e::Editor::Windows {
 #pragma endregion
 
 #pragma region Private Functions
+        void RenderMap() {
+            _mapGraphicsScene.clear();
+            if (!_mapRecord->HasContent()) return;
+            for (int i = 0; i < _mapRecord->GetCols(); i++) {
+                for (int j = 0; j < _mapRecord->GetRows(); j++) {
+                    auto* rect = new MapView::MapCellGraphicsRectItem(
+                        i * _cellSize, j * _cellSize, _cellSize - _padding, _cellSize - _padding
+                    );
+                    auto cell = _mapRecord->GetCellAt(i, j);
+                    //
+                    _mapGraphicsScene.addItem(rect);
+                }
+            }
+        }
 #pragma endregion
     };
 }
