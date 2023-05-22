@@ -17,6 +17,7 @@ namespace Simp1e::Editor {
             const std::vector<std::pair<std::string, bool>>& dataFilePaths
         ) = 0;
 
-        virtual void ShowRecordWindow(Data::Record* dataRecord) = 0;
+        virtual void ShowRecordWindow(Data::Record* dataRecord)  = 0;
+        virtual void ShowRecordPreview(Data::Record* dataRecord) = 0;
     };
 }

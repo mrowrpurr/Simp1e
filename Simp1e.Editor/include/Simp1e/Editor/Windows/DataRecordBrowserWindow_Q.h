@@ -5,6 +5,7 @@
 #include <QHeaderView>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMessageBox>
 #include <QModelIndex>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
@@ -36,8 +37,8 @@ namespace Simp1e::Editor::Windows {
         DataRecordBrowserWindow(IApp* app) : _app(app), QWidget(nullptr) {
             IDs();
             Layout();
-            Events();
             Configure();
+            Events();
             ReloadRecords();
         }
 
@@ -76,6 +77,10 @@ namespace Simp1e::Editor::Windows {
                 &_tree_DataRecords, &QTreeView::doubleClicked, this,
                 &DataRecordBrowserWindow::on_tree_DataRecords_doubleClicked
             );
+            connect(
+                _tree_DataRecords.selectionModel(), &QItemSelectionModel::selectionChanged, this,
+                &DataRecordBrowserWindow::on_tree_DataRecords_selectionChanged
+            );
         }
 #pragma endregion
 #pragma region Event Handlers
@@ -85,6 +90,15 @@ namespace Simp1e::Editor::Windows {
                 _app->GetDataStore().GetRecord(item.data().toString().toStdString().c_str());
             if (record == nullptr) return;
             _app->ShowRecordWindow(record);
+        }
+        void on_tree_DataRecords_selectionChanged(
+            const QItemSelection& selected, const QItemSelection& deselected
+        ) {
+            auto  item = _model_DataRecords_SortFilterProxy.mapToSource(selected.indexes()[0]);
+            auto* record =
+                _app->GetDataStore().GetRecord(item.data().toString().toStdString().c_str());
+            if (record == nullptr) return;
+            _app->ShowRecordPreview(record);
         }
 #pragma endregion
 #pragma region Private Functions

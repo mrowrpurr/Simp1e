@@ -87,5 +87,9 @@ namespace Simp1e::Editor {
         void ShowRecordWindow(Data::Record* dataRecord) override {
             _windowManager.ShowWindowForRecord(dataRecord);
         }
+
+        void ShowRecordPreview(Data::Record* dataRecord) override {
+            _windowManager.ShowRecordPreview(dataRecord);
+        }
     };
 }
