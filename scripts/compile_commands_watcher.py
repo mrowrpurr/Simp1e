@@ -38,10 +38,12 @@ if __name__ == "__main__":
     observer = Observer()
     observer.schedule(event_handler, path, recursive=False)
     observer.start()
+    print("Reformatting compile_commands.json...")
+    FileChangeHandler.filter_moc_entries(path + '/compile_commands.json')
     print("Watching for changes to compile_commands.json...")
     try:
         while True:
-            time.sleep(1)
+            time.sleep(2)
     except KeyboardInterrupt:
         observer.stop()
     observer.join()

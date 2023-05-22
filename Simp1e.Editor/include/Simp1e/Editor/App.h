@@ -80,12 +80,7 @@ namespace Simp1e::Editor {
                 _dataStore.InsertDataFile(dataFile);
                 if (active) _activeDataFile = Data::JsonDataFile{path};
             }
-            _windowManager.CloseDataFilesSelector();
             _windowManager.ShowDataRecordBrowser();
-        }
-
-        void ShowRecordWindow(Data::Record* dataRecord) override {
-            _windowManager.ShowWindowForRecord(dataRecord);
         }
 
         void ShowRecordPreview(Data::Record* dataRecord) override {
