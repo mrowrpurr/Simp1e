@@ -9,6 +9,7 @@
 #include <QModelIndex>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
+#include <QTimer>
 #include <QTreeView>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -94,12 +95,32 @@ namespace Simp1e::Editor::Windows {
         void on_tree_DataRecords_selectionChanged(
             const QItemSelection& selected, const QItemSelection& deselected
         ) {
+            if (selected.indexes().isEmpty()) {
+                return;
+            }
+
+            auto selectedItem = _tree_DataRecords.selectionModel()->selectedIndexes().first();
+            qDebug() << "selectedItem:" << selectedItem.row() << selectedItem.column()
+                     << selectedItem.data().toString();
+
             auto  item = _model_DataRecords_SortFilterProxy.mapToSource(selected.indexes()[0]);
             auto* record =
                 _app->GetDataStore().GetRecord(item.data().toString().toStdString().c_str());
             if (record == nullptr) return;
-            _app->ShowRecordPreview(record);
+
+            _app->ShowRecordPreview(record);  // This creates and shows the new window
+
+            // After showing the window, restore the selection and set the focus back to the
+            // QTreeView.
+            _tree_DataRecords.selectionModel()->select(selectedItem, QItemSelectionModel::Select);
+            _tree_DataRecords.scrollTo(selectedItem);
+            _tree_DataRecords.setFocus();
+
+            selectedItem = _tree_DataRecords.selectionModel()->selectedIndexes().first();
+            qDebug() << "After selectedItem:" << selectedItem.row() << selectedItem.column()
+                     << selectedItem.data().toString();
         }
+
 #pragma endregion
 #pragma region Private Functions
         void ReloadRecords() {

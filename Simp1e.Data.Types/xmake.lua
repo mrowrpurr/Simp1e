@@ -1,0 +1,5 @@
+target("Simp1e.Data.Types")
+    set_kind("headeronly")
+    add_includedirs("include", {public = true})
+    add_headerfiles("include/(**).h")
+    add_deps("Simp1e.Data")
