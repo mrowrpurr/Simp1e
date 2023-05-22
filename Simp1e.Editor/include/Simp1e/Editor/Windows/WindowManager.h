@@ -1,5 +1,9 @@
 #pragma once
 
+#include <Simp1e/Data/Record.h>
+#include <string_format.h>
+
+#include <QMessageBox>
 #include <memory>
 
 #include "../IApp.h"
@@ -32,10 +36,25 @@ namespace Simp1e::Editor::Windows {
         }
         void CloseDataRecordBrowser() { _dataRecordBrowser->close(); }
 
-        void ShowMapView() {
-            if (!_mapViewWindow) _mapViewWindow = std::make_unique<Windows::MapViewWindow>(_app);
+        void ShowMapView(Data::Record* dataRecord) {
+            if (!_mapViewWindow)
+                _mapViewWindow = std::make_unique<Windows::MapViewWindow>(_app, dataRecord);
             _mapViewWindow->show();
         }
         void CloseMapView() { _mapViewWindow->close(); }
+
+        void ShowWindowForRecord(Data::Record* dataRecord) {
+            auto type = dataRecord->GetType();
+            if (strcmp(type, "gridmap") == 0) {
+                ShowMapView(dataRecord);
+            } else {
+                QMessageBox msgBox;
+                msgBox.setText(string_format("Unsupported record type: '{}'", type).c_str());
+                msgBox.setInformativeText("This record type is not supported by the editor.");
+                msgBox.setStandardButtons(QMessageBox::Ok);
+                msgBox.setDefaultButton(QMessageBox::Ok);
+                msgBox.exec();
+            }
+        }
     };
 }

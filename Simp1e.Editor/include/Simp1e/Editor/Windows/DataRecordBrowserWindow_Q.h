@@ -5,6 +5,7 @@
 #include <QHeaderView>
 #include <QLabel>
 #include <QLineEdit>
+#include <QModelIndex>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
 #include <QTreeView>
@@ -31,7 +32,6 @@ namespace Simp1e::Editor::Windows {
         QTreeView                                     _tree_DataRecords;
         QLineEdit                                     _txt_FilterText;
 #pragma endregion
-
     public:
         DataRecordBrowserWindow(IApp* app) : _app(app), QWidget(nullptr) {
             IDs();
@@ -71,12 +71,21 @@ namespace Simp1e::Editor::Windows {
                 &_txt_FilterText, &QLineEdit::textChanged, &_model_DataRecords_SortFilterProxy,
                 &QSortFilterProxyModel::setFilterFixedString
             );
+            connect(
+                &_tree_DataRecords, &QTreeView::doubleClicked, this,
+                &DataRecordBrowserWindow::on_tree_DataRecords_doubleClicked
+            );
         }
 #pragma endregion
-
 #pragma region Event Handlers
+        void on_tree_DataRecords_doubleClicked(const QModelIndex& index) {
+            auto  item = _model_DataRecords_SortFilterProxy.mapToSource(index);
+            auto* record =
+                _app->GetDataStore().GetRecord(item.data().toString().toStdString().c_str());
+            if (record == nullptr) return;
+            _app->ShowRecordWindow(record);
+        }
 #pragma endregion
-
 #pragma region Private Functions
         void ReloadRecords() {
             _model_DataRecords.clear();
