@@ -61,8 +61,9 @@ namespace Simp1e::Editor::Windows {
             _tree_DataRecords.setSortingEnabled(true);
             _tree_DataRecords.sortByColumn(0, Qt::SortOrder::AscendingOrder);
             _tree_DataRecords.setAlternatingRowColors(true);
-            _tree_DataRecords.header()->setStretchLastSection(true);
-            _tree_DataRecords.expandAll();
+            _tree_DataRecords.header()->setSectionResizeMode(
+                QHeaderView::ResizeMode::ResizeToContents
+            );
             _txt_FilterText.setPlaceholderText("Filter");
         }
 
