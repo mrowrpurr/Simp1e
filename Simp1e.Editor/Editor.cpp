@@ -1,5 +1,5 @@
 #include <_Log_.h>
-_LogToFile_("Editor.log");
+// _LogToFile_("Editor.log"); // With this commented out, logs go to STDOUT
 //
 
 #include <string_format.h>
