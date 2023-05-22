@@ -3,9 +3,9 @@
 #include <memory>
 
 #include "../IApp.h"
-#include "DataFilesSelector_Q.h"
-#include "DataRecordBrowser_Q.h"
-#include "MapView_Q.h"
+#include "DataFilesSelectorWindow_Q.h"
+#include "DataRecordBrowserWindow_Q.h"
+#include "MapViewWindow_Q.h"
 
 namespace Simp1e::Editor::Windows {
 
