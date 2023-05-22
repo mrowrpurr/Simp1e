@@ -5,6 +5,7 @@
 #include "../IApp.h"
 #include "DataFilesSelector_Q.h"
 #include "DataRecordBrowser_Q.h"
+#include "MapView_Q.h"
 
 namespace Simp1e::Editor::Windows {
 
@@ -12,6 +13,7 @@ namespace Simp1e::Editor::Windows {
         IApp*                                             _app;
         std::unique_ptr<Windows::DataFilesSelectorWindow> _dataFilesSelectorWindow;
         std::unique_ptr<Windows::DataRecordBrowserWindow> _dataRecordBrowser;
+        std::unique_ptr<Windows::MapViewWindow>           _mapViewWindow;
 
     public:
         WindowManager(IApp* app) : _app(app) {}
@@ -29,5 +31,11 @@ namespace Simp1e::Editor::Windows {
             _dataRecordBrowser->show();
         }
         void CloseDataRecordBrowser() { _dataRecordBrowser->close(); }
+
+        void ShowMapView() {
+            if (!_mapViewWindow) _mapViewWindow = std::make_unique<Windows::MapViewWindow>(_app);
+            _mapViewWindow->show();
+        }
+        void CloseMapView() { _mapViewWindow->close(); }
     };
 }

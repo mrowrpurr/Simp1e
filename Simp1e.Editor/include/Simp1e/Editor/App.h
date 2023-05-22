@@ -82,6 +82,7 @@ namespace Simp1e::Editor {
             }
             _windowManager.CloseDataFilesSelector();
             _windowManager.ShowDataRecordBrowser();
+            _windowManager.ShowMapView();
         }
     };
 }
