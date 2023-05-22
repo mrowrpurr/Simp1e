@@ -12,6 +12,7 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QShortcut>
 #include <QStandardPaths>
 #include <QStyle>
 #include <QTextEdit>
@@ -54,6 +55,8 @@ namespace Simp1e::Editor::Windows {
         DataFilesSelector::DataFilesListStandardItemModel _model_DataFiles;
         QPushButton                                       _btn_DataFiles_SetActive{"Set Active"};
         QPushButton                                       _btn_Continue{"Continue"};
+        QShortcut                                         _enterShortcut{Qt::Key_Enter, this};
+        QShortcut                                         _enterReturn{Qt::Key_Return, this};
 #pragma endregion
 
     public:
@@ -153,6 +156,14 @@ namespace Simp1e::Editor::Windows {
             );
             connect(
                 &_btn_Continue, &QPushButton::clicked, this,
+                &DataFilesSelectorWindow::on_btn_Continue_clicked
+            );
+            connect(
+                &_enterShortcut, &QShortcut::activated, this,
+                &DataFilesSelectorWindow::on_btn_Continue_clicked
+            );
+            connect(
+                &_enterReturn, &QShortcut::activated, this,
                 &DataFilesSelectorWindow::on_btn_Continue_clicked
             );
         }
