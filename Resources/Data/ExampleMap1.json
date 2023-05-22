@@ -1,0 +1,21 @@
+{
+    "data": {
+        "map1": {
+            "type": "gridmap",
+            "data": {
+                "rows": 10,
+                "cols": 10,
+                "grid": {
+                    "0,0": {
+                        "layers": [
+                            {
+                                "type": "image",
+                                "imageId": "OpenclipartImages1.lightgrass1"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}
