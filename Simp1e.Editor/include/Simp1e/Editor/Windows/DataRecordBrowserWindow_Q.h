@@ -54,7 +54,7 @@ namespace Simp1e::Editor::Windows {
 
         void Configure() {
             setWindowTitle("Data Record Browser");
-            setMinimumSize(400, 400);
+            setMinimumSize(800, 400);
             _model_DataRecords_SortFilterProxy.setSourceModel(&_model_DataRecords);
             _model_DataRecords_SortFilterProxy.setFilterKeyColumn(0);
             _tree_DataRecords.setModel(&_model_DataRecords_SortFilterProxy);
