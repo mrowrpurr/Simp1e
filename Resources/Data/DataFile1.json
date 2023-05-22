@@ -2,19 +2,27 @@
     "data": {
         "parfait": {
             "type": "item",
-            "description": "A delicious parfait. It's so good, it's almost like it's made of layers."
+            "data": {
+                "description": "A delicious parfait. It's so good, it's almost like it's made of layers."
+            }
         },
         "onion": {
             "type": "item",
-            "description": "A large onion. It's so large, it's almost like it's made of layers."
+            "data": {
+                "description": "A large onion. It's so large, it's almost like it's made of layers."
+            }
         },
         "ogre": {
             "type": "npc",
-            "description": "An ogre. It's so ogre."
+            "data": {
+                "description": "An ogre. It's so ogre."
+            }
         },
         "donkey": {
             "type": "npc",
-            "description": "A donkey. It's so donkey."
+            "data": {
+                "description": "A donkey. It's so donkey."
+            }
         }
     }
 }

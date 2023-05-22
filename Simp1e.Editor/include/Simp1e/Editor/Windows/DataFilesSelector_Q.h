@@ -62,6 +62,11 @@ namespace Simp1e::Editor::Windows {
             Layout();
             Events();
             Configure();
+
+            // For easier testing, check all the boxes in the model
+            for (int i = 0; i < _model_DataFiles.rowCount(); i++) {
+                _model_DataFiles.item(i)->setCheckState(Qt::Checked);
+            }
         }
 
     private:

@@ -57,15 +57,11 @@ namespace Simp1e::Editor::Windows {
             setMinimumSize(400, 400);
             _model_DataRecords_SortFilterProxy.setSourceModel(&_model_DataRecords);
             _model_DataRecords_SortFilterProxy.setFilterKeyColumn(0);
-            // _model_DataRecords.setHeaderData(0, Qt::Orientation::Horizontal, "Data Records");
             _tree_DataRecords.setModel(&_model_DataRecords_SortFilterProxy);
             _tree_DataRecords.setSortingEnabled(true);
             _tree_DataRecords.sortByColumn(0, Qt::SortOrder::AscendingOrder);
             _tree_DataRecords.setAlternatingRowColors(true);
             _tree_DataRecords.header()->setStretchLastSection(true);
-            _tree_DataRecords.header()->setSectionResizeMode(
-                QHeaderView::ResizeMode::ResizeToContents
-            );
             _tree_DataRecords.expandAll();
             _txt_FilterText.setPlaceholderText("Filter");
         }
@@ -90,18 +86,25 @@ namespace Simp1e::Editor::Windows {
                 recordsByType[record->GetType()].push_back(record);
 
             for (auto& [type, records] : recordsByType) {
-                auto* item = new QStandardItem(type.c_str());
-                item->setEditable(false);
-                _model_DataRecords.appendRow(item);
+                auto* groupItem         = new QStandardItem(type.c_str());
+                auto* descriptionColumn = new QStandardItem("");
+                groupItem->setEditable(false);
+                descriptionColumn->setEditable(false);
+                _model_DataRecords.appendRow({groupItem, descriptionColumn});
 
                 for (auto& record : records) {
-                    auto* child = new QStandardItem(record->GetFullIdentifier());
-                    child->setEditable(false);
-                    item->appendRow(child);
+                    auto  description = record->GetData()->GetString("description");
+                    auto* childId     = new QStandardItem(record->GetFullIdentifier());
+                    auto* childDescription =
+                        new QStandardItem(description.has_value() ? (*description).c_str() : "");
+                    childId->setEditable(false);
+                    childDescription->setEditable(false);
+                    groupItem->appendRow({childId, childDescription});
                 }
             }
 
-            _model_DataRecords.setHeaderData(0, Qt::Orientation::Horizontal, "Data Records");
+            _model_DataRecords.setHeaderData(0, Qt::Orientation::Horizontal, "ID");
+            _model_DataRecords.setHeaderData(1, Qt::Orientation::Horizontal, "Description");
         }
 #pragma endregion
     };
