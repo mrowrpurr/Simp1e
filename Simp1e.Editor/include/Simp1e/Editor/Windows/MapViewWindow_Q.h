@@ -17,6 +17,7 @@ namespace Simp1e::Editor::Windows {
 
 #pragma region Widget Variables
         QVBoxLayout*              _layout_Window;
+        QLabel                    _lbl_Title{"Map: <name of the map> (10x20)"};
         MapView::MapGraphicsScene _mapGraphicsScene;
         MapView::MapGraphicsView  _mapGraphicsView;
 #pragma endregion
@@ -31,10 +32,11 @@ namespace Simp1e::Editor::Windows {
 
     private:
 #pragma region Widget Setup
-        void IDs() { setObjectName("DataRecordBrowser"); }
+        void IDs() { setObjectName("MapViewWindow"); }
 
         void Layout() {
             _layout_Window = new QVBoxLayout(this);
+            _layout_Window->addWidget(&_lbl_Title);
             _layout_Window->addWidget(&_mapGraphicsView);
             setLayout(_layout_Window);
         }
