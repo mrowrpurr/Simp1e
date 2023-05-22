@@ -2,6 +2,7 @@
 
 #include <_Log_.h>
 
+#include <memory>
 #include <nlohmann/json.hpp>
 #include <optional>
 #include <sstream>
@@ -151,20 +152,20 @@ namespace Simp1e::Data {
             if (!value || !value->get().is_number()) return {};
             return value->get().get<float>();
         }
-        std::optional<RecordData*> GetMap(const char* path) const {
+        std::optional<std::unique_ptr<RecordData>> GetMap(const char* path) const {
             auto value = GetNestedJson(path);
             if (!value || !value->get().is_object()) return {};
-            return new JsonRecordData(value->get());
+            return std::make_unique<JsonRecordData>(value->get());
         }
-        std::optional<RecordData*> GetList(const char* path) const {
+        std::optional<std::unique_ptr<RecordData>> GetList(const char* path) const {
             auto value = GetNestedJson(path);
             if (!value || !value->get().is_array()) return {};
-            return new JsonRecordData(value->get());
+            return std::make_unique<JsonRecordData>(value->get());
         }
-        std::optional<RecordData*> GetObject(const char* path) const {
+        std::optional<std::unique_ptr<RecordData>> GetObject(const char* path) const {
             auto value = GetNestedJson(path);
             if (!value || !(value->get().is_object() || value->get().is_array())) return {};
-            return new JsonRecordData(value->get());
+            return std::make_unique<JsonRecordData>(value->get());
         }
         std::optional<std::vector<std::string>> GetStringList(const char* path) const {
             auto value = GetNestedJson(path);
@@ -206,13 +207,14 @@ namespace Simp1e::Data {
             }
             return list;
         }
-        std::optional<std::vector<RecordData*>> GetObjectList(const char* path) const {
+        std::optional<std::vector<std::unique_ptr<RecordData>>> GetObjectList(const char* path
+        ) const {
             auto value = GetNestedJson(path);
             if (!value || !value->get().is_array()) return {};
-            std::vector<RecordData*> list;
+            std::vector<std::unique_ptr<RecordData>> list;
             for (auto& item : value->get()) {
                 if (!item.is_object()) return {};
-                list.push_back(new JsonRecordData(item));
+                list.push_back(std::make_unique<JsonRecordData>(item));
             }
             return list;
         }
@@ -245,26 +247,26 @@ namespace Simp1e::Data {
             if (!value.is_number()) return {};
             return value.get<float>();
         }
-        std::optional<RecordData*> GetMapAt(size_t index) const {
+        std::optional<std::unique_ptr<RecordData>> GetMapAt(size_t index) const {
             if (_recordData.is_null()) return {};
             if (_recordData.size() <= index) return {};
             auto value = _recordData[index];
             if (!value.is_object()) return {};
-            return new JsonRecordData(value);
+            return std::make_unique<JsonRecordData>(value);
         }
-        std::optional<RecordData*> GetListAt(size_t index) const {
+        std::optional<std::unique_ptr<RecordData>> GetListAt(size_t index) const {
             if (_recordData.is_null()) return {};
             if (_recordData.size() <= index) return {};
             auto value = _recordData[index];
             if (!value.is_array()) return {};
-            return new JsonRecordData(value);
+            return std::make_unique<JsonRecordData>(value);
         }
-        std::optional<RecordData*> GetObjectAt(size_t index) const {
+        std::optional<std::unique_ptr<RecordData>> GetObjectAt(size_t index) const {
             if (_recordData.is_null()) return {};
             if (_recordData.size() <= index) return {};
             auto value = _recordData[index];
             if (!value.is_object() && !value.is_array()) return {};
-            return new JsonRecordData(value);
+            return std::make_unique<JsonRecordData>(value);
         }
         std::optional<std::vector<std::string>> GetStringListAt(size_t index) const {
             if (_recordData.is_null()) return {};
@@ -314,15 +316,16 @@ namespace Simp1e::Data {
             }
             return list;
         }
-        std::optional<std::vector<RecordData*>> GetObjectListAt(size_t index) const {
+        std::optional<std::vector<std::unique_ptr<RecordData>>> GetObjectListAt(size_t index
+        ) const {
             if (_recordData.is_null()) return {};
             if (_recordData.size() <= index) return {};
             auto value = _recordData[index];
             if (!value.is_array()) return {};
-            std::vector<RecordData*> list;
+            std::vector<std::unique_ptr<RecordData>> list;
             for (auto& item : value) {
                 if (!item.is_object() && !item.is_array()) return {};
-                list.push_back(new JsonRecordData(item));
+                list.push_back(std::make_unique<JsonRecordData>(item));
             }
             return list;
         }

@@ -2,6 +2,7 @@
 
 #include <_Log_.h>
 
+#include <memory>
 #include <optional>
 #include <string>
 #include <vector>
@@ -36,30 +37,33 @@ namespace Simp1e::Data {
         virtual size_t                   GetListCount(const char* path) const = 0;
         virtual std::vector<std::string> GetMapKeys(const char* path) const   = 0;
 
-        virtual std::optional<std::string>              GetString(const char* path) const     = 0;
-        virtual std::optional<bool>                     GetBool(const char* path) const       = 0;
-        virtual std::optional<int>                      GetInt(const char* path) const        = 0;
-        virtual std::optional<float>                    GetFloat(const char* path) const      = 0;
-        virtual std::optional<RecordData*>              GetMap(const char* path) const        = 0;
-        virtual std::optional<RecordData*>              GetList(const char* path) const       = 0;
-        virtual std::optional<RecordData*>              GetObject(const char* path) const     = 0;
+        virtual std::optional<std::string>                 GetString(const char* path) const  = 0;
+        virtual std::optional<bool>                        GetBool(const char* path) const    = 0;
+        virtual std::optional<int>                         GetInt(const char* path) const     = 0;
+        virtual std::optional<float>                       GetFloat(const char* path) const   = 0;
+        virtual std::optional<std::unique_ptr<RecordData>> GetMap(const char* path) const     = 0;
+        virtual std::optional<std::unique_ptr<RecordData>> GetList(const char* path) const    = 0;
+        virtual std::optional<std::unique_ptr<RecordData>> GetObject(const char* path) const  = 0;
         virtual std::optional<std::vector<std::string>> GetStringList(const char* path) const = 0;
         virtual std::optional<std::vector<bool>>        GetBoolList(const char* path) const   = 0;
         virtual std::optional<std::vector<int>>         GetIntList(const char* path) const    = 0;
         virtual std::optional<std::vector<float>>       GetFloatList(const char* path) const  = 0;
-        virtual std::optional<std::vector<RecordData*>> GetObjectList(const char* path) const = 0;
+        virtual std::optional<std::vector<std::unique_ptr<RecordData>>> GetObjectList(
+            const char* path
+        ) const = 0;
 
-        virtual std::optional<std::string>              GetStringAt(size_t index) const     = 0;
-        virtual std::optional<bool>                     GetBoolAt(size_t index) const       = 0;
-        virtual std::optional<int>                      GetIntAt(size_t index) const        = 0;
-        virtual std::optional<float>                    GetFloatAt(size_t index) const      = 0;
-        virtual std::optional<RecordData*>              GetMapAt(size_t index) const        = 0;
-        virtual std::optional<RecordData*>              GetListAt(size_t index) const       = 0;
-        virtual std::optional<RecordData*>              GetObjectAt(size_t index) const     = 0;
-        virtual std::optional<std::vector<std::string>> GetStringListAt(size_t index) const = 0;
-        virtual std::optional<std::vector<bool>>        GetBoolListAt(size_t index) const   = 0;
-        virtual std::optional<std::vector<int>>         GetIntListAt(size_t index) const    = 0;
-        virtual std::optional<std::vector<float>>       GetFloatListAt(size_t index) const  = 0;
-        virtual std::optional<std::vector<RecordData*>> GetObjectListAt(size_t index) const = 0;
+        virtual std::optional<std::string>                 GetStringAt(size_t index) const     = 0;
+        virtual std::optional<bool>                        GetBoolAt(size_t index) const       = 0;
+        virtual std::optional<int>                         GetIntAt(size_t index) const        = 0;
+        virtual std::optional<float>                       GetFloatAt(size_t index) const      = 0;
+        virtual std::optional<std::unique_ptr<RecordData>> GetMapAt(size_t index) const        = 0;
+        virtual std::optional<std::unique_ptr<RecordData>> GetListAt(size_t index) const       = 0;
+        virtual std::optional<std::unique_ptr<RecordData>> GetObjectAt(size_t index) const     = 0;
+        virtual std::optional<std::vector<std::string>>    GetStringListAt(size_t index) const = 0;
+        virtual std::optional<std::vector<bool>>           GetBoolListAt(size_t index) const   = 0;
+        virtual std::optional<std::vector<int>>            GetIntListAt(size_t index) const    = 0;
+        virtual std::optional<std::vector<float>>          GetFloatListAt(size_t index) const  = 0;
+        virtual std::optional<std::vector<std::unique_ptr<RecordData>>> GetObjectListAt(size_t index
+        ) const                                                                                = 0;
     };
 }

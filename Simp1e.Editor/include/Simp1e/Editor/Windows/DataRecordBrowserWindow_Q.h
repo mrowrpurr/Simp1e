@@ -5,6 +5,7 @@
 #include <QHeaderView>
 #include <QLabel>
 #include <QLineEdit>
+#include <QModelIndex>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
 #include <QTreeView>
@@ -31,7 +32,6 @@ namespace Simp1e::Editor::Windows {
         QTreeView                                     _tree_DataRecords;
         QLineEdit                                     _txt_FilterText;
 #pragma endregion
-
     public:
         DataRecordBrowserWindow(IApp* app) : _app(app), QWidget(nullptr) {
             IDs();
@@ -54,15 +54,16 @@ namespace Simp1e::Editor::Windows {
 
         void Configure() {
             setWindowTitle("Data Record Browser");
-            setMinimumSize(400, 400);
+            setMinimumSize(800, 400);
             _model_DataRecords_SortFilterProxy.setSourceModel(&_model_DataRecords);
             _model_DataRecords_SortFilterProxy.setFilterKeyColumn(0);
             _tree_DataRecords.setModel(&_model_DataRecords_SortFilterProxy);
             _tree_DataRecords.setSortingEnabled(true);
             _tree_DataRecords.sortByColumn(0, Qt::SortOrder::AscendingOrder);
             _tree_DataRecords.setAlternatingRowColors(true);
-            _tree_DataRecords.header()->setStretchLastSection(true);
-            _tree_DataRecords.expandAll();
+            _tree_DataRecords.header()->setSectionResizeMode(
+                QHeaderView::ResizeMode::ResizeToContents
+            );
             _txt_FilterText.setPlaceholderText("Filter");
         }
 
@@ -71,12 +72,21 @@ namespace Simp1e::Editor::Windows {
                 &_txt_FilterText, &QLineEdit::textChanged, &_model_DataRecords_SortFilterProxy,
                 &QSortFilterProxyModel::setFilterFixedString
             );
+            connect(
+                &_tree_DataRecords, &QTreeView::doubleClicked, this,
+                &DataRecordBrowserWindow::on_tree_DataRecords_doubleClicked
+            );
         }
 #pragma endregion
-
 #pragma region Event Handlers
+        void on_tree_DataRecords_doubleClicked(const QModelIndex& index) {
+            auto  item = _model_DataRecords_SortFilterProxy.mapToSource(index);
+            auto* record =
+                _app->GetDataStore().GetRecord(item.data().toString().toStdString().c_str());
+            if (record == nullptr) return;
+            _app->ShowRecordWindow(record);
+        }
 #pragma endregion
-
 #pragma region Private Functions
         void ReloadRecords() {
             _model_DataRecords.clear();

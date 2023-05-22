@@ -1,0 +1,88 @@
+{
+    "data": {
+        "castle1": {
+            "type": "image",
+            "data": {
+                "file": "9424.png",
+                "root_env": "Openclipart"
+            }
+        },
+        "inn1": {
+            "type": "image",
+            "data": {
+                "file": "11470.png",
+                "root_env": "Openclipart"
+            }
+        },
+        "tavern1": {
+            "type": "image",
+            "data": {
+                "file": "11518.png",
+                "root_env": "Openclipart"
+            }
+        },
+        "lightgrass1": {
+            "type": "image",
+            "data": {
+                "file": "9424.png",
+                "root_env": "Openclipart"
+            }
+        },
+        "lightgrass2": {
+            "type": "image",
+            "data": {
+                "file": "56407.png",
+                "root_env": "Openclipart"
+            }
+        },
+        "water1": {
+            "type": "image",
+            "data": {
+                "file": "219395.png",
+                "root_env": "Openclipart"
+            }
+        },
+        "water2": {
+            "type": "image",
+            "data": {
+                "file": "250243.png",
+                "root_env": "Openclipart"
+            }
+        },
+        "stoneroad1": {
+            "type": "image",
+            "data": {
+                "file": "264720.png",
+                "root_env": "Openclipart"
+            }
+        },
+        "sand1": {
+            "type": "image",
+            "data": {
+                "file": "265992.png",
+                "root_env": "Openclipart"
+            }
+        },
+        "grassdirt1": {
+            "type": "image",
+            "data": {
+                "file": "265995.png",
+                "root_env": "Openclipart"
+            }
+        },
+        "knightlady1": {
+            "type": "image",
+            "data": {
+                "file": "293917.png",
+                "root_env": "Openclipart"
+            }
+        },
+        "knightman1": {
+            "type": "image",
+            "data": {
+                "file": "294040.png",
+                "root_env": "Openclipart"
+            }
+        }
+    }
+}
