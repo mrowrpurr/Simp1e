@@ -33,14 +33,20 @@ namespace Simp1e::Editor::Windows {
 #pragma endregion
 
     public:
-        MapViewWindow(IApp* app, Data::Record* record)
-            : _app(app),
-              _mapRecord(std::make_unique<Data::MapRecord>(&_app->GetDataStore(), record)),
-              QWidget(nullptr) {
+        MapViewWindow(IApp* app) : _app(app), QWidget(nullptr) {
             IDs();
             Layout();
             Events();
             Configure();
+        }
+
+        void SetMap(Data::Record* record) {
+            _mapRecord = std::make_unique<Data::MapRecord>(&_app->GetDataStore(), record);
+            _lbl_Title.setText(string_format(
+                                   "Map: {} ({}x{})", _mapRecord->GetID(), _mapRecord->GetCols(),
+                                   _mapRecord->GetRows()
+            )
+                                   .c_str());
             RenderMap();
         }
 
@@ -55,16 +61,7 @@ namespace Simp1e::Editor::Windows {
             setLayout(_layout_Window);
         }
 
-        void Configure() {
-            setWindowTitle("Map View");
-            _lbl_Title.setText(string_format(
-                                   "Map: {} ({}x{})", _mapRecord->GetID(), _mapRecord->GetCols(),
-                                   _mapRecord->GetRows()
-            )
-                                   .c_str());
-
-            _mapGraphicsView.setScene(&_mapGraphicsScene);
-        }
+        void Configure() { _mapGraphicsView.setScene(&_mapGraphicsScene); }
 
         void Events() {}
 #pragma endregion

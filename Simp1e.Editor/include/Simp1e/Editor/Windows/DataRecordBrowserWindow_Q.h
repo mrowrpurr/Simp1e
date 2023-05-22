@@ -40,7 +40,35 @@ namespace Simp1e::Editor::Windows {
             Layout();
             Configure();
             Events();
-            ReloadRecords();
+        }
+
+        void ReloadRecords() {
+            _model_DataRecords.clear();
+
+            std::unordered_map<std::string, std::vector<Data::Record*>> recordsByType;
+            for (auto& record : _app->GetDataStore().GetAllRecords())
+                recordsByType[record->GetType()].push_back(record);
+
+            for (auto& [type, records] : recordsByType) {
+                auto* groupItem         = new QStandardItem(type.c_str());
+                auto* descriptionColumn = new QStandardItem("");
+                groupItem->setEditable(false);
+                descriptionColumn->setEditable(false);
+                _model_DataRecords.appendRow({groupItem, descriptionColumn});
+
+                for (auto& record : records) {
+                    auto  description = record->GetData()->GetString("description");
+                    auto* childId     = new QStandardItem(record->GetFullIdentifier());
+                    auto* childDescription =
+                        new QStandardItem(description.has_value() ? (*description).c_str() : "");
+                    childId->setEditable(false);
+                    childDescription->setEditable(false);
+                    groupItem->appendRow({childId, childDescription});
+                }
+            }
+
+            _model_DataRecords.setHeaderData(0, Qt::Orientation::Horizontal, "ID");
+            _model_DataRecords.setHeaderData(1, Qt::Orientation::Horizontal, "Description");
         }
 
     private:
@@ -75,29 +103,21 @@ namespace Simp1e::Editor::Windows {
                 &QSortFilterProxyModel::setFilterFixedString
             );
             connect(
-                &_tree_DataRecords, &QTreeView::doubleClicked, this,
-                &DataRecordBrowserWindow::on_tree_DataRecords_doubleClicked
-            );
-            connect(
                 _tree_DataRecords.selectionModel(), &QItemSelectionModel::selectionChanged, this,
                 &DataRecordBrowserWindow::on_tree_DataRecords_selectionChanged
             );
         }
 #pragma endregion
 #pragma region Event Handlers
-        void on_tree_DataRecords_doubleClicked(const QModelIndex& index) {
-            auto  item = _model_DataRecords_SortFilterProxy.mapToSource(index);
-            auto* record =
-                _app->GetDataStore().GetRecord(item.data().toString().toStdString().c_str());
-            if (record == nullptr) return;
-            _app->ShowRecordWindow(record);
-        }
         void on_tree_DataRecords_selectionChanged(
             const QItemSelection& selected, const QItemSelection& deselected
         ) {
-            if (selected.indexes().isEmpty()) {
-                return;
-            }
+            if (selected.indexes().isEmpty() || !_tree_DataRecords.model()) return;
+
+            _Log_(
+                "on_tree_DataRecords_selectionChanged index selected {} {}",
+                selected.indexes()[0].row(), selected.indexes()[0].column()
+            );
 
             auto selectedItem = _tree_DataRecords.selectionModel()->selectedIndexes().first();
             qDebug() << "selectedItem:" << selectedItem.row() << selectedItem.column()
@@ -123,34 +143,6 @@ namespace Simp1e::Editor::Windows {
 
 #pragma endregion
 #pragma region Private Functions
-        void ReloadRecords() {
-            _model_DataRecords.clear();
-
-            std::unordered_map<std::string, std::vector<Data::Record*>> recordsByType;
-            for (auto& record : _app->GetDataStore().GetAllRecords())
-                recordsByType[record->GetType()].push_back(record);
-
-            for (auto& [type, records] : recordsByType) {
-                auto* groupItem         = new QStandardItem(type.c_str());
-                auto* descriptionColumn = new QStandardItem("");
-                groupItem->setEditable(false);
-                descriptionColumn->setEditable(false);
-                _model_DataRecords.appendRow({groupItem, descriptionColumn});
-
-                for (auto& record : records) {
-                    auto  description = record->GetData()->GetString("description");
-                    auto* childId     = new QStandardItem(record->GetFullIdentifier());
-                    auto* childDescription =
-                        new QStandardItem(description.has_value() ? (*description).c_str() : "");
-                    childId->setEditable(false);
-                    childDescription->setEditable(false);
-                    groupItem->appendRow({childId, childDescription});
-                }
-            }
-
-            _model_DataRecords.setHeaderData(0, Qt::Orientation::Horizontal, "ID");
-            _model_DataRecords.setHeaderData(1, Qt::Orientation::Horizontal, "Description");
-        }
 #pragma endregion
     };
 }
