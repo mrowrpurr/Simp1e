@@ -9,6 +9,7 @@
 #include "../IApp.h"
 #include "DataFilesSelectorWindow_Q.h"
 #include "DataRecordBrowserWindow_Q.h"
+#include "DataRecordPreviewWindow_Q.h"
 #include "MapViewWindow_Q.h"
 
 namespace Simp1e::Editor::Windows {
@@ -17,6 +18,7 @@ namespace Simp1e::Editor::Windows {
         IApp*                                             _app;
         std::unique_ptr<Windows::DataFilesSelectorWindow> _dataFilesSelectorWindow;
         std::unique_ptr<Windows::DataRecordBrowserWindow> _dataRecordBrowser;
+        std::unique_ptr<Windows::DataRecordPreviewWindow> _dataRecordPreview;
         std::unique_ptr<Windows::MapViewWindow>           _mapViewWindow;
 
     public:
@@ -25,7 +27,7 @@ namespace Simp1e::Editor::Windows {
         void ShowDataFilesSelector() {
             if (!_dataFilesSelectorWindow)
                 _dataFilesSelectorWindow = std::make_unique<Windows::DataFilesSelectorWindow>(_app);
-            _dataFilesSelectorWindow->show();
+            if (!_dataFilesSelectorWindow->isVisible()) _dataFilesSelectorWindow->show();
         }
         void CloseDataFilesSelector() { _dataFilesSelectorWindow->close(); }
 
@@ -39,13 +41,22 @@ namespace Simp1e::Editor::Windows {
         void ShowMapView(Data::Record* dataRecord) {
             if (!_mapViewWindow)
                 _mapViewWindow = std::make_unique<Windows::MapViewWindow>(_app, dataRecord);
-            _mapViewWindow->show();
+            if (!_mapViewWindow->isVisible()) _mapViewWindow->show();
         }
         void CloseMapView() { _mapViewWindow->close(); }
 
+        // TODO change all the functins to end with *Window
+
+        void ShowDataRecordPreviewWindow() {
+            if (!_dataRecordPreview)
+                _dataRecordPreview = std::make_unique<Windows::DataRecordPreviewWindow>(_app);
+            if (!_dataRecordPreview->isVisible()) _dataRecordPreview->show();
+        }
+        void CloseDataRecordPreviewWindow() { _dataRecordPreview->close(); }
+
         void ShowWindowForRecord(Data::Record* dataRecord) {
-            auto type = dataRecord->GetType();
-            if (strcmp(type, "gridmap") == 0) {
+            auto type = std::string{dataRecord->GetType()};
+            if (type == "gridmap") {
                 ShowMapView(dataRecord);
             } else {
                 QMessageBox msgBox;
@@ -55,6 +66,11 @@ namespace Simp1e::Editor::Windows {
                 msgBox.setDefaultButton(QMessageBox::Ok);
                 msgBox.exec();
             }
+        }
+
+        void ShowRecordPreview(Data::Record* dataRecord) {
+            ShowDataRecordPreviewWindow();
+            _dataRecordPreview->SetRecord(dataRecord);
         }
     };
 }
