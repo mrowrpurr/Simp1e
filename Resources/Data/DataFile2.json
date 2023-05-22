@@ -1,7 +1,9 @@
 {
     "data": {
         "DataFile1.donkey": {
-            "description": "CHANGED DONKEY DESCRIPTION"
+            "data": {
+                "description": "CHANGED DONKEY DESCRIPTION"
+            }
         }
     }
 }

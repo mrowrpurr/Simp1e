@@ -64,6 +64,8 @@ namespace Simp1e::Data {
         }
 
     public:
+        size_t GetRecordCount() override { return _records.size(); }
+
         bool HasObject(const char* fullIdentifier) override {
             return _records.contains(fullIdentifier);
         }
