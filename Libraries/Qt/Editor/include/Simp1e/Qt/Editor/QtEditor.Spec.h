@@ -6,23 +6,38 @@
 #include "QtEditor.h"
 #include "SpecHelper.h"
 
-Describe("QtEditor") {
-    it("can do something with actual QWidgets?", []() {
-        int   argc = 0;
-        char* argv[0];
-        TheStuffFromMainGoesHere(argc, argv);
-        // QApplication app{argc, argv};
-        // QWidget      window;
-        // window.setWindowTitle("Simple example");
-        // AssertThat(window.windowTitle().toStdString(), Equals("Simple example"));
-        // QVBoxLayout layout{&window};
-        // QLabel      title{"TITLE!"};
-        // title.setObjectName("the name");
-        // layout.addWidget(&title);
-        // window.setLayout(&layout);
+Describe("ui (Qt automation): QtEditor") {
+    it("Running the editor shows the Data File Chooser", []() {
+        //
+    });
+}
 
-        // // Let's introspect the children
-        // auto children = window.children();
-        // AssertThat(children[1]->objectName().toStdString(), Equals("TITLE!????"));
+Describe("ui (biz logic controller/integration): QtEditor") {
+    it("Running the editor shows the Data File Chooser", []() {
+        //
+    });
+}
+
+Describe("ui (Qt automation): Data File Chooser") {
+    it("does the things", []() {
+        //
+    });
+}
+
+Describe("ui (biz logic controller/integration): Data File Chooser") {
+    it("does the things", []() {
+        //
+    });
+}
+
+Describe("viewmodel: Data Files UI Model") {
+    it("does the things", []() {
+        //
+    });
+}
+
+Describe("model: Data File") {
+    it("does the things", []() {
+        //
     });
 }
