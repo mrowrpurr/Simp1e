@@ -1,0 +1,2 @@
+#define __SpecsHack_UniqueCppFileValue __SpecsHack_TestFile_Simp1e_Second_Spec_h
+#include "Simp1e/Second.Spec.h"

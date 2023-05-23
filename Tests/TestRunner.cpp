@@ -1,12 +1,9 @@
 #include <Specs/BDD.h>
+#include <Specs/CLI.h>
 #include <Specs/ExceptionHandlers/SnowhouseExceptionHandler.h>
 #include <Specs/Setup.h>
 
-#include "_SpecHelper.h"
-
-//
-#include "__SpecHeaderIncludes.h"
-//
+#include "SpecHelper.h"
 
 int main(int argc, char** argv) {
     Specs::CLI cli;
