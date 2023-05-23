@@ -4,7 +4,7 @@ target("Generate Tests")
         if os.isdir("Tests/TestFiles") then 
             os.rmdir("Tests/TestFiles")
         end
-        for _, filepath in ipairs(os.files(path.join("Libraries", "**.Spec.h"))) do
+        for _, filepath in ipairs(os.files(path.join("Simp1e*", "**.Spec.h"))) do
             local after_include = string.gsub(filepath, ".*/include/", "")
             local only_alphachars = string.gsub(after_include, "[^%w]", "_")
             local unique_macro_variable = "__SpecsHack_TestFile_" .. only_alphachars
@@ -24,7 +24,7 @@ target("[tests] Simp1e Tests")
     add_string_formatting()
     set_kind("binary")
     -- ADD ALL THE THINGS!
-    add_deps("Generate Tests", "Simp1e.DI", "Simp1e.Qt.Editor")
+    add_deps("Generate Tests", "Simp1e.Data") -- add Editor
     add_files("TestRunner.cpp", "SpecHelperInternal.cpp", "TestFiles/**/*.cpp")
     add_includedirs(".")
     after_build(function(target)

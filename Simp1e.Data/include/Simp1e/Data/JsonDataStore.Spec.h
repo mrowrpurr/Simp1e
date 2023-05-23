@@ -1,4 +1,4 @@
-#include "_SpecHelper.h"
+#include "DataSpecHelper.h"
 
 Describe("JsonDataStore") {
     it("can load a data file and get its records", []() {

@@ -13,4 +13,4 @@ target("Simp1e.Editor")
         add_files("Editor.rc")
     end
 
-mac_icon_for_target("Simp1e.Editor", "Resources/Logo/iconset.icns")
+-- mac_icon_for_target("SimP1e.Editor", "Resources/Logo/iconset.icns")

@@ -1,0 +1,4 @@
+#define __SpecsHack_UniqueCppFileValue __SpecsHack_TestFile_Simp1e_Data_JsonRecordData_Spec_h
+#define __SpecsHack_UniqueCppFileValue2 __SpecsHack_TestFile2_Simp1e_Data_JsonRecordData_Spec_h
+
+#include "Simp1e/Data/JsonRecordData.Spec.h"

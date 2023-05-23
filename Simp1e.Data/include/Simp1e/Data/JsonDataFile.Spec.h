@@ -1,16 +1,16 @@
-#include "_SpecHelper.h"
+#include "DataSpecHelper.h"
 
 Describe("JsonDataFile") {
     it("has identifier which matches name of file", []() {
-        auto dataFile1 = GetDataFile("FoodDataFile.json");
-        auto dataFile2 = GetDataFile("FoodSweetrollPatch.json");
+        auto dataFile1 = GetJsonDataFile("FoodDataFile.json");
+        auto dataFile2 = GetJsonDataFile("FoodSweetrollPatch.json");
 
         AssertThat(dataFile1->GetIdentifier(), Equals("FoodDataFile"));
         AssertThat(dataFile2->GetIdentifier(), Equals("FoodSweetrollPatch"));
     });
 
     it("can get and read individual records from data file using relative record IDs", []() {
-        auto dataFile = GetDataFile("FoodDataFile.json");
+        auto dataFile = GetJsonDataFile("FoodDataFile.json");
 
         auto sweetroll = dataFile->GetRecord("sweetroll");
 
@@ -21,7 +21,7 @@ Describe("JsonDataFile") {
     });
 
     it("can get and read all records", []() {
-        auto dataFile = GetDataFile("FoodDataFile.json");
+        auto dataFile = GetJsonDataFile("FoodDataFile.json");
 
         auto records = dataFile->GetAllRecords();
         AssertThat(records.size(), Equals(4));

@@ -1,4 +1,0 @@
-#define __SpecsHack_UniqueCppFileValue __SpecsHack_TestFile_Simp1e_Qt_Editor_QtEditor_Spec_h
-#define __SpecsHack_UniqueCppFileValue2 __SpecsHack_TestFile2_Simp1e_Qt_Editor_QtEditor_Spec_h
-
-#include "Simp1e/Qt/Editor/QtEditor.Spec.h"
