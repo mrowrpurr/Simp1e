@@ -13,4 +13,12 @@ target("Simp1e.Editor")
         add_files("Editor.rc")
     end
 
+target("Simp1e.Editor [includes]")
+    set_kind("headeronly")
+    add_qt_libs()
+    add_includedirs("include", {public = true})
+    add_string_formatting()
+    add_logging()
+    add_deps("Simp1e.Data", "Simp1e.Data.Types", "Simp1e.Editor.Types")
+
 -- mac_icon_for_target("SimP1e.Editor", "Resources/Logo/iconset.icns")

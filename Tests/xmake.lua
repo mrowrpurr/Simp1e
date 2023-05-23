@@ -24,7 +24,7 @@ target("[tests] Simp1e Tests")
     add_string_formatting()
     set_kind("binary")
     -- ADD ALL THE THINGS!
-    add_deps("Generate Tests", "Simp1e.Data") -- add Editor
+    add_deps("Generate Tests", "Simp1e.Editor [includes]")
     add_files("TestRunner.cpp", "SpecHelperInternal.cpp", "TestFiles/**/*.cpp")
     add_includedirs(".")
     after_build(function(target)

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Simp1e/Data/JsonDataFile.h>
+#include <Simp1e/Data/JsonDataStore.h>
 #include <string_format.h>
 
 #include <QApplication>
