@@ -7,7 +7,6 @@ AccessModifierOffset: -4
 ColumnLimit: 100
 NamespaceIndentation: All
 IndentPPDirectives: BeforeHash
-IndentExternBlock: true
 FixNamespaceComments: false
 DerivePointerAlignment: false
 AlignConsecutiveDeclarations: true
