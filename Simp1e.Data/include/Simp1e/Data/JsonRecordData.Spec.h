@@ -1,12 +1,4 @@
-#include <nlohmann/json.hpp>
-
-#include "Simp1e/Data/DataFile.h"
-#include "Simp1e/Data/DataStore.h"
-#include "Simp1e/Data/JsonDataFile.h"
-#include "Simp1e/Data/JsonDataStore.h"
-#include "Simp1e/Data/JsonRecord.h"
-#include "Simp1e/Data/JsonRecordData.h"
-#include "_SpecHelper.h"
+#include "DataSpecHelper.h"
 
 Describe("JsonRecordData") {
     it("Has*", []() {

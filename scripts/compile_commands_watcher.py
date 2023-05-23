@@ -15,8 +15,11 @@ class FileChangeHandler(FileSystemEventHandler):
     @staticmethod
     def on_modified(event):
         if not event.is_directory and (os.path.basename(event.src_path) == "compile_commands.json"):
-            sleep(0.5)  # Delay for 500ms
-            FileChangeHandler.filter_moc_entries(event.src_path)
+            sleep(1)  # Delay for a second
+            try:
+                FileChangeHandler.filter_moc_entries(event.src_path)
+            except Exception as e:
+                print(e)
 
     @staticmethod
     def filter_moc_entries(file_path):
@@ -43,7 +46,7 @@ if __name__ == "__main__":
     print("Watching for changes to compile_commands.json...")
     try:
         while True:
-            time.sleep(2)
+            time.sleep(1)
     except KeyboardInterrupt:
         observer.stop()
     observer.join()

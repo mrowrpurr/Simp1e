@@ -1,15 +1,9 @@
 #include <Specs/BDD.h>
+#include <Specs/CLI.h>
 #include <Specs/ExceptionHandlers/SnowhouseExceptionHandler.h>
 #include <Specs/Setup.h>
 
-#include "_SpecHelper.h"
-
-//
-// include test files
-#include "JsonDataFile.Spec.h"
-#include "JsonDataStore.Spec.h"
-#include "JsonRecordData.Spec.h"
-//
+#include "SpecHelper.h"
 
 int main(int argc, char** argv) {
     Specs::CLI cli;

@@ -1,9 +1,4 @@
--- Call this in an existing target to configure it as a Qt application.
-function add_qt()
-    add_rules("qt.application")
-    add_rules("qt.qrc")
-    add_rules("qt.moc")
-
+function add_qt_libs()
     -- Path to your Qt installation folder, including the version
     -- e.g. C:\Qt\5.12.0\msvc2017_64 or /usr/local/Qt-5.12.0
     local qt_root = os.getenv("QTROOT")
@@ -65,4 +60,12 @@ function add_qt()
     else
         print("Unsupported host platform")
     end
+end
+
+-- Call this in an existing target to configure it as a Qt application.
+function add_qt()
+    add_rules("qt.application")
+    add_rules("qt.qrc")
+    add_rules("qt.moc")
+    add_qt_libs()
 end
