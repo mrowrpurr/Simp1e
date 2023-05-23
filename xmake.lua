@@ -6,6 +6,7 @@ add_requires_for_logging()
 add_requires_for_string_formatting()
 add_requires_for_specs()
 includes("Libraries/**/xmake.lua")
+includes("Editor/xmake.lua")
 
 -- If tests..
 includes("Tests/xmake.lua")
