@@ -1,4 +1,3 @@
-
 target("Simp1e Tests")
     add_specs()
     add_logging_support_for_binaries()
