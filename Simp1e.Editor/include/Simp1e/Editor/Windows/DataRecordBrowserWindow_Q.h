@@ -130,12 +130,6 @@ namespace Simp1e::Editor::Windows {
 
             _app->ShowRecordPreview(record);  // This creates and shows the new window
 
-            // After showing the window, restore the selection and set the focus back to the
-            // QTreeView.
-            _tree_DataRecords.selectionModel()->select(selectedItem, QItemSelectionModel::Select);
-            _tree_DataRecords.scrollTo(selectedItem);
-            _tree_DataRecords.setFocus();
-
             selectedItem = _tree_DataRecords.selectionModel()->selectedIndexes().first();
             qDebug() << "After selectedItem:" << selectedItem.row() << selectedItem.column()
                      << selectedItem.data().toString();
