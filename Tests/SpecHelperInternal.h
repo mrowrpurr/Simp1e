@@ -22,7 +22,7 @@ namespace HacksPendingSpecsCppLibraryCompletion {
 #define __SpecsHack_Macro_Concat_(x, y) x##y
 #define __SpecsHack_Macro_Concat(x, y) __SpecsHack_Macro_Concat_(x, y)
 #define __SpecsHack_Macro_Unique(count) \
-    __SpecsHack_Macro_Concat(__specsMacroCreatedVariable__, count)
+    __SpecsHack_Macro_Concat(__SpecsHack_UniqueCppFileValue2, count)
 
 #define __SpecsHack_Macro_LambdaCollector(count)                                               \
     HacksPendingSpecsCppLibraryCompletion::CollectSpecDefinitionBody __SpecsHack_Macro_Concat( \
