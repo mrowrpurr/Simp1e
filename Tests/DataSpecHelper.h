@@ -1,11 +1,12 @@
 #pragma once
 
+#include "SpecHelper.h"
+//
+
 #include <Simp1e/Data/JsonDataFile.h>
 #include <Simp1e/Data/JsonDataStore.h>
 
 using namespace Simp1e::Data;
-
-#include "SpecHelper.h"
 
 inline std::unique_ptr<Simp1e::Data::JsonDataFile> GetJsonDataFile(std::string filename) {
     return std::make_unique<Simp1e::Data::JsonDataFile>(
