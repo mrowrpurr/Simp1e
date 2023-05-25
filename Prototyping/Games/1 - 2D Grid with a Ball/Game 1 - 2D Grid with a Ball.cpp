@@ -16,11 +16,11 @@ struct RGBColor {
 
 #include <QGraphicsSceneMouseEvent>
 
-class ClickableRectItem : public QGraphicsRectItem {
+class GameGraphicsRectItem : public QGraphicsRectItem {
     std::function<void()> _onClickHandler;
 
 public:
-    ClickableRectItem(const QRectF& rect, QGraphicsItem* parent = nullptr)
+    GameGraphicsRectItem(const QRectF& rect, QGraphicsItem* parent = nullptr)
         : QGraphicsRectItem(rect, parent) {}
 
     void OnClick(std::function<void()> handler) { _onClickHandler = handler; }
@@ -130,7 +130,7 @@ private:
 
                 QRectF rect(offsetX, offsetY, cellWidth, cellHeight);
 
-                ClickableRectItem* item = new ClickableRectItem(rect);
+                GameGraphicsRectItem* item = new GameGraphicsRectItem(rect);
                 item->OnClick([this, i, j]() {
                     qDebug() << "Clicked on tile" << i << j;
                     this->MoveCircleTo(i, j);
