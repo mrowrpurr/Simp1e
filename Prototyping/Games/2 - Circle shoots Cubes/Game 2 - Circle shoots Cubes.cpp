@@ -13,6 +13,7 @@
 #include <QTimer>
 #include <functional>
 #include <map>
+#include <random>
 
 struct RGBColor {
     int red, green, blue;
@@ -85,7 +86,7 @@ public:
 
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
         override {
-        painter->setBrush(Qt::red);
+        painter->setBrush(Qt::blue);
         painter->drawEllipse(rect);
     }
 
@@ -154,6 +155,8 @@ public:
     }
 
 private:
+    std::map<std::pair<int, int>, QGraphicsRectItem*>& getCubeItems() { return _currentCubeItems; }
+
     void fireProjectile(std::pair<int, int> from, std::pair<int, int> to) {
         qDebug() << "Firing projectile from" << from.first << "," << from.second << "to" << to.first
                  << "," << to.second;
@@ -181,9 +184,16 @@ private:
 
         // Connect the finished signal of the animations to a lambda function that removes and
         // deletes the projectile
-        QObject::connect(animation, &QPropertyAnimation::finished, [projectile, this]() {
+        QObject::connect(animation, &QPropertyAnimation::finished, [projectile, this, to]() {
             scene->removeItem(projectile);
             delete projectile;
+            qDebug() << "Projectile reached" << to.first << "," << to.second;
+            auto foundCube = getCubeItems().find(to);
+            if (foundCube != _currentCubeItems.end()) {
+                qDebug() << "Found cube to explode";
+                explode(foundCube->second);
+                _currentCubeItems.erase(foundCube);
+            }
         });
 
         // Start the animations
@@ -191,6 +201,52 @@ private:
     }
 
     std::pair<int, int> getCurrentCirclePosition() { return _currentCirclePosition; }
+
+    void explode(QGraphicsRectItem* cube) {
+        if (cube->x() == 0) {
+            qDebug() << "Something is wrong, the cube is at 0,0";
+        }
+
+        auto cubePos = cube->pos();
+        auto cubeX   = cubePos.x();
+        auto cubeY   = cubePos.y();
+
+        std::default_random_engine            generator;
+        std::uniform_real_distribution<qreal> distribution(-50.0, 50.0);
+
+        qDebug() << "Explode cube which is at " << cubeX << "," << cubeY;
+
+        // Create a bunch of particles at the cube's location
+        const int numParticles = 100;
+        for (int i = 0; i < numParticles; ++i) {
+            AnimatedEllipse* particle =
+                new AnimatedEllipse(cubeX, cubeY, 5, 5);  // Adjust size as necessary
+            scene->addItem(particle);
+
+            // Create a property animation for the x and y coordinates
+            QPropertyAnimation* animation = new QPropertyAnimation(particle, "pos");
+            animation->setDuration(500);  // Animation duration in milliseconds
+
+            // Set the end position to a random offset from the cube's position
+            qreal endX = cubeX + distribution(generator);
+            qreal endY = cubeY + distribution(generator);
+            animation->setEndValue(QPointF(endX, endY));
+
+            // Connect the finished signal of the animations to a lambda function that removes and
+            // deletes the particle
+            QObject::connect(animation, &QPropertyAnimation::finished, [particle, this]() {
+                scene->removeItem(particle);
+                delete particle;
+            });
+
+            // Start the animation
+            animation->start(QAbstractAnimation::DeleteWhenStopped);
+        }
+
+        // Hide or delete the cube
+        scene->removeItem(cube);
+        delete cube;
+    }
 
     void drawGrid() {
         for (int i = 0; i < rows; ++i) {
@@ -221,7 +277,10 @@ private:
         }
     }
 
+    std::map<std::pair<int, int>, QGraphicsRectItem*> _currentCubeItems;
+
     void drawCubes() {
+        _currentCubeItems.clear();
         for (auto& cube : _currentCubePositions) {
             int offsetX = cube.second * cellWidth;
             int offsetY = cube.first * cellHeight;
@@ -230,8 +289,9 @@ private:
             QRectF rect(offsetX + size / 2, offsetY + size / 2, size, size);
 
             QGraphicsRectItem* item = new QGraphicsRectItem(rect);
+            qDebug() << "Adding current cube item at " << cube.first << "," << cube.second;
+            _currentCubeItems[{cube.first, cube.second}] = item;
             item->setBrush(Qt::blue);
-
             scene->addItem(item);
         }
     }
