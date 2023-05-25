@@ -1,0 +1,6 @@
+target("Game 1 - 2D Grid with a Ball")
+    add_files("Game 1 - 2D Grid with a Ball.cpp")
+    set_kind("binary")
+    add_qt()
+    add_string_formatting()
+    add_logging_support_for_binaries()
