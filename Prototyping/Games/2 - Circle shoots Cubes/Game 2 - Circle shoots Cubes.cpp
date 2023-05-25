@@ -207,20 +207,16 @@ private:
             qDebug() << "Something is wrong, the cube is at 0,0";
         }
 
-        auto cubePos = cube->pos();
-        auto cubeX   = cubePos.x();
-        auto cubeY   = cubePos.y();
-
         std::default_random_engine            generator;
         std::uniform_real_distribution<qreal> distribution(-50.0, 50.0);
 
-        qDebug() << "Explode cube which is at " << cubeX << "," << cubeY;
+        qDebug() << "Explode cube which is at " << cube->x() << "," << cube->y();
 
         // Create a bunch of particles at the cube's location
         const int numParticles = 100;
         for (int i = 0; i < numParticles; ++i) {
-            AnimatedEllipse* particle =
-                new AnimatedEllipse(cubeX, cubeY, 5, 5);  // Adjust size as necessary
+            auto particle = new AnimatedEllipse(0, 0, 5, 5);
+            particle->setPos(cube->scenePos());
             scene->addItem(particle);
 
             // Create a property animation for the x and y coordinates
@@ -228,8 +224,8 @@ private:
             animation->setDuration(500);  // Animation duration in milliseconds
 
             // Set the end position to a random offset from the cube's position
-            qreal endX = cubeX + distribution(generator);
-            qreal endY = cubeY + distribution(generator);
+            qreal endX = cube->x() + distribution(generator);
+            qreal endY = cube->y() + distribution(generator);
             animation->setEndValue(QPointF(endX, endY));
 
             // Connect the finished signal of the animations to a lambda function that removes and
@@ -285,10 +281,10 @@ private:
             int offsetX = cube.second * cellWidth;
             int offsetY = cube.first * cellHeight;
 
-            int    size = cellWidth / 2;  // You can adjust these values as you need
-            QRectF rect(offsetX + size / 2, offsetY + size / 2, size, size);
+            int                size = cellWidth / 2;  // You can adjust these values as you need
+            QGraphicsRectItem* item = new QGraphicsRectItem(0, 0, size, size);
+            item->setPos(offsetX + size / 2, offsetY + size / 2);
 
-            QGraphicsRectItem* item = new QGraphicsRectItem(rect);
             qDebug() << "Adding current cube item at " << cube.first << "," << cube.second;
             _currentCubeItems[{cube.first, cube.second}] = item;
             item->setBrush(Qt::blue);
