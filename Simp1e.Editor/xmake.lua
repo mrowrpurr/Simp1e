@@ -1,5 +1,3 @@
-add_languages("c++20")
-
 target("Simp1e.Editor")
     add_qt()
     set_kind("binary")
