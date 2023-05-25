@@ -20,18 +20,22 @@ struct RGBColor {
 };
 
 class ClickableRectItem : public QGraphicsRectItem {
-    std::function<void()> _onClickHandler = []() {};
+    std::function<void()> _onClickHandler      = []() {};
+    std::function<void()> _onRightClickHandler = []() {};
 
 public:
     ClickableRectItem(const QRectF& rect, QGraphicsItem* parent = nullptr)
         : QGraphicsRectItem(rect, parent) {}
 
     void OnClick(std::function<void()> handler) { _onClickHandler = handler; }
+    void OnRightClick(std::function<void()> handler) { _onRightClickHandler = handler; }
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override {
         if (event->button() == Qt::LeftButton) {
             _onClickHandler();
+        } else if (event->button() == Qt::RightButton) {
+            _onRightClickHandler();
         }
         QGraphicsRectItem::mousePressEvent(event);
     }
@@ -155,7 +159,30 @@ public:
     }
 
 private:
+    std::pair<int, int> gridCoordinates(QPointF scenePos) {
+        int gridX = static_cast<int>(scenePos.x()) / cellWidth;
+        int gridY = static_cast<int>(scenePos.y()) / cellHeight;
+        return {gridY, gridX};
+    }
+
     std::map<std::pair<int, int>, QGraphicsRectItem*>& getCubeItems() { return _currentCubeItems; }
+
+    void explodeUnderProjectileIfAnyCubes(QPointF pos) {
+        auto foundCube = getCubeItems().find(gridCoordinates(pos));
+        if (foundCube != _currentCubeItems.end()) {
+            qDebug() << "Found cube to explode";
+            // explode in a single shot
+            // QTimer::singleShot(0, [this, foundCube]() { explode(foundCube->second); });
+            explode(foundCube->second);
+            _currentCubeItems.erase(foundCube);
+            _currentCubePositions.erase(
+                std::remove(
+                    _currentCubePositions.begin(), _currentCubePositions.end(), gridCoordinates(pos)
+                ),
+                _currentCubePositions.end()
+            );
+        }
+    }
 
     void fireProjectile(std::pair<int, int> from, std::pair<int, int> to) {
         qDebug() << "Firing projectile from" << from.first << "," << from.second << "to" << to.first
@@ -171,6 +198,13 @@ private:
         // Create a small ellipse representing the projectile
         AnimatedEllipse* projectile = new AnimatedEllipse(0, 0, 10, 10);
 
+        QTimer* timer = new QTimer();
+
+        QObject::connect(timer, &QTimer::timeout, [projectile, this]() {
+            QPointF scenePos = projectile->pos();
+            explodeUnderProjectileIfAnyCubes(scenePos);
+        });
+
         // Add the projectile to the scene
         scene->addItem(projectile);
 
@@ -185,24 +219,29 @@ private:
         // Connect the finished signal of the animations to a lambda function that removes and
         // deletes the projectile
         QObject::connect(animation, &QPropertyAnimation::finished, [projectile, this, to]() {
+            explodeUnderProjectileIfAnyCubes(projectile->pos());
             scene->removeItem(projectile);
             delete projectile;
             qDebug() << "Projectile reached" << to.first << "," << to.second;
-            auto foundCube = getCubeItems().find(to);
-            if (foundCube != _currentCubeItems.end()) {
-                qDebug() << "Found cube to explode";
-                explode(foundCube->second);
-                _currentCubeItems.erase(foundCube);
-            }
         });
 
         // Start the animations
         animation->start(QAbstractAnimation::DeleteWhenStopped);
+        timer->start(50);
+
+        QObject::connect(animation, &QPropertyAnimation::finished, [timer]() {
+            timer->stop();
+            delete timer;
+        });
     }
 
     std::pair<int, int> getCurrentCirclePosition() { return _currentCirclePosition; }
 
     void explode(QGraphicsRectItem* cube) {
+        if (!cube) {
+            qDebug() << "Cube is null";
+            return;
+        }
         if (cube->x() == 0) {
             qDebug() << "Something is wrong, the cube is at 0,0";
         }
@@ -258,6 +297,10 @@ private:
                     qDebug() << "Current circle position is" << getCurrentCirclePosition();
                     auto from = getCurrentCirclePosition();
                     fireProjectile(from, {i, j});
+                });
+                item->OnRightClick([this, i, j]() {
+                    // Single shot timer
+                    QTimer::singleShot(0, [this, i, j]() { AddCube(i, j); });
                 });
                 if (drawTileLines) {
                     item->setPen(QPen(Qt::black, 1));
