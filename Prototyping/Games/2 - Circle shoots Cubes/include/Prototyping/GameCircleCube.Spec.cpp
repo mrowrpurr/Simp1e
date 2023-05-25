@@ -1,10 +1,12 @@
+#define spec_name GameCircleCube
+
 #include "Prototyping/GameCircleCube.h"
 
 #include "SpecHelper.h"
 
 using namespace Prototyping;
 
-Describe("Circle Shoots Cubes Game") {
+Describe("GameCircleCube") {
     it("it had a size (rows and columns)", []() {
         GameCircleCube game;
         AssertThat(game.GetRowCount(), Equals(0));
