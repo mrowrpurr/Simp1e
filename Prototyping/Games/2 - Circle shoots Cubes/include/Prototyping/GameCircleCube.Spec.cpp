@@ -1,10 +1,6 @@
 #define spec_name GameCircleCube
 
-#include "Prototyping/GameCircleCube.h"
-
-#include "SpecHelper.h"
-
-using namespace Prototyping;
+#include "GameSpecHelper.h"
 
 Describe("GameCircleCube") {
     it("it had a size (rows and columns)", []() {

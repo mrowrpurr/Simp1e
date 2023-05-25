@@ -9,6 +9,7 @@ function prototype(target_name)
 
     test_target("[test] " .. target_name)
         add_includedirs("include")
+        add_includedirs(".")
 end
 
 includes("**/xmake.lua")

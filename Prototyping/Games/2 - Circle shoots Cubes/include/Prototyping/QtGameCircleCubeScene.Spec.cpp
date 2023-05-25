@@ -5,15 +5,13 @@
 #include <QApplication>
 #include <QGraphicsView>
 
-#include "SpecHelper.h"
+#include "GameSpecHelper.h"
 
 using namespace Prototyping;
 
 Describe("QtGameCircleCubeScene") {
     it("can specify cell width and height", []() {
-        int          argc = 0;
-        char**       argv = nullptr;
-        QApplication app(argc, argv);
+        SetupQtApp app;
 
         GameCircleCube game{5, 10};
 
@@ -26,10 +24,8 @@ Describe("QtGameCircleCubeScene") {
         AssertThat(scene2.GetCellHeight(), Equals(8));
     });
 
-    it("has the correct size", []() {
-        int          argc = 0;
-        char**       argv = nullptr;
-        QApplication app(argc, argv);
+    it("has a size that fits the map", []() {
+        SetupQtApp app;
 
         GameCircleCube game{5, 10};
         QGraphicsView  view;
@@ -37,17 +33,20 @@ Describe("QtGameCircleCubeScene") {
         QtGameCircleCubeSceneParams sceneParams = {.cellWidth = 5, .cellHeight = 8};
         QtGameCircleCubeScene       scene(game, sceneParams);
 
-        // view.setScene(&scene);
-        // view.show();
+        view.setScene(&scene);
+        view.show();
 
-        // AssertThat(scene.width(), Equals(game.GetColumnCount() * sceneParams.cellWidth));
-        // AssertThat(scene.height(), Equals(game.GetRowCount() * sceneParams.cellHeight));
+        AssertThat(
+            scene.width(), Is().GreaterThanOrEqualTo(game.GetColumnCount() * sceneParams.cellWidth)
+        );
+        AssertThat(
+            scene.height(), Is().GreaterThanOrEqualTo(game.GetRowCount() * sceneParams.cellHeight)
+        );
     });
 
     it("has a circle on its scene", []() {
-        int                         argc = 0;
-        char**                      argv = nullptr;
-        QApplication                app(argc, argv);
+        SetupQtApp app;
+
         GameCircleCube              game{5, 10};
         QtGameCircleCubeSceneParams sceneParams{.cellWidth = 6, .cellHeight = 10};
         QtGameCircleCubeScene       scene(game, sceneParams);
@@ -67,11 +66,9 @@ Describe("QtGameCircleCubeScene") {
                                    (sceneParams.circleSize / 2)
                                )
         );
-
-        // AssertThat(circle->pos().y(), Equals(20));
-
-        // game.MoveCircleTo({3, 5});
-        // AssertThat(circle->pos().x(), Equals(15));
-        // AssertThat(circle->pos().y(), Equals(50));
     });
+
+    // it("can get coordinate of position", []() {
+
+    // });
 }

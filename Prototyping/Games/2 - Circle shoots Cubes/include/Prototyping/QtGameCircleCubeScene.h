@@ -76,5 +76,11 @@ namespace Prototyping {
         QGraphicsEllipseItem* GetCircle() const { return _circle; }
         uint32_t              GetCellWidth() const { return _cellWidth; }
         uint32_t              GetCellHeight() const { return _cellHeight; }
+
+    protected:
+        // void mousePressEvent(QGraphicsSceneMouseEvent* event) override {
+
+        //     _game.MoveCircleTo({cellX, cellY});
+        // }
     };
 }
