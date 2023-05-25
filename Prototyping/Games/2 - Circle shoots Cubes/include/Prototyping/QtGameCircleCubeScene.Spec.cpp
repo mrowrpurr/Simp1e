@@ -68,7 +68,59 @@ Describe("QtGameCircleCubeScene") {
         );
     });
 
-    // it("can get coordinate of position", []() {
+    it("can get cell from a Qt position", []() {
+        SetupQtApp app;
 
+        GameCircleCube              game{5, 10};
+        QtGameCircleCubeSceneParams sceneParams{.cellWidth = 6, .cellHeight = 10};
+        QtGameCircleCubeScene       scene(game, sceneParams);
+        game.MoveCircleTo({1, 2});
+        auto* circle = scene.GetCircle();
+
+        auto coordinate = scene.PositionToCell(circle->pos());
+        AssertThat(coordinate, Equals(Coordinate{1, 2}));
+
+        game.MoveCircleTo({3, 4});
+        auto coordinate2 = scene.PositionToCell(circle->pos());
+        AssertThat(coordinate2, Equals(Coordinate{3, 4}));
+    });
+
+    it("can get Qt position (rect) from a cell", []() {
+        SetupQtApp app;
+
+        GameCircleCube              game{5, 10};
+        QtGameCircleCubeSceneParams sceneParams{.cellWidth = 6, .cellHeight = 10};
+        QtGameCircleCubeScene       scene(game, sceneParams);
+        game.MoveCircleTo({1, 2});
+        auto* circle = scene.GetCircle();
+
+        auto actual   = scene.CellToPosition({1, 2});
+        auto expected = BoundingBox{
+            {1 * sceneParams.cellWidth,                         2 * sceneParams.cellHeight},
+            {1 * sceneParams.cellWidth + sceneParams.cellWidth,
+             2 * sceneParams.cellHeight + sceneParams.cellHeight                          },
+        };
+        AssertThat(actual.topLeft.x, Equals(expected.topLeft.x));
+        AssertThat(actual.topLeft.y, Equals(expected.topLeft.y));
+        AssertThat(actual.bottomRight.x, Equals(expected.bottomRight.x));
+        AssertThat(actual.bottomRight.y, Equals(expected.bottomRight.y));
+    });
+
+    // it("left clicking moves the circle to that position", []() {
+    //     SetupQtApp app;
+
+    //     GameCircleCube              game{5, 10};
+    //     QtGameCircleCubeSceneParams sceneParams{.cellWidth = 6, .cellHeight = 10};
+    //     QtGameCircleCubeScene       scene(game, sceneParams);
+    //     game.MoveCircleTo({1, 2});
+    //     auto* circle = scene.GetCircle();
+
+    //     QGraphicsSceneMouseEvent pressEvent(QEvent::GraphicsSceneMousePress);
+    //     pressEvent.setButton(Qt::LeftButton);
+    //     pressEvent.setScenePos(QPointF(50, 50));  // Set your coordinates here
+    //     pressEvent.setButtonDownScenePos(
+    //         Qt::LeftButton, QPointF(50, 50)
+    //     );  // Repeat your coordinates here
+    //     QApplication::sendEvent(scene, &pressEvent);
     // });
 }

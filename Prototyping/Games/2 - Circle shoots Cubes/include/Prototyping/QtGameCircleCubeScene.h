@@ -4,6 +4,7 @@
 #include <QGraphicsScene>
 #include <cstdint>
 
+#include "Prototyping/BoundingBox.h"
 #include "Prototyping/GameCircleCube.h"
 
 namespace Prototyping {
@@ -76,6 +77,19 @@ namespace Prototyping {
         QGraphicsEllipseItem* GetCircle() const { return _circle; }
         uint32_t              GetCellWidth() const { return _cellWidth; }
         uint32_t              GetCellHeight() const { return _cellHeight; }
+
+        Coordinate PositionToCell(QPointF position) const {
+            return {
+                static_cast<uint32_t>(position.x() / _cellWidth),
+                static_cast<uint32_t>(position.y() / _cellHeight)};
+        }
+
+        BoundingBox CellToPosition(Coordinate cell) const {
+            auto topLeft = Coordinate{cell.x * _cellWidth, cell.y * _cellHeight};
+            auto bottomRight =
+                Coordinate{cell.x * _cellWidth + _cellWidth, cell.y * _cellHeight + _cellHeight};
+            return {topLeft, bottomRight};
+        }
 
     protected:
         // void mousePressEvent(QGraphicsSceneMouseEvent* event) override {
