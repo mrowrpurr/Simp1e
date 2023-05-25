@@ -12,8 +12,13 @@ int main(int argc, char* argv[]) {
     GameCircleCube game{10, 8};
     QGraphicsView  view;
 
-    QtGameCircleCubeSceneParams sceneParams = {.cellWidth = 50, .cellHeight = 75, .circleSize = 25};
-    QtGameCircleCubeScene       scene(game, sceneParams);
+    QtGameCircleCubeSceneParams sceneParams = {
+        .cellWidth       = 50,
+        .cellHeight      = 75,
+        .circleSize      = 25,
+        .renderGridLines = true,
+    };
+    QtGameCircleCubeScene scene(game, sceneParams);
 
     view.setScene(&scene);
     view.show();

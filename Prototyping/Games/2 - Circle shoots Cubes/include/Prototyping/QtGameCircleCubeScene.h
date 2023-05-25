@@ -9,9 +9,10 @@
 namespace Prototyping {
 
     struct QtGameCircleCubeSceneParams {
-        uint32_t cellWidth  = 0;
-        uint32_t cellHeight = 0;
-        uint32_t circleSize = 0;
+        uint32_t cellWidth       = 0;
+        uint32_t cellHeight      = 0;
+        uint32_t circleSize      = 0;
+        bool     renderGridLines = false;
     };
 
     class QtGameCircleCubeScene : public QGraphicsScene {
@@ -28,10 +29,28 @@ namespace Prototyping {
             rect->setBrush(QBrush(Qt::black));
             addItem(rect);
         }
+        void RenderGridLines() {
+            for (uint32_t x = 0; x < _game.GetColumnCount(); x++) {
+                auto* line = new QGraphicsLineItem(
+                    x * _cellWidth, 0, x * _cellWidth, _game.GetRowCount() * _cellHeight
+                );
+                line->setPen(QPen(Qt::white));
+                addItem(line);
+            }
+            for (uint32_t y = 0; y < _game.GetRowCount(); y++) {
+                auto* line = new QGraphicsLineItem(
+                    0, y * _cellHeight, _game.GetColumnCount() * _cellWidth, y * _cellHeight
+                );
+                line->setPen(QPen(Qt::white));
+                addItem(line);
+            }
+        }
         void UpdateCirclePosition() {
-            _circle->setPos(
-                _game.GetCirclePosition().x * _cellWidth, _game.GetCirclePosition().y * _cellHeight
-            );
+            auto newX =
+                _game.GetCirclePosition().x * _cellWidth + (_cellWidth / 2) - (_circleSize / 2);
+            auto newY =
+                _game.GetCirclePosition().y * _cellHeight + (_cellHeight / 2) - (_circleSize / 2);
+            _circle->setPos(newX, newY);
         }
         void AddCircle() {
             if (_circle) return;
@@ -49,6 +68,7 @@ namespace Prototyping {
               _cellHeight(params.cellHeight),
               _circleSize(params.circleSize) {
             AddBackground();
+            if (params.renderGridLines) RenderGridLines();
             AddCircle();
             UpdateCirclePosition();
         }
