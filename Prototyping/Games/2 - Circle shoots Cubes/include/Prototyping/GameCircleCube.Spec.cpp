@@ -1,4 +1,5 @@
 #include "Prototyping/GameCircleCube.h"
+
 #include "SpecHelper.h"
 
 using namespace Prototyping;
@@ -28,6 +29,4 @@ Describe("Circle Shoots Cubes Game") {
         AssertThat(game3.GetCirclePosition().y, Equals(7));
         AssertThat(game3.GetCirclePosition().x, Equals(4));
     });
-
-    // it("can have cubes", [](){});
 }
