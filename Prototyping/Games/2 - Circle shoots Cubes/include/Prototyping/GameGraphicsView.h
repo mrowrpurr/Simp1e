@@ -1,52 +1,58 @@
 #pragma once
 
 #include <QGraphicsView>
+#include <QKeyEvent>
+#include <functional>
+#include <memory>
 
 namespace Prototyping {
 
     class GameGraphicsView : public QGraphicsView {
+        std::unique_ptr<std::function<void()>> _upKeyHandler;
+        std::unique_ptr<std::function<void()>> _downKeyHandler;
+        std::unique_ptr<std::function<void()>> _leftKeyHandler;
+        std::unique_ptr<std::function<void()>> _rightKeyHandler;
+
     public:
         GameGraphicsView(QWidget* parent = nullptr) : QGraphicsView(parent) {}
 
         void SetScene(QGraphicsScene* scene) { QGraphicsView::setScene(scene); }
 
-        // : _gridMap(map), QGraphicsView(scene, parent) {}
+        void OnUpKey(std::function<void()> handler) {
+            _upKeyHandler = std::make_unique<std::function<void()>>(handler);
+        }
+        void OnDownKey(std::function<void()> handler) {
+            _downKeyHandler = std::make_unique<std::function<void()>>(handler);
+        }
+        void OnLeftKey(std::function<void()> handler) {
+            _leftKeyHandler = std::make_unique<std::function<void()>>(handler);
+        }
+        void OnRightKey(std::function<void()> handler) {
+            _rightKeyHandler = std::make_unique<std::function<void()>>(handler);
+        }
 
-        // protected:
-        //     void OnUpKey() {
-        //         if (_gridMap) _gridMap->MoveCircleUp();
-        //     }
-        //     void OnDownKey() {
-        //         if (_gridMap) _gridMap->MoveCircleDown();
-        //     }
-        //     void OnLeftKey() {
-        //         if (_gridMap) _gridMap->MoveCircleLeft();
-        //     }
-        //     void OnRightKey() {
-        //         if (_gridMap) _gridMap->MoveCircleRight();
-        //     }
-
-        // void keyPressEvent(QKeyEvent* event) override {
-        //     switch (event->key()) {
-        //         case Qt::Key_Up:
-        //             OnUpKey();
-        //             break;
-        //         case Qt::Key_Down:
-        //         case Qt::Key_S:
-        //             OnDownKey();
-        //             break;
-        //         case Qt::Key_Left:
-        //         case Qt::Key_A:
-        //             OnLeftKey();
-        //             break;
-        //         case Qt::Key_Right:
-        //         case Qt::Key_D:
-        //             OnRightKey();
-        //             break;
-        //         default:
-        //             QGraphicsView::keyPressEvent(event);
-        //             break;
-        //     }
-        // }
+    protected:
+        void keyPressEvent(QKeyEvent* event) override {
+            switch (event->key()) {
+                case Qt::Key_Up:
+                    if (_upKeyHandler) (*_upKeyHandler)();
+                    break;
+                case Qt::Key_Down:
+                case Qt::Key_S:
+                    if (_downKeyHandler) (*_downKeyHandler)();
+                    break;
+                case Qt::Key_Left:
+                case Qt::Key_A:
+                    if (_leftKeyHandler) (*_leftKeyHandler)();
+                    break;
+                case Qt::Key_Right:
+                case Qt::Key_D:
+                    if (_rightKeyHandler) (*_rightKeyHandler)();
+                    break;
+                default:
+                    QGraphicsView::keyPressEvent(event);
+                    break;
+            }
+        }
     };
 }

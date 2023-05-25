@@ -16,15 +16,21 @@ namespace Prototyping {
     class GameMapForCircleAndCubes {
         std::pair<int, int>              _currentCirclePosition;
         std::vector<std::pair<int, int>> _currentCubePositions;
+        bool                             _initialized = false;
+        RGBColor                         _circleColor = {207, 2, 152};
+        QGraphicsEllipseItem*            _currentCircleItem;
 
     public:
         GameMapForCircleAndCubes(int rows, int cols)
             : rows(rows), cols(cols), cellWidth(50), cellHeight(50) {
             scene      = new QGraphicsScene();
             tileColors = std::map<std::pair<int, int>, QColor>();
-            // drawGrid();
+            drawGrid();
+            drawCircleOnTile(0, 0, _circleColor);
         }
 
+        unsigned int    GetWidth() const { return cols * cellWidth; }
+        unsigned int    GetHeight() const { return rows * cellHeight; }
         QGraphicsScene* GetScene() const { return scene; }
 
         void SetTileLines(bool state) { drawTileLines = state; }
@@ -34,7 +40,10 @@ namespace Prototyping {
             tileColors[{row, col}] = qcolor;
         }
 
-        void AddCube(int row, int col) { _currentCubePositions.push_back({row, col}); }
+        void AddCube(int row, int col) {
+            _currentCubePositions.push_back({row, col});
+            drawCubes();
+        }
 
         void MoveCircleTo(int row, int col) { _currentCirclePosition = {row, col}; }
 
@@ -55,16 +64,9 @@ namespace Prototyping {
                 MoveCircleTo(_currentCirclePosition.first, _currentCirclePosition.second + 1);
         }
 
-        void Redraw() {
-            scene->clear();
-            drawGrid();
-            drawCubes();
-            drawCircleOnTile(
-                _currentCirclePosition.first, _currentCirclePosition.second, {207, 2, 152}
-            );
-        }
-
     private:
+        void redrawTile(int row, int col) { auto foundCube = getCubeItems().find({row, col}); }
+
         std::pair<int, int> gridCoordinates(QPointF scenePos) {
             int gridX = static_cast<int>(scenePos.x()) / cellWidth;
             int gridY = static_cast<int>(scenePos.y()) / cellHeight;
@@ -110,8 +112,10 @@ namespace Prototyping {
             QTimer* timer = new QTimer();
 
             QObject::connect(timer, &QTimer::timeout, [projectile, this]() {
-                QPointF scenePos = projectile->pos();
-                explodeUnderProjectileIfAnyCubes(scenePos);
+                if (projectile) {
+                    QPointF scenePos = projectile->pos();
+                    explodeUnderProjectileIfAnyCubes(scenePos);
+                }
             });
 
             // Add the projectile to the scene
@@ -202,16 +206,13 @@ namespace Prototyping {
 
                     GameGraphicsRectItem* item = new GameGraphicsRectItem(rect);
 
-                    item->OnClick([this, i, j]() {
+                    item->OnLeftClick([this, i, j]() {
                         qDebug() << "Clicked on tile" << i << j;
                         qDebug() << "Current circle position is" << getCurrentCirclePosition();
                         auto from = getCurrentCirclePosition();
                         fireProjectile(from, {i, j});
                     });
-                    item->OnRightClick([this, i, j]() {
-                        // Single shot timer
-                        QTimer::singleShot(0, [this, i, j]() { AddCube(i, j); });
-                    });
+                    item->OnRightClick([this, i, j]() { AddCube(i, j); });
                     if (drawTileLines) {
                         item->setPen(QPen(Qt::black, 1));
                     }
@@ -228,21 +229,23 @@ namespace Prototyping {
 
         std::map<std::pair<int, int>, QGraphicsRectItem*> _currentCubeItems;
 
+        void drawCubeOnTile(int row, int col) {
+            int offsetX = row * cellWidth;
+            int offsetY = col * cellHeight;
+
+            int                size = cellWidth / 2;  // You can adjust these values as you need
+            QGraphicsRectItem* item = new QGraphicsRectItem(0, 0, size, size);
+            item->setPos(offsetX + size / 2, offsetY + size / 2);
+
+            qDebug() << "Adding current cube item at " << row << "," << col;
+            _currentCubeItems[{row, col}] = item;
+            item->setBrush(Qt::blue);
+            scene->addItem(item);
+        }
+
         void drawCubes() {
             _currentCubeItems.clear();
-            for (auto& cube : _currentCubePositions) {
-                int offsetX = cube.second * cellWidth;
-                int offsetY = cube.first * cellHeight;
-
-                int                size = cellWidth / 2;  // You can adjust these values as you need
-                QGraphicsRectItem* item = new QGraphicsRectItem(0, 0, size, size);
-                item->setPos(offsetX + size / 2, offsetY + size / 2);
-
-                qDebug() << "Adding current cube item at " << cube.first << "," << cube.second;
-                _currentCubeItems[{cube.first, cube.second}] = item;
-                item->setBrush(Qt::blue);
-                scene->addItem(item);
-            }
+            for (auto& cube : _currentCubePositions) drawCubeOnTile(cube.first, cube.second);
         }
 
         void drawCircleOnTile(int row, int col, RGBColor color) {
@@ -257,11 +260,11 @@ namespace Prototyping {
             offsetX += cellWidth / 4;
             offsetY += cellHeight / 4;
 
-            QGraphicsEllipseItem* item =
+            _currentCircleItem =
                 new QGraphicsEllipseItem(offsetX, offsetY, circleWidth, circleHeight);
-            item->setBrush(qcolor);
+            _currentCircleItem->setBrush(qcolor);
 
-            scene->addItem(item);
+            scene->addItem(_currentCircleItem);
         }
 
         int                                   rows;
