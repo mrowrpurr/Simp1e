@@ -41,47 +41,6 @@ protected:
     }
 };
 
-class KeyPressGraphicsView : public QGraphicsView {
-    std::function<void()> _upKeyHandler;
-    std::function<void()> _downKeyHandler;
-    std::function<void()> _leftKeyHandler;
-    std::function<void()> _rightKeyHandler;
-
-public:
-    KeyPressGraphicsView(QGraphicsScene* scene, QWidget* parent = nullptr)
-        : QGraphicsView(scene, parent) {}
-
-    void OnUpKey(std::function<void()> handler) { _upKeyHandler = handler; }
-    void OnDownKey(std::function<void()> handler) { _downKeyHandler = handler; }
-    void OnLeftKey(std::function<void()> handler) { _leftKeyHandler = handler; }
-    void OnRightKey(std::function<void()> handler) { _rightKeyHandler = handler; }
-
-protected:
-    void keyPressEvent(QKeyEvent* event) override {
-        switch (event->key()) {
-            case Qt::Key_Up:
-            case Qt::Key_W:
-                _upKeyHandler();
-                break;
-            case Qt::Key_Down:
-            case Qt::Key_S:
-                _downKeyHandler();
-                break;
-            case Qt::Key_Left:
-            case Qt::Key_A:
-                _leftKeyHandler();
-                break;
-            case Qt::Key_Right:
-            case Qt::Key_D:
-                _rightKeyHandler();
-                break;
-            default:
-                QGraphicsView::keyPressEvent(event);
-                break;
-        }
-    }
-};
-
 class AnimatedEllipse : public QGraphicsObject {
 public:
     AnimatedEllipse(qreal x, qreal y, qreal w, qreal h) : rect(x, y, w, h) { setPos(x, y); }
@@ -106,7 +65,7 @@ public:
     GridMap(int rows, int cols) : rows(rows), cols(cols), cellWidth(50), cellHeight(50) {
         scene      = new QGraphicsScene();
         tileColors = std::map<std::pair<int, int>, QColor>();
-        drawGrid();
+        // drawGrid();
     }
 
     QGraphicsScene* getScene() const { return scene; }
@@ -118,19 +77,9 @@ public:
         tileColors[{row, col}] = qcolor;
     }
 
-    void AddCube(int row, int col) {
-        _currentCubePositions.push_back({row, col});
-        Redraw();
-    }
+    void AddCube(int row, int col) { _currentCubePositions.push_back({row, col}); }
 
-    void MoveCircleTo(int row, int col) {
-        _currentCirclePosition = {row, col};
-        // single shot timer to avoid flickering
-        QTimer::singleShot(0, [this, row, col]() {
-            Redraw();
-            // emit CircleMoved(row, col);
-        });
-    }
+    void MoveCircleTo(int row, int col) { _currentCirclePosition = {row, col}; }
 
     void MoveCircleUp() {
         if (_currentCirclePosition.first > 0)
@@ -363,22 +312,74 @@ private:
     std::map<std::pair<int, int>, QColor> tileColors;
 };
 
+class KeyPressGraphicsView : public QGraphicsView {
+    // GridMap* _gridMap;
+
+public:
+    KeyPressGraphicsView(QGraphicsScene* scene, QWidget* parent = nullptr)
+        : QGraphicsView(scene, parent) {}
+
+    // : _gridMap(map), QGraphicsView(scene, parent) {}
+
+    // protected:
+    //     void OnUpKey() {
+    //         if (_gridMap) _gridMap->MoveCircleUp();
+    //     }
+    //     void OnDownKey() {
+    //         if (_gridMap) _gridMap->MoveCircleDown();
+    //     }
+    //     void OnLeftKey() {
+    //         if (_gridMap) _gridMap->MoveCircleLeft();
+    //     }
+    //     void OnRightKey() {
+    //         if (_gridMap) _gridMap->MoveCircleRight();
+    //     }
+
+    // void keyPressEvent(QKeyEvent* event) override {
+    //     switch (event->key()) {
+    //         case Qt::Key_Up:
+    //             OnUpKey();
+    //             break;
+    //         case Qt::Key_Down:
+    //         case Qt::Key_S:
+    //             OnDownKey();
+    //             break;
+    //         case Qt::Key_Left:
+    //         case Qt::Key_A:
+    //             OnLeftKey();
+    //             break;
+    //         case Qt::Key_Right:
+    //         case Qt::Key_D:
+    //             OnRightKey();
+    //             break;
+    //         default:
+    //             QGraphicsView::keyPressEvent(event);
+    //             break;
+    //     }
+    // }
+};
+
 int main(int argc, char* argv[]) {
+    int z = 420;
+    int x = 69;
+
     QApplication app{argc, argv};
 
     GridMap map(10, 15);
-    map.SetTileLines(true);
-    map.MoveCircleTo(5, 5);
-    map.AddCube(1, 2);
-    map.AddCube(8, 7);
-    map.AddCube(3, 8);
+    // map.SetTileLines(true);
+    // map.MoveCircleTo(5, 5);
+    // map.AddCube(1, 2);
+    // map.AddCube(8, 7);
+    // map.AddCube(3, 8);
 
-    KeyPressGraphicsView view(map.getScene());
-    view.OnUpKey([&map]() { map.MoveCircleUp(); });
-    view.OnDownKey([&map]() { map.MoveCircleDown(); });
-    view.OnLeftKey([&map]() { map.MoveCircleLeft(); });
-    view.OnRightKey([&map]() { map.MoveCircleRight(); });
+    auto scene = map.getScene();
+
+    KeyPressGraphicsView view(scene);
     view.show();
 
-    return app.exec();
+    // map.Redraw();
+
+    app.exec();
+
+    return 0;
 }
