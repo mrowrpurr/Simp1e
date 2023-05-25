@@ -1,0 +1,6 @@
+target("Game 2 - Circle shoots Cubes")
+    add_files("Game 2 - Circle shoots Cubes.cpp")
+    set_kind("binary")
+    add_qt()
+    add_string_formatting()
+    add_logging_support_for_binaries()
