@@ -1,10 +1,22 @@
 #include <QApplication>
-#include <QWidget>
+#include <QGraphicsView>
+
+#include "Prototyping/GameCircleCube.h"
+#include "Prototyping/QtGameCircleCubeScene.h"
+
+using namespace Prototyping;
 
 int main(int argc, char* argv[]) {
     QApplication app{argc, argv};
-    QWidget      widget;
-    widget.setFixedSize(100, 100);
-    widget.show();
+
+    GameCircleCube game{10, 8};
+    QGraphicsView  view;
+
+    QtGameCircleCubeSceneParams sceneParams = {.cellWidth = 50, .cellHeight = 75, .circleSize = 25};
+    QtGameCircleCubeScene       scene(game, sceneParams);
+
+    view.setScene(&scene);
+    view.show();
+
     return app.exec();
 }
