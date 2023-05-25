@@ -54,9 +54,11 @@ Describe("QtGameCircleCubeScene") {
         game.MoveCircleTo({1, 2});
         auto* circle = scene.GetCircle();
         AssertThat(circle, Is().Not().Null());
-        AssertThat(circle->pos(), Equals(QPointF(5, 20)));
+        AssertThat(circle->pos().x(), Equals(5));
+        AssertThat(circle->pos().y(), Equals(20));
 
-        // game.MoveCircleTo({1, 1});
-        // circle->pos()
+        game.MoveCircleTo({3, 5});
+        AssertThat(circle->pos().x(), Equals(15));
+        AssertThat(circle->pos().y(), Equals(50));
     });
 }

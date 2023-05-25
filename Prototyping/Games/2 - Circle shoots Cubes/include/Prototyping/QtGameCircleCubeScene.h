@@ -28,15 +28,17 @@ namespace Prototyping {
             rect->setBrush(QBrush(Qt::black));
             addItem(rect);
         }
-        void AddCircle() {
-            _circle = new QGraphicsEllipseItem(0, 0, _circleSize, _circleSize);
-            _circle->setBrush(QBrush(Qt::magenta));
-            addItem(_circle);
-        }
         void UpdateCirclePosition() {
             _circle->setPos(
                 _game.GetCirclePosition().x * _cellWidth, _game.GetCirclePosition().y * _cellHeight
             );
+        }
+        void AddCircle() {
+            if (_circle) return;
+            _circle = new QGraphicsEllipseItem(0, 0, _circleSize, _circleSize);
+            _circle->setBrush(QBrush(Qt::magenta));
+            addItem(_circle);
+            _game.OnCircleMoved([this]() { UpdateCirclePosition(); });
         }
 
     public:
@@ -47,12 +49,6 @@ namespace Prototyping {
               _cellHeight(params.cellHeight),
               _circleSize(params.circleSize) {
             AddBackground();
-
-            // // Add a blue rectangle to the scene
-            // auto* rect = new QGraphicsRectItem(0, 0, 100, 100);
-            // rect->setBrush(QBrush(Qt::blue));
-            // addItem(rect);
-
             AddCircle();
             UpdateCirclePosition();
         }
