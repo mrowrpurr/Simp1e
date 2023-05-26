@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <functional>
 #include <stdexcept>
+#include <unordered_set>
 #include <vector>
 
 #include "Coordinate.h"
@@ -12,15 +13,24 @@
 namespace Prototyping {
 
     class GameCircleCube {
-        Coordinate                         _circlePosition;
         uint32_t                           _rowCount    = 0;
         uint32_t                           _columnCount = 0;
+        Coordinate                         _circleTile;
+        std::unordered_set<Coordinate>     _cubeTiles;
         std::vector<std::function<void()>> _onCircleMovedCallbacks;
+
+        void ThrowIfOutOfBounds(Coordinate coordinate) {
+            if (coordinate.x >= _columnCount || coordinate.y >= _rowCount)
+                throw std::runtime_error(string_format(
+                    "({},{}) is out of bounds (map size: {}x{})", coordinate.x, coordinate.y,
+                    _columnCount, _rowCount
+                ));
+        }
 
     public:
         GameCircleCube() = default;
-        GameCircleCube(uint32_t coloumnCount, uint32_t rowCount)
-            : _rowCount(rowCount), _columnCount(coloumnCount) {}
+        GameCircleCube(uint32_t columnCount, uint32_t rowCount)
+            : _rowCount(rowCount), _columnCount(columnCount) {}
 
         uint32_t GetRowCount() const { return _rowCount; }
         uint32_t GetColumnCount() const { return _columnCount; }
@@ -32,16 +42,22 @@ namespace Prototyping {
             for (auto& callback : _onCircleMovedCallbacks) callback();
         }
 
-        void MoveCircleTo(Coordinate coordinate) {
-            if (coordinate.x >= _columnCount || coordinate.y >= _rowCount)
-                throw std::runtime_error(string_format(
-                    "({},{}) is out of bounds (map size: {}x{})", coordinate.x, coordinate.y,
-                    _columnCount, _rowCount
-                ));
-            _circlePosition = coordinate;
+        void MoveCircleTo(const Coordinate& coordinate) {
+            ThrowIfOutOfBounds(coordinate);
+            _circleTile = coordinate;
             TriggerOnCircleMoved();
         }
 
-        Coordinate& GetCircleTile() { return _circlePosition; }
+        void AddCubeTo(const Coordinate& coordinate) {
+            ThrowIfOutOfBounds(coordinate);
+            if (_cubeTiles.find(coordinate) != _cubeTiles.end())
+                throw std::runtime_error(
+                    string_format("({},{}) already has a cube", coordinate.x, coordinate.y)
+                );
+            _cubeTiles.insert(coordinate);
+        }
+
+        Coordinate&                     GetCircleTile() { return _circleTile; }
+        std::unordered_set<Coordinate>& GetCubeTiles() { return _cubeTiles; }
     };
 }
