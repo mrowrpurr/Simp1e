@@ -2,8 +2,6 @@
 
 #include <QApplication>
 
-#include "Prototyping/GameCircleCube.h"
-#include "Prototyping/GameCircleCubeInputHandler.h"
 #include "SpecHelper.h"
 
 using namespace Prototyping;

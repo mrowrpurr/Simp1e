@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 
 namespace Prototyping {
 
@@ -8,10 +9,12 @@ namespace Prototyping {
         uint32_t x = 0;
         uint32_t y = 0;
 
+        // TODO test
         bool operator==(const Coordinate& other) const { return x == other.x && y == other.y; }
     };
 }
 
+// TODO test
 namespace std {
     template <>
     struct hash<Prototyping::Coordinate> {

@@ -10,6 +10,7 @@ namespace Prototyping {
     public:
         GameCircleCubeInputHandler(GameCircleCube& game) : _game(game) {}
 
-        void OnLeftClick(Coordinate cell) { _game.MoveCircleTo(cell); }
+        void OnLeftClick(const Coordinate& cell) { _game.MoveCircleTo(cell); }
+        void OnRightClick(const Coordinate& cell) { _game.AddCubeTo(cell); }
     };
 }

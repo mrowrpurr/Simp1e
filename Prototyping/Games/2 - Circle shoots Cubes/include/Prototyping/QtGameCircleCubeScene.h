@@ -1,10 +1,12 @@
 #pragma once
 
 #include <QGraphicsEllipseItem>
+#include <QGraphicsRectItem>
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <cstdint>
 #include <iostream>
+#include <vector>
 
 #include "Prototyping/BoundingBox.h"
 #include "Prototyping/GameCircleCube.h"
@@ -16,16 +18,19 @@ namespace Prototyping {
         uint32_t tileWidth       = 0;
         uint32_t tileHeight      = 0;
         uint32_t circleSize      = 0;
+        uint32_t cubeSize        = 0;
         bool     renderGridLines = false;
     };
 
     class QtGameCircleCubeScene : public QGraphicsScene {
-        GameCircleCube&            _game;
-        GameCircleCubeInputHandler _inputHandler{_game};
-        uint32_t                   _tileWidth  = 0;
-        uint32_t                   _tileHeight = 0;
-        uint32_t                   _circleSize = 0;
-        QGraphicsEllipseItem*      _circle     = nullptr;
+        GameCircleCube&                 _game;
+        GameCircleCubeInputHandler      _inputHandler{_game};
+        uint32_t                        _tileWidth  = 0;
+        uint32_t                        _tileHeight = 0;
+        uint32_t                        _circleSize = 0;
+        uint32_t                        _cubeSize   = 0;
+        QGraphicsEllipseItem*           _circle     = nullptr;
+        std::vector<QGraphicsRectItem*> _cubes;
 
         void AddBackground() {
             auto* rect = new QGraphicsRectItem(
@@ -61,7 +66,18 @@ namespace Prototyping {
             _circle = new QGraphicsEllipseItem(0, 0, _circleSize, _circleSize);
             _circle->setBrush(QBrush(Qt::magenta));
             addItem(_circle);
+        }
+        void AddCube(const Coordinate& coordinate) {
+            auto* cube = new QGraphicsRectItem(
+                coordinate.x * _tileWidth, coordinate.y * _tileHeight, _tileWidth, _tileHeight
+            );
+            cube->setBrush(QBrush(Qt::white));
+            addItem(cube);
+            _cubes.push_back(cube);
+        }
+        void RegisterGameCallbacks() {
             _game.OnCircleMoved([this]() { UpdateCirclePosition(); });
+            _game.OnCubeAdded([this](const Coordinate& coordinate) { AddCube(coordinate); });
         }
 
     public:
@@ -75,18 +91,19 @@ namespace Prototyping {
             if (params.renderGridLines) RenderGridLines();
             AddCircle();
             UpdateCirclePosition();
+            RegisterGameCallbacks();
         }
 
-        QGraphicsEllipseItem* GetCircle() const { return _circle; }
-        uint32_t              GetCellWidth() const { return _tileWidth; }
-        uint32_t              GetCellHeight() const { return _tileHeight; }
+        QGraphicsEllipseItem*            GetCircle() const { return _circle; }
+        std::vector<QGraphicsRectItem*>& GetCubes() { return _cubes; }
+        uint32_t                         GetCellWidth() const { return _tileWidth; }
+        uint32_t                         GetCellHeight() const { return _tileHeight; }
 
         Coordinate PositionToTile(QPointF position) const {
             return {
                 static_cast<uint32_t>(position.x() / _tileWidth),
                 static_cast<uint32_t>(position.y() / _tileHeight)};
         }
-
         BoundingBox TileToPosition(Coordinate tile) const {
             auto topLeft = Coordinate{tile.x * _tileWidth, tile.y * _tileHeight};
             auto bottomRight =

@@ -13,11 +13,13 @@
 namespace Prototyping {
 
     class GameCircleCube {
-        uint32_t                           _rowCount    = 0;
-        uint32_t                           _columnCount = 0;
-        Coordinate                         _circleTile;
-        std::unordered_set<Coordinate>     _cubeTiles;
-        std::vector<std::function<void()>> _onCircleMovedCallbacks;
+        uint32_t                       _rowCount    = 0;
+        uint32_t                       _columnCount = 0;
+        Coordinate                     _circleTile;
+        std::unordered_set<Coordinate> _cubeTiles;
+        std::vector<std::function<void()>>
+            _onCircleMovedCallbacks;  // TODO update to include the circle coordinates
+        std::vector<std::function<void(const Coordinate&)>> _onCubeAddedCallbacks;
 
         void ThrowIfOutOfBounds(Coordinate coordinate) {
             if (coordinate.x >= _columnCount || coordinate.y >= _rowCount)
@@ -42,10 +44,17 @@ namespace Prototyping {
             for (auto& callback : _onCircleMovedCallbacks) callback();
         }
 
+        void OnCubeAdded(std::function<void(const Coordinate&)> callback) {
+            _onCubeAddedCallbacks.push_back(callback);
+        }
+        void TriggerOnCubeAdded(const Coordinate& coordinate) {
+            for (auto& callback : _onCubeAddedCallbacks) callback(coordinate);
+        }
+
         void MoveCircleTo(const Coordinate& coordinate) {
             ThrowIfOutOfBounds(coordinate);
             _circleTile = coordinate;
-            TriggerOnCircleMoved();
+            TriggerOnCircleMoved();  // <-- TODO this is where we should pass the circle coordinates
         }
 
         void AddCubeTo(const Coordinate& coordinate) {
@@ -55,6 +64,7 @@ namespace Prototyping {
                     string_format("({},{}) already has a cube", coordinate.x, coordinate.y)
                 );
             _cubeTiles.insert(coordinate);
+            TriggerOnCubeAdded(coordinate);
         }
 
         Coordinate&                     GetCircleTile() { return _circleTile; }

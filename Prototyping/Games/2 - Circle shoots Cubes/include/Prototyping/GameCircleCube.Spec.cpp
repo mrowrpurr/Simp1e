@@ -1,5 +1,7 @@
 #define spec_name GameCircleCube
 
+#include "GameCircleCube.h"
+
 #include "GameSpecHelper.h"
 
 Describe("GameCircleCube") {

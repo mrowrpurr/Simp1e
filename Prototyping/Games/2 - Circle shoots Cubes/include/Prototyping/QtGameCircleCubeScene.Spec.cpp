@@ -69,6 +69,26 @@ Describe("QtGameCircleCubeScene") {
         );
     });
 
+    // it("can have cubes on its scene", []() {
+    //     SetupQtApp app;
+
+    //     GameCircleCube              game{5, 10};
+    //     QtGameCircleCubeSceneParams sceneParams{.tileWidth = 6, .tileHeight = 10};
+    //     QtGameCircleCubeScene       scene(game, sceneParams);
+
+    //     AssertThat(scene.GetCubes().size(), Equals(0));
+
+    //     game.AddCubeTo({1, 2});
+    //     AssertThat(scene.GetCubes().size(), Equals(1));
+
+    //     auto expectedCubeBoundingBox = scene.TileToPosition({1, 2});
+    //     auto* cube = scene.GetCubes().front();
+    //     // AssertThat(expectedCubeBoundingBox.Contains(cube->pos()), IsTrue());
+
+    //     game.AddCubeTo({3, 4});
+    //     AssertThat(scene.GetCubes().size(), Equals(2));
+    // });
+
     it("can get tile from a Qt position", []() {
         SetupQtApp app;
 
@@ -131,4 +151,6 @@ Describe("QtGameCircleCubeScene") {
 
         AssertThat(game.GetCircleTile(), Equals(Coordinate{3, 4}));
     });
+
+    // it(right ...)
 }
