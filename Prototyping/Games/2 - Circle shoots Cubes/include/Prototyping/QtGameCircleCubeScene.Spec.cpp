@@ -3,6 +3,7 @@
 #include "QtGameCircleCubeScene.h"
 
 #include <QApplication>
+#include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
 
 #include "GameSpecHelper.h"
@@ -106,21 +107,30 @@ Describe("QtGameCircleCubeScene") {
         AssertThat(actual.bottomRight.y, Equals(expected.bottomRight.y));
     });
 
-    // it("left clicking moves the circle to that position", []() {
-    //     SetupQtApp app;
+    it("left clicking moves the circle to that position", []() {
+        SetupQtApp app;
 
-    //     GameCircleCube              game{5, 10};
-    //     QtGameCircleCubeSceneParams sceneParams{.cellWidth = 6, .cellHeight = 10};
-    //     QtGameCircleCubeScene       scene(game, sceneParams);
-    //     game.MoveCircleTo({1, 2});
-    //     auto* circle = scene.GetCircle();
+        GameCircleCube              game{5, 10};
+        QtGameCircleCubeSceneParams sceneParams{.cellWidth = 6, .cellHeight = 10};
+        QtGameCircleCubeScene       scene(game, sceneParams);
+        game.MoveCircleTo({1, 2});
+        auto* circle = scene.GetCircle();
 
-    //     QGraphicsSceneMouseEvent pressEvent(QEvent::GraphicsSceneMousePress);
-    //     pressEvent.setButton(Qt::LeftButton);
-    //     pressEvent.setScenePos(QPointF(50, 50));  // Set your coordinates here
-    //     pressEvent.setButtonDownScenePos(
-    //         Qt::LeftButton, QPointF(50, 50)
-    //     );  // Repeat your coordinates here
-    //     QApplication::sendEvent(scene, &pressEvent);
-    // });
+        auto positionToClick = scene.CellToPosition({3, 4});
+
+        AssertThat(game.GetCirclePosition(), Equals(Coordinate{1, 2}));
+
+        QGraphicsSceneMouseEvent pressEvent(QEvent::GraphicsSceneMousePress);
+        pressEvent.setButton(Qt::LeftButton);
+        pressEvent.setScenePos(QPointF(positionToClick.topLeft.x, positionToClick.topLeft.y)
+        );  // Set your coordinates here
+        pressEvent.setButtonDownScenePos(
+            Qt::LeftButton, QPointF(50, 50)
+        );  // Repeat your coordinates here
+        QApplication::sendEvent(&scene, &pressEvent);
+
+        AssertThat(game.GetCirclePosition(), Equals(Coordinate{3, 4}));
+    });
+
+    // .... TODO ...
 }

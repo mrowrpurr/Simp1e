@@ -2,7 +2,9 @@
 
 #include <QGraphicsEllipseItem>
 #include <QGraphicsScene>
+#include <QGraphicsSceneMouseEvent>
 #include <cstdint>
+#include <iostream>
 
 #include "Prototyping/BoundingBox.h"
 #include "Prototyping/GameCircleCube.h"
@@ -92,9 +94,12 @@ namespace Prototyping {
         }
 
     protected:
-        // void mousePressEvent(QGraphicsSceneMouseEvent* event) override {
-
-        //     _game.MoveCircleTo({cellX, cellY});
-        // }
+        void mousePressEvent(QGraphicsSceneMouseEvent* event) override {
+            if (event->button() == Qt::MouseButton::LeftButton) {
+                auto cell = PositionToCell(event->scenePos());
+                _game.MoveCircleTo(cell);
+            }
+            QGraphicsScene::mousePressEvent(event);
+        }
     };
 }
