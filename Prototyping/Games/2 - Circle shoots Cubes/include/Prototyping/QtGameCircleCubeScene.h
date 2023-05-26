@@ -8,6 +8,7 @@
 
 #include "Prototyping/BoundingBox.h"
 #include "Prototyping/GameCircleCube.h"
+#include "Prototyping/GameCircleCubeInputHandler.h"
 
 namespace Prototyping {
 
@@ -19,11 +20,12 @@ namespace Prototyping {
     };
 
     class QtGameCircleCubeScene : public QGraphicsScene {
-        GameCircleCube&       _game;
-        uint32_t              _cellWidth  = 0;
-        uint32_t              _cellHeight = 0;
-        uint32_t              _circleSize = 0;
-        QGraphicsEllipseItem* _circle     = nullptr;
+        GameCircleCube&            _game;
+        GameCircleCubeInputHandler _inputHandler{_game};
+        uint32_t                   _cellWidth  = 0;
+        uint32_t                   _cellHeight = 0;
+        uint32_t                   _circleSize = 0;
+        QGraphicsEllipseItem*      _circle     = nullptr;
 
         void AddBackground() {
             auto* rect = new QGraphicsRectItem(
@@ -49,10 +51,9 @@ namespace Prototyping {
             }
         }
         void UpdateCirclePosition() {
-            auto newX =
-                _game.GetCirclePosition().x * _cellWidth + (_cellWidth / 2) - (_circleSize / 2);
+            auto newX = _game.GetCircleTile().x * _cellWidth + (_cellWidth / 2) - (_circleSize / 2);
             auto newY =
-                _game.GetCirclePosition().y * _cellHeight + (_cellHeight / 2) - (_circleSize / 2);
+                _game.GetCircleTile().y * _cellHeight + (_cellHeight / 2) - (_circleSize / 2);
             _circle->setPos(newX, newY);
         }
         void AddCircle() {
@@ -80,13 +81,13 @@ namespace Prototyping {
         uint32_t              GetCellWidth() const { return _cellWidth; }
         uint32_t              GetCellHeight() const { return _cellHeight; }
 
-        Coordinate PositionToCell(QPointF position) const {
+        Coordinate PositionToTile(QPointF position) const {
             return {
                 static_cast<uint32_t>(position.x() / _cellWidth),
                 static_cast<uint32_t>(position.y() / _cellHeight)};
         }
 
-        BoundingBox CellToPosition(Coordinate cell) const {
+        BoundingBox TileToPosition(Coordinate cell) const {
             auto topLeft = Coordinate{cell.x * _cellWidth, cell.y * _cellHeight};
             auto bottomRight =
                 Coordinate{cell.x * _cellWidth + _cellWidth, cell.y * _cellHeight + _cellHeight};
@@ -95,10 +96,8 @@ namespace Prototyping {
 
     protected:
         void mousePressEvent(QGraphicsSceneMouseEvent* event) override {
-            if (event->button() == Qt::MouseButton::LeftButton) {
-                auto cell = PositionToCell(event->scenePos());
-                _game.MoveCircleTo(cell);
-            }
+            if (event->button() == Qt::MouseButton::LeftButton)
+                _inputHandler.OnLeftClick(PositionToTile(event->scenePos()));
             QGraphicsScene::mousePressEvent(event);
         }
     };

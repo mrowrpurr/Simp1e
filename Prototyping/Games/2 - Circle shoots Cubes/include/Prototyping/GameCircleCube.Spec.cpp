@@ -24,7 +24,28 @@ Describe("GameCircleCube") {
 
         GameCircleCube game3(5, 8);
         game3.MoveCircleTo({4, 7});
-        AssertThat(game3.GetCirclePosition().y, Equals(7));
-        AssertThat(game3.GetCirclePosition().x, Equals(4));
+        AssertThat(game3.GetCircleTile().y, Equals(7));
+        AssertThat(game3.GetCircleTile().x, Equals(4));
     });
+
+    // it("can have multiple cubes (1 per cell)", []() {
+    //     GameCircleCube game;
+    //     AssertThat(game.GetCubeCells().size(), Equals(0));
+
+    //     AssertThrows(std::runtime_error, game.AddCubeTo({5, 8}));
+    //     AssertThat(LastException<std::runtime_error>().what(), Contains("out of bounds"));
+
+    //     GameCircleCube game2(5, 8);
+    //     AssertThrows(std::runtime_error, game2.AddCubeTo({5, 8}));
+    //     AssertThat(LastException<std::runtime_error>().what(), Contains("out of bounds"));
+
+    //     GameCircleCube game3(5, 8);
+    //     game3.AddCubeTo({4, 7});
+    //     AssertThat(game3.GetCircleTile().y, Equals(7));
+    //     AssertThat(game3.GetCircleTile().x, Equals(4));
+    //     AssertThat(game.GetCubeCells().size(), Equals(1));
+
+    //     AssertThrows(std::runtime_error, game2.AddCubeTo({4, 7}));
+    //     AssertThat(LastException<std::runtime_error>().what(), Contains("already has a cube"));
+    // });
 }

@@ -78,11 +78,11 @@ Describe("QtGameCircleCubeScene") {
         game.MoveCircleTo({1, 2});
         auto* circle = scene.GetCircle();
 
-        auto coordinate = scene.PositionToCell(circle->pos());
+        auto coordinate = scene.PositionToTile(circle->pos());
         AssertThat(coordinate, Equals(Coordinate{1, 2}));
 
         game.MoveCircleTo({3, 4});
-        auto coordinate2 = scene.PositionToCell(circle->pos());
+        auto coordinate2 = scene.PositionToTile(circle->pos());
         AssertThat(coordinate2, Equals(Coordinate{3, 4}));
     });
 
@@ -95,7 +95,7 @@ Describe("QtGameCircleCubeScene") {
         game.MoveCircleTo({1, 2});
         auto* circle = scene.GetCircle();
 
-        auto actual   = scene.CellToPosition({1, 2});
+        auto actual   = scene.TileToPosition({1, 2});
         auto expected = BoundingBox{
             {1 * sceneParams.cellWidth,                         2 * sceneParams.cellHeight},
             {1 * sceneParams.cellWidth + sceneParams.cellWidth,
@@ -116,9 +116,9 @@ Describe("QtGameCircleCubeScene") {
         game.MoveCircleTo({1, 2});
         auto* circle = scene.GetCircle();
 
-        auto positionToClick = scene.CellToPosition({3, 4});
+        auto positionToClick = scene.TileToPosition({3, 4});
 
-        AssertThat(game.GetCirclePosition(), Equals(Coordinate{1, 2}));
+        AssertThat(game.GetCircleTile(), Equals(Coordinate{1, 2}));
 
         QGraphicsSceneMouseEvent pressEvent(QEvent::GraphicsSceneMousePress);
         pressEvent.setButton(Qt::LeftButton);
@@ -129,7 +129,7 @@ Describe("QtGameCircleCubeScene") {
         );  // Repeat your coordinates here
         QApplication::sendEvent(&scene, &pressEvent);
 
-        AssertThat(game.GetCirclePosition(), Equals(Coordinate{3, 4}));
+        AssertThat(game.GetCircleTile(), Equals(Coordinate{3, 4}));
     });
 
     // .... TODO ...

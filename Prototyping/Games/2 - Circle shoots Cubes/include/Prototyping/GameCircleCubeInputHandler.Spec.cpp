@@ -8,9 +8,9 @@ Describe("GameCircleCubeInputHandler") {
         GameCircleCubeInputHandler inputHandler{game};
 
         game.MoveCircleTo({1, 1});
-        AssertThat(game.GetCirclePosition(), Equals(Coordinate{1, 1}));
+        AssertThat(game.GetCircleTile(), Equals(Coordinate{1, 1}));
 
         inputHandler.OnLeftClick({2, 2});
-        AssertThat(game.GetCirclePosition(), Equals(Coordinate{2, 2}));
+        AssertThat(game.GetCircleTile(), Equals(Coordinate{2, 2}));
     });
 }

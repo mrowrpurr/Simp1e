@@ -42,6 +42,6 @@ namespace Prototyping {
             TriggerOnCircleMoved();
         }
 
-        Coordinate& GetCirclePosition() { return _circlePosition; }
+        Coordinate& GetCircleTile() { return _circlePosition; }
     };
 }
