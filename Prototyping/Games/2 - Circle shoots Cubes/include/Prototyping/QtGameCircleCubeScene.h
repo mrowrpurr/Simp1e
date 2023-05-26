@@ -67,10 +67,9 @@ namespace Prototyping {
             _circle->setBrush(QBrush(Qt::magenta));
             addItem(_circle);
         }
-        void AddCube(const Coordinate& coordinate) {
-            auto* cube = new QGraphicsRectItem(
-                coordinate.x * _tileWidth, coordinate.y * _tileHeight, _tileWidth, _tileHeight
-            );
+        void AddCube(const Coordinate& tile) {
+            auto* cube = new QGraphicsRectItem(0, 0, _cubeSize, _cubeSize);
+            cube->setPos(tile.x * _tileWidth, tile.y * _tileHeight);
             cube->setBrush(QBrush(Qt::white));
             addItem(cube);
             _cubes.push_back(cube);
@@ -86,7 +85,8 @@ namespace Prototyping {
               _game(game),
               _tileWidth(params.tileWidth),
               _tileHeight(params.tileHeight),
-              _circleSize(params.circleSize) {
+              _circleSize(params.circleSize),
+              _cubeSize(params.cubeSize) {
             AddBackground();
             if (params.renderGridLines) RenderGridLines();
             AddCircle();
@@ -115,6 +115,8 @@ namespace Prototyping {
         void mousePressEvent(QGraphicsSceneMouseEvent* event) override {
             if (event->button() == Qt::MouseButton::LeftButton)
                 _inputHandler.OnLeftClick(PositionToTile(event->scenePos()));
+            else if (event->button() == Qt::MouseButton::RightButton)
+                _inputHandler.OnRightClick(PositionToTile(event->scenePos()));
             QGraphicsScene::mousePressEvent(event);
         }
     };

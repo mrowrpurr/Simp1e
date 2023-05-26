@@ -69,25 +69,42 @@ Describe("QtGameCircleCubeScene") {
         );
     });
 
-    // it("can have cubes on its scene", []() {
-    //     SetupQtApp app;
+    it("can have cubes on its scene", []() {
+        SetupQtApp app;
 
-    //     GameCircleCube              game{5, 10};
-    //     QtGameCircleCubeSceneParams sceneParams{.tileWidth = 6, .tileHeight = 10};
-    //     QtGameCircleCubeScene       scene(game, sceneParams);
+        GameCircleCube              game{5, 10};
+        QtGameCircleCubeSceneParams sceneParams{.tileWidth = 6, .tileHeight = 10, .cubeSize = 5};
+        QtGameCircleCubeScene       scene(game, sceneParams);
 
-    //     AssertThat(scene.GetCubes().size(), Equals(0));
+        AssertThat(scene.GetCubes().size(), Equals(0));
 
-    //     game.AddCubeTo({1, 2});
-    //     AssertThat(scene.GetCubes().size(), Equals(1));
+        game.AddCubeTo({1, 2});
+        AssertThat(scene.GetCubes().size(), Equals(1));
 
-    //     auto expectedCubeBoundingBox = scene.TileToPosition({1, 2});
-    //     auto* cube = scene.GetCubes().front();
-    //     // AssertThat(expectedCubeBoundingBox.Contains(cube->pos()), IsTrue());
+        auto  expectedCubeBoundingBox = scene.TileToPosition({1, 2});
+        auto* cube                    = scene.GetCubes().front();
+        AssertThat(
+            expectedCubeBoundingBox.Contains(
+                {static_cast<uint32_t>(cube->pos().x()), static_cast<uint32_t>(cube->pos().y())}
+            ),
+            IsTrue()
+        );
 
-    //     game.AddCubeTo({3, 4});
-    //     AssertThat(scene.GetCubes().size(), Equals(2));
-    // });
+        game.AddCubeTo({3, 4});
+        AssertThat(scene.GetCubes().size(), Equals(2));
+
+        bool found                    = false;
+        auto expectedCubeBoundingBox2 = scene.TileToPosition({3, 4});
+        for (auto* cube : scene.GetCubes()) {
+            if (expectedCubeBoundingBox2.Contains(
+                    {static_cast<uint32_t>(cube->pos().x()), static_cast<uint32_t>(cube->pos().y())}
+                )) {
+                found = true;
+                break;
+            }
+        }
+        AssertThat(found, IsTrue());
+    });
 
     it("can get tile from a Qt position", []() {
         SetupQtApp app;
@@ -145,12 +162,34 @@ Describe("QtGameCircleCubeScene") {
         pressEvent.setScenePos(QPointF(positionToClick.topLeft.x, positionToClick.topLeft.y)
         );  // Set your coordinates here
         pressEvent.setButtonDownScenePos(
-            Qt::LeftButton, QPointF(50, 50)
-        );  // Repeat your coordinates here
+            Qt::LeftButton, QPointF(positionToClick.topLeft.x, positionToClick.topLeft.y)
+        );  // Repeat your coordinates here <--- can we get rid of this? TODO
         QApplication::sendEvent(&scene, &pressEvent);
 
         AssertThat(game.GetCircleTile(), Equals(Coordinate{3, 4}));
     });
 
-    // it(right ...)
+    it("right clicking adds cubes to that position (if not already there)", []() {
+        SetupQtApp app;
+
+        GameCircleCube              game{5, 10};
+        QtGameCircleCubeSceneParams sceneParams{.tileWidth = 6, .tileHeight = 10};
+        QtGameCircleCubeScene       scene(game, sceneParams);
+
+        auto positionToClick = scene.TileToPosition({3, 4});
+        AssertThat(game.GetCubeTiles().size(), Equals(0));
+
+        QGraphicsSceneMouseEvent pressEvent(QEvent::GraphicsSceneMousePress);
+        pressEvent.setButton(Qt::RightButton);
+        pressEvent.setScenePos(QPointF(positionToClick.topLeft.x, positionToClick.topLeft.y)
+        );  // Set your coordinates here
+        pressEvent.setButtonDownScenePos(
+            Qt::RightButton, QPointF(positionToClick.topLeft.x, positionToClick.topLeft.y)
+        );  // Repeat your coordinates here
+        QApplication::sendEvent(&scene, &pressEvent);
+
+        AssertThat(game.GetCubeTiles().size(), Equals(1));
+
+        // TODO
+    });
 }
