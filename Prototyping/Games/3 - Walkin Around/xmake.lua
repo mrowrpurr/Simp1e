@@ -1,0 +1,6 @@
+target("Game 3 - Walkin Around")
+    add_files("Game 3 - Walkin Around.cpp")
+    set_kind("binary")
+    add_qt()
+    add_string_formatting()
+    add_logging_support_for_binaries()
