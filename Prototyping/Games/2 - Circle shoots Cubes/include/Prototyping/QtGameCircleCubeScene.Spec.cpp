@@ -89,6 +89,18 @@ Describe("QtGameCircleCubeScene") {
             ),
             IsTrue()
         );
+        AssertThat(
+            cube->pos().x(),
+            Equals(
+                1 * sceneParams.tileWidth + (sceneParams.tileWidth / 2) - (sceneParams.cubeSize / 2)
+            )
+        );
+        AssertThat(
+            cube->pos().y(), Equals(
+                                 2 * sceneParams.tileHeight + (sceneParams.tileHeight / 2) -
+                                 (sceneParams.cubeSize / 2)
+                             )
+        );
 
         game.AddCubeTo({3, 4});
         AssertThat(scene.GetCubes().size(), Equals(2));
@@ -189,7 +201,6 @@ Describe("QtGameCircleCubeScene") {
         QApplication::sendEvent(&scene, &pressEvent);
 
         AssertThat(game.GetCubeTiles().size(), Equals(1));
-
-        // TODO
+        AssertThat(game.GetCubeTiles(), Contains(Coordinate{3, 4}));
     });
 }

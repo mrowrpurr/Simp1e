@@ -69,8 +69,13 @@ namespace Prototyping {
         }
         void AddCube(const Coordinate& tile) {
             auto* cube = new QGraphicsRectItem(0, 0, _cubeSize, _cubeSize);
-            cube->setPos(tile.x * _tileWidth, tile.y * _tileHeight);
-            cube->setBrush(QBrush(Qt::white));
+            cube->setPos(
+                tile.x * _tileWidth + (static_cast<uint32_t>(_tileWidth / 2)) -
+                    (static_cast<uint32_t>(_cubeSize / 2)),
+                tile.y * _tileHeight + (static_cast<uint32_t>(_tileHeight / 2)) -
+                    (static_cast<uint32_t>(_cubeSize / 2))
+            );
+            cube->setBrush(QBrush(Qt::blue));
             addItem(cube);
             _cubes.push_back(cube);
         }

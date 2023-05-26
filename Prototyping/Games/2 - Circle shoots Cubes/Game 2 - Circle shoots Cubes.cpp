@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
         .tileWidth       = 50,
         .tileHeight      = 50,
         .circleSize      = 20,
-        .cubeSize        = 35,
+        .cubeSize        = 25,
         .renderGridLines = true,
     };
     QtGameCircleCubeScene scene(game, sceneParams);
