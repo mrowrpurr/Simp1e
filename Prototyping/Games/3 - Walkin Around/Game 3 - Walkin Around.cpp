@@ -1,269 +1,233 @@
 #include <QApplication>
-#include <QColor>
-#include <QDebug>
-#include <QGraphicsEllipseItem>
 #include <QGraphicsRectItem>
 #include <QGraphicsScene>
+#include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
 #include <QKeyEvent>
-#include <QTimer>
-#include <functional>
-#include <map>
-#include <queue>
-#include <vector>
 
-constexpr auto BOARD =
-    "      *   \n"
-    " **   *   \n"
-    " **       \n"
-    "        * \n"
-    "***   *   \n"
-    "   *  *   \n";
+enum CellType { FREE, OBSTACLE, START, END };
 
-struct Tile {
-    bool obstacle = false;
-    int  x, y;
+class Cell;
+
+struct IGame {
+    virtual void SetStartCell(Cell* cell) = 0;
+    virtual void SetEndCell(Cell* cell)   = 0;
 };
 
-struct Node {
-    Tile* tile;
-    int   g_cost;
-    int   h_cost;
-    Node* parent;
-
-    int f_cost() const { return g_cost + h_cost; }
-};
-
-typedef std::vector<std::vector<Tile>> TileGrid;
-
-TileGrid theGrid;
-
-void InitializeGridFromString(const std::string& text) {
-    // Get the number of rows and columns from the text.
-    int rows = 0;
-    int cols = 0;
-    for (auto c : text) {
-        if (c == '\n') {
-            ++rows;
-            continue;
-        }
-        if (rows == 0) {
-            ++cols;
-        }
-    }
-
-    // Resize the grid to the correct size.
-    theGrid.resize(rows);
-    for (auto& row : theGrid) {
-        row.resize(cols);
-    }
-
-    // Fill in the grid with the tiles.
-    for (int row = 0; row < rows; ++row) {
-        for (int col = 0; col < cols; ++col) {
-            theGrid[row][col].x = col;
-            theGrid[row][col].y = row;
-        }
-    }
-
-    // // Given a string with multiple lines of empty spaces and asterisks,
-    // // create a grid of tiles where the asterisks are obstacles.
-    int row = 0;
-    int col = 0;
-    for (auto c : text) {
-        if (c == '\n') {
-            ++row;
-            col = 0;
-            continue;
-        }
-        if (c == '*') {
-            theGrid[row][col].obstacle = true;
-        }
-        ++col;
-    }
-}
-
-struct RGBColor {
-    int red, green, blue;
-};
-
-#include <QGraphicsSceneMouseEvent>
-
-class GameGraphicsRectItem : public QGraphicsRectItem {
-    std::function<void()> _onClickHandler;
+class Cell : public QGraphicsRectItem {
+    QBrush defaultBrush;
+    QBrush obstacleBrush;
+    QBrush startBrush;
+    QBrush endBrush;
+    IGame* game;
 
 public:
-    GameGraphicsRectItem(const QRectF& rect, QGraphicsItem* parent = nullptr)
-        : QGraphicsRectItem(rect, parent) {}
-
-    void OnClick(std::function<void()> handler) { _onClickHandler = handler; }
-
-protected:
-    void mousePressEvent(QGraphicsSceneMouseEvent* event) override {
-        if (event->button() == Qt::LeftButton) {
-            _onClickHandler();
-        }
-        QGraphicsRectItem::mousePressEvent(event);
+    Cell(IGame* g, qreal x, qreal y, qreal w, qreal h, QGraphicsItem* parent = nullptr)
+        : QGraphicsRectItem(x, y, w, h, parent),
+          defaultBrush(Qt::white),
+          obstacleBrush(Qt::black),
+          startBrush(Qt::green),
+          endBrush(Qt::red),
+          game(g) {
+        setBrush(defaultBrush);
     }
-};
 
-class KeyPressGraphicsView : public QGraphicsView {
-    std::function<void()> _upKeyHandler;
-    std::function<void()> _downKeyHandler;
-    std::function<void()> _leftKeyHandler;
-    std::function<void()> _rightKeyHandler;
+    // A* shit
+    CellType           type    = FREE;
+    bool               visited = false;
+    float              globalGoal;        // also known as "g"
+    float              localGoal;         // also known as "f"
+    std::vector<Cell*> vecNeighbors;      // cells this cell is connected to
+    Cell*              parent = nullptr;  // cell connecting to this cell
 
-public:
-    KeyPressGraphicsView(QGraphicsScene* scene, QWidget* parent = nullptr)
-        : QGraphicsView(scene, parent) {}
-
-    void OnUpKey(std::function<void()> handler) { _upKeyHandler = handler; }
-    void OnDownKey(std::function<void()> handler) { _downKeyHandler = handler; }
-    void OnLeftKey(std::function<void()> handler) { _leftKeyHandler = handler; }
-    void OnRightKey(std::function<void()> handler) { _rightKeyHandler = handler; }
-
-protected:
-    void keyPressEvent(QKeyEvent* event) override {
-        switch (event->key()) {
-            case Qt::Key_Up:
-            case Qt::Key_W:
-                _upKeyHandler();
+    void setType(CellType newType) {
+        switch (newType) {
+            case OBSTACLE:
+                setBrush(obstacleBrush);
                 break;
-            case Qt::Key_Down:
-            case Qt::Key_S:
-                _downKeyHandler();
+            case START:
+                setBrush(startBrush);
                 break;
-            case Qt::Key_Left:
-            case Qt::Key_A:
-                _leftKeyHandler();
-                break;
-            case Qt::Key_Right:
-            case Qt::Key_D:
-                _rightKeyHandler();
+            case END:
+                setBrush(endBrush);
                 break;
             default:
-                QGraphicsView::keyPressEvent(event);
+                setBrush(defaultBrush);
                 break;
+        }
+    }
+
+    void mousePressEvent(QGraphicsSceneMouseEvent* event) override {
+        if (event->button() == Qt::LeftButton) {
+            game->SetStartCell(this);
+            setType(START);
+        } else if (event->button() == Qt::MiddleButton) {
+            game->SetEndCell(this);
+            setType(END);
+        } else if (event->button() == Qt::RightButton) {
+            setType(OBSTACLE);
         }
     }
 };
 
-class GridMap {
-    std::pair<int, int> _currentCirclePosition;
+class Game : public IGame {
+    QGraphicsScene*                 scene;
+    std::vector<std::vector<Cell*>> grid;
+    Cell*                           startCell = nullptr;
+    Cell*                           endCell   = nullptr;
+    int                             cellSize  = 50;
 
 public:
-    GridMap() : cellWidth(50), cellHeight(50) {
-        scene      = new QGraphicsScene();
-        tileColors = std::map<std::pair<int, int>, QColor>();
-        initializeGrid();
-        initializeCircle(3, 4, {255, 0, 255});
+    Game() {
+        scene = new QGraphicsScene;
+        scene->setSceneRect(0, 0, 500, 500);
+        scene->setBackgroundBrush(Qt::black);
     }
 
     QGraphicsScene* getScene() const { return scene; }
 
-    void SetTileColor(int row, int col, RGBColor color) {
-        QColor qcolor(color.red, color.green, color.blue);
-        tileColors[{row, col}] = qcolor;
+    void SetStartCell(Cell* cell) override {
+        if (startCell) startCell->setType(FREE);
+        startCell = cell;
+    }
+    void SetEndCell(Cell* cell) override {
+        if (endCell) endCell->setType(FREE);
+        endCell = cell;
     }
 
-    void MoveCircleTo(int row, int col) {
-        _currentCirclePosition = {row, col};
-        // Move the circle to the new position.
-        circle->setPos(
-            col * cellWidth + cellWidth / 2 - circleSize / 2,
-            row * cellHeight + cellHeight / 2 - circleSize / 2
-        );
-    }
-
-    void MoveCircleUp() {
-        if (_currentCirclePosition.first > 0 &&
-            !theGrid[_currentCirclePosition.first - 1][_currentCirclePosition.second].obstacle)
-            MoveCircleTo(_currentCirclePosition.first - 1, _currentCirclePosition.second);
-    }
-    void MoveCircleDown() {
-        if (_currentCirclePosition.first < rows - 1 &&
-            !theGrid[_currentCirclePosition.first + 1][_currentCirclePosition.second].obstacle)
-            MoveCircleTo(_currentCirclePosition.first + 1, _currentCirclePosition.second);
-    }
-    void MoveCircleLeft() {
-        if (_currentCirclePosition.second > 0 &&
-            !theGrid[_currentCirclePosition.first][_currentCirclePosition.second - 1].obstacle)
-            MoveCircleTo(_currentCirclePosition.first, _currentCirclePosition.second - 1);
-    }
-    void MoveCircleRight() {
-        if (_currentCirclePosition.second < cols - 1 &&
-            !theGrid[_currentCirclePosition.first][_currentCirclePosition.second + 1].obstacle)
-            MoveCircleTo(_currentCirclePosition.first, _currentCirclePosition.second + 1);
-    }
-
-private:
-    void initializeGrid() {
-        rows = theGrid.size();
-        cols = theGrid[0].size();
+    void createGrid(int rows, int cols) {
+        grid.resize(rows, std::vector<Cell*>(cols));
 
         for (int i = 0; i < rows; ++i) {
             for (int j = 0; j < cols; ++j) {
-                int  offsetX = j * cellWidth;
-                int  offsetY = i * cellHeight;
-                auto tile    = theGrid[i][j];
+                auto* cell = new Cell(this, j * cellSize, i * cellSize, cellSize, cellSize);
+                grid[i][j] = cell;
+                cell->setPen(QPen(Qt::black));
+                scene->addItem(cell);
+            }
+        }
 
-                QRectF rect(offsetX, offsetY, cellWidth, cellHeight);
-
-                GameGraphicsRectItem* item = new GameGraphicsRectItem(rect);
-                item->OnClick([this, i, j]() {
-                    qDebug() << "Clicked on tile" << i << j;
-                    this->MoveCircleTo(i, j);
-                });
-                if (drawTileLines) {
-                    item->setPen(QPen(Qt::black, 1));
-                }
-                if (tileColors.find({i, j}) != tileColors.end()) {
-                    item->setBrush(tileColors[{i, j}]);
-                } else if (tile.obstacle) {
-                    item->setBrush(Qt::black);
-                } else {
-                    item->setBrush(Qt::white);
-                }
-
-                scene->addItem(item);
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < cols; ++j) {
+                if (j > 0) grid[i][j]->vecNeighbors.push_back(grid[i][j - 1]);         // Left
+                if (j < cols - 1) grid[i][j]->vecNeighbors.push_back(grid[i][j + 1]);  // Right
+                if (i > 0) grid[i][j]->vecNeighbors.push_back(grid[i - 1][j]);         // Above
+                if (i < rows - 1) grid[i][j]->vecNeighbors.push_back(grid[i + 1][j]);  // Below
             }
         }
     }
 
-    void initializeCircle(int row, int col, RGBColor color) {
-        QColor qcolor(color.red, color.green, color.blue);
+    void solveAStar(Cell* startCell, Cell* endCell) {
+        for (const auto& row : grid) {
+            for (const auto& cell : row) {
+                cell->visited    = false;
+                cell->globalGoal = INFINITY;
+                cell->localGoal  = INFINITY;
+                cell->parent     = nullptr;
+            }
+        }
 
-        circle = new QGraphicsEllipseItem(0, 0, circleSize, circleSize);
-        circle->setBrush(qcolor);
+        auto distance = [](Cell* a, Cell* b) {
+            return std::hypot(b->pos().x() - a->pos().x(), b->pos().y() - a->pos().y());
+        };
 
-        scene->addItem(circle);
+        auto heuristic = [distance](Cell* a, Cell* b) { return distance(a, b); };
+
+        // Initial setup
+        Cell* current         = startCell;
+        startCell->localGoal  = 0.0f;
+        startCell->globalGoal = heuristic(startCell, endCell);
+
+        std::list<Cell*> notTestedCells;
+        notTestedCells.push_back(startCell);
+
+        while (!notTestedCells.empty() && current != endCell) {
+            notTestedCells.sort([](const Cell* lhs, const Cell* rhs) {
+                return lhs->globalGoal < rhs->globalGoal;
+            });
+
+            // Remove cells which have been visited.
+            while (!notTestedCells.empty() && notTestedCells.front()->visited) {
+                notTestedCells.pop_front();
+            }
+
+            if (notTestedCells.empty()) {
+                break;
+            }
+
+            current          = notTestedCells.front();
+            current->visited = true;
+
+            for (auto neighbor : current->vecNeighbors) {
+                if (!neighbor->visited && neighbor->type != OBSTACLE) {
+                    notTestedCells.push_back(neighbor);
+                }
+
+                float possiblyLowerGoal = current->localGoal + distance(current, neighbor);
+
+                if (possiblyLowerGoal < neighbor->localGoal) {
+                    neighbor->parent    = current;
+                    neighbor->localGoal = possiblyLowerGoal;
+
+                    // Update the neighbor's globalGoal because it's the heuristic that we use to
+                    // sort the notTestedCells list.
+                    neighbor->globalGoal = neighbor->localGoal + heuristic(neighbor, endCell);
+                }
+            }
+        }
     }
 
-    int                                   circleSize = 30;
-    int                                   rows       = 0;
-    int                                   cols       = 0;
-    QGraphicsEllipseItem*                 circle;
-    int                                   cellWidth;
-    int                                   cellHeight;
-    QGraphicsScene*                       scene;
-    bool                                  drawTileLines = true;
-    std::map<std::pair<int, int>, QColor> tileColors;
+    std::vector<Cell*> getShortestPath(Cell* startCell, Cell* endCell) {
+        if (endCell->parent == nullptr) {
+            return {};  // No path.
+        }
+
+        std::vector<Cell*> path;
+        Cell*              current = endCell;
+        while (current != startCell) {
+            path.push_back(current);
+            current = current->parent;
+        }
+
+        std::reverse(path.begin(), path.end());  // We want the path to go from start to end.
+
+        return path;
+    }
+
+    void Solve() {
+        if (startCell && endCell) {
+            solveAStar(startCell, endCell);
+            auto path = getShortestPath(startCell, endCell);
+            qDebug() << "Path size: " << path.size();
+            for (const auto& cell : path) {
+                qDebug() << "(" << cell->x() / cellSize << ", " << cell->y() / cellSize << ")";
+            }
+        }
+    }
+};
+
+class OurView : public QGraphicsView {
+    Game* game;
+
+public:
+    OurView(Game* g) : game(g) {
+        setSceneRect(0, 0, 500, 500);
+        setBackgroundBrush(Qt::black);
+    }
+
+    void keyPressEvent(QKeyEvent* event) {
+        if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
+            game->Solve();
+        }
+    }
 };
 
 int main(int argc, char* argv[]) {
     QApplication app{argc, argv};
-
-    InitializeGridFromString(BOARD);
-
-    GridMap map;
-    map.MoveCircleTo(3, 4);
-
-    KeyPressGraphicsView view{map.getScene()};
-    view.OnUpKey([&map]() { map.MoveCircleUp(); });
-    view.OnDownKey([&map]() { map.MoveCircleDown(); });
-    view.OnLeftKey([&map]() { map.MoveCircleLeft(); });
-    view.OnRightKey([&map]() { map.MoveCircleRight(); });
+    Game         game;
+    game.createGrid(10, 10);
+    OurView view{&game};
+    view.setScene(game.getScene());
     view.show();
-
     return app.exec();
 }
