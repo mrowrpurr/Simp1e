@@ -8,11 +8,11 @@
 #include <iostream>
 #include <vector>
 
-#include "Prototyping/BoundingBox.h"
-#include "Prototyping/GameCircleCube.h"
-#include "Prototyping/GameCircleCubeInputHandler.h"
+#include "../../../BoundingBox.h"
+#include "../Core/GameCircleCube.h"
+#include "../Core/GameCircleCubeInputHandler.h"
 
-namespace Prototyping {
+namespace Prototyping::Games::CircleCube {
 
     struct QtGameCircleCubeSceneParams {
         uint32_t tileWidth       = 0;

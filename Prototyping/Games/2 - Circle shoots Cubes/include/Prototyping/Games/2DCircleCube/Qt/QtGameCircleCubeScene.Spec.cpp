@@ -6,7 +6,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
 
-#include "GameSpecHelper.h"
+#include "CircleCubeSpecHelper.h"
 
 using namespace Prototyping;
 

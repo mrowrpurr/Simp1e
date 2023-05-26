@@ -2,7 +2,7 @@
 
 #include "GameCircleCube.h"
 
-namespace Prototyping {
+namespace Prototyping::Games::CircleCube {
 
     class GameCircleCubeInputHandler {
         GameCircleCube& _game;

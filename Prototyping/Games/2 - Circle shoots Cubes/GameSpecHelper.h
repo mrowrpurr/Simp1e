@@ -4,6 +4,8 @@
 
 #include "SpecHelper.h"
 
+namespace Prototyping {}
+
 using namespace Prototyping;
 
 struct SetupQtApp {

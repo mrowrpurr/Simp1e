@@ -2,7 +2,7 @@
 
 #include "GameCircleCube.h"
 
-#include "GameSpecHelper.h"
+#include "CircleCubeSpecHelper.h"
 
 Describe("GameCircleCube") {
     it("it had a size (rows and columns)", []() {

@@ -1,10 +1,10 @@
 #include <QApplication>
 #include <QGraphicsView>
 
-#include "Prototyping/GameCircleCube.h"
-#include "Prototyping/QtGameCircleCubeScene.h"
+#include "Prototyping/Games/2DCircleCube/Core/GameCircleCube.h"
+#include "Prototyping/Games/2DCircleCube/Qt/QtGameCircleCubeScene.h"
 
-using namespace Prototyping;
+using namespace Prototyping::Games::CircleCube;
 
 int main(int argc, char* argv[]) {
     QApplication app{argc, argv};

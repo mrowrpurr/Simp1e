@@ -2,7 +2,7 @@
 
 #include "GameCircleCubeInputHandler.h"
 
-#include "GameSpecHelper.h"
+#include "CircleCubeSpecHelper.h"
 
 Describe("GameCircleCubeInputHandler") {
     it("moves the circle to a left-clicked cell", []() {

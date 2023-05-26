@@ -8,9 +8,9 @@
 #include <unordered_set>
 #include <vector>
 
-#include "Coordinate.h"
+#include "../../../Coordinate.h"
 
-namespace Prototyping {
+namespace Prototyping::Games::CircleCube {
 
     class GameCircleCube {
         uint32_t                       _rowCount    = 0;
