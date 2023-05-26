@@ -13,8 +13,8 @@
 namespace Prototyping {
 
     struct QtGameCircleCubeSceneParams {
-        uint32_t cellWidth       = 0;
-        uint32_t cellHeight      = 0;
+        uint32_t tileWidth       = 0;
+        uint32_t tileHeight      = 0;
         uint32_t circleSize      = 0;
         bool     renderGridLines = false;
     };
@@ -22,14 +22,14 @@ namespace Prototyping {
     class QtGameCircleCubeScene : public QGraphicsScene {
         GameCircleCube&            _game;
         GameCircleCubeInputHandler _inputHandler{_game};
-        uint32_t                   _cellWidth  = 0;
-        uint32_t                   _cellHeight = 0;
+        uint32_t                   _tileWidth  = 0;
+        uint32_t                   _tileHeight = 0;
         uint32_t                   _circleSize = 0;
         QGraphicsEllipseItem*      _circle     = nullptr;
 
         void AddBackground() {
             auto* rect = new QGraphicsRectItem(
-                0, 0, _cellWidth * _game.GetColumnCount(), _cellHeight * _game.GetRowCount()
+                0, 0, _tileWidth * _game.GetColumnCount(), _tileHeight * _game.GetRowCount()
             );
             rect->setBrush(QBrush(Qt::black));
             addItem(rect);
@@ -37,23 +37,23 @@ namespace Prototyping {
         void RenderGridLines() {
             for (uint32_t x = 0; x < _game.GetColumnCount(); x++) {
                 auto* line = new QGraphicsLineItem(
-                    x * _cellWidth, 0, x * _cellWidth, _game.GetRowCount() * _cellHeight
+                    x * _tileWidth, 0, x * _tileWidth, _game.GetRowCount() * _tileHeight
                 );
                 line->setPen(QPen(Qt::white));
                 addItem(line);
             }
             for (uint32_t y = 0; y < _game.GetRowCount(); y++) {
                 auto* line = new QGraphicsLineItem(
-                    0, y * _cellHeight, _game.GetColumnCount() * _cellWidth, y * _cellHeight
+                    0, y * _tileHeight, _game.GetColumnCount() * _tileWidth, y * _tileHeight
                 );
                 line->setPen(QPen(Qt::white));
                 addItem(line);
             }
         }
         void UpdateCirclePosition() {
-            auto newX = _game.GetCircleTile().x * _cellWidth + (_cellWidth / 2) - (_circleSize / 2);
+            auto newX = _game.GetCircleTile().x * _tileWidth + (_tileWidth / 2) - (_circleSize / 2);
             auto newY =
-                _game.GetCircleTile().y * _cellHeight + (_cellHeight / 2) - (_circleSize / 2);
+                _game.GetCircleTile().y * _tileHeight + (_tileHeight / 2) - (_circleSize / 2);
             _circle->setPos(newX, newY);
         }
         void AddCircle() {
@@ -68,8 +68,8 @@ namespace Prototyping {
         QtGameCircleCubeScene(GameCircleCube& game, QtGameCircleCubeSceneParams params = {})
             : QGraphicsScene(),
               _game(game),
-              _cellWidth(params.cellWidth),
-              _cellHeight(params.cellHeight),
+              _tileWidth(params.tileWidth),
+              _tileHeight(params.tileHeight),
               _circleSize(params.circleSize) {
             AddBackground();
             if (params.renderGridLines) RenderGridLines();
@@ -78,19 +78,19 @@ namespace Prototyping {
         }
 
         QGraphicsEllipseItem* GetCircle() const { return _circle; }
-        uint32_t              GetCellWidth() const { return _cellWidth; }
-        uint32_t              GetCellHeight() const { return _cellHeight; }
+        uint32_t              GetCellWidth() const { return _tileWidth; }
+        uint32_t              GetCellHeight() const { return _tileHeight; }
 
         Coordinate PositionToTile(QPointF position) const {
             return {
-                static_cast<uint32_t>(position.x() / _cellWidth),
-                static_cast<uint32_t>(position.y() / _cellHeight)};
+                static_cast<uint32_t>(position.x() / _tileWidth),
+                static_cast<uint32_t>(position.y() / _tileHeight)};
         }
 
-        BoundingBox TileToPosition(Coordinate cell) const {
-            auto topLeft = Coordinate{cell.x * _cellWidth, cell.y * _cellHeight};
+        BoundingBox TileToPosition(Coordinate tile) const {
+            auto topLeft = Coordinate{tile.x * _tileWidth, tile.y * _tileHeight};
             auto bottomRight =
-                Coordinate{cell.x * _cellWidth + _cellWidth, cell.y * _cellHeight + _cellHeight};
+                Coordinate{tile.x * _tileWidth + _tileWidth, tile.y * _tileHeight + _tileHeight};
             return {topLeft, bottomRight};
         }
 

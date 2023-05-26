@@ -11,7 +11,7 @@
 using namespace Prototyping;
 
 Describe("QtGameCircleCubeScene") {
-    it("can specify cell width and height", []() {
+    it("can specify tile width and height", []() {
         SetupQtApp app;
 
         GameCircleCube game{5, 10};
@@ -20,7 +20,7 @@ Describe("QtGameCircleCubeScene") {
         AssertThat(scene.GetCellWidth(), Equals(0));
         AssertThat(scene.GetCellHeight(), Equals(0));
 
-        QtGameCircleCubeScene scene2(game, {.cellWidth = 5, .cellHeight = 8});
+        QtGameCircleCubeScene scene2(game, {.tileWidth = 5, .tileHeight = 8});
         AssertThat(scene2.GetCellWidth(), Equals(5));
         AssertThat(scene2.GetCellHeight(), Equals(8));
     });
@@ -31,17 +31,17 @@ Describe("QtGameCircleCubeScene") {
         GameCircleCube game{5, 10};
         QGraphicsView  view;
 
-        QtGameCircleCubeSceneParams sceneParams = {.cellWidth = 5, .cellHeight = 8};
+        QtGameCircleCubeSceneParams sceneParams = {.tileWidth = 5, .tileHeight = 8};
         QtGameCircleCubeScene       scene(game, sceneParams);
 
         view.setScene(&scene);
         view.show();
 
         AssertThat(
-            scene.width(), Is().GreaterThanOrEqualTo(game.GetColumnCount() * sceneParams.cellWidth)
+            scene.width(), Is().GreaterThanOrEqualTo(game.GetColumnCount() * sceneParams.tileWidth)
         );
         AssertThat(
-            scene.height(), Is().GreaterThanOrEqualTo(game.GetRowCount() * sceneParams.cellHeight)
+            scene.height(), Is().GreaterThanOrEqualTo(game.GetRowCount() * sceneParams.tileHeight)
         );
     });
 
@@ -49,7 +49,7 @@ Describe("QtGameCircleCubeScene") {
         SetupQtApp app;
 
         GameCircleCube              game{5, 10};
-        QtGameCircleCubeSceneParams sceneParams{.cellWidth = 6, .cellHeight = 10};
+        QtGameCircleCubeSceneParams sceneParams{.tileWidth = 6, .tileHeight = 10};
         QtGameCircleCubeScene       scene(game, sceneParams);
 
         game.MoveCircleTo({1, 2});
@@ -57,23 +57,23 @@ Describe("QtGameCircleCubeScene") {
         AssertThat(circle, Is().Not().Null());
         AssertThat(
             circle->pos().x(), Equals(
-                                   (1 * sceneParams.cellWidth) + (sceneParams.cellWidth / 2) -
+                                   (1 * sceneParams.tileWidth) + (sceneParams.tileWidth / 2) -
                                    (sceneParams.circleSize / 2)
                                )
         );
         AssertThat(
             circle->pos().y(), Equals(
-                                   (2 * sceneParams.cellHeight) + (sceneParams.cellHeight / 2) -
+                                   (2 * sceneParams.tileHeight) + (sceneParams.tileHeight / 2) -
                                    (sceneParams.circleSize / 2)
                                )
         );
     });
 
-    it("can get cell from a Qt position", []() {
+    it("can get tile from a Qt position", []() {
         SetupQtApp app;
 
         GameCircleCube              game{5, 10};
-        QtGameCircleCubeSceneParams sceneParams{.cellWidth = 6, .cellHeight = 10};
+        QtGameCircleCubeSceneParams sceneParams{.tileWidth = 6, .tileHeight = 10};
         QtGameCircleCubeScene       scene(game, sceneParams);
         game.MoveCircleTo({1, 2});
         auto* circle = scene.GetCircle();
@@ -86,20 +86,20 @@ Describe("QtGameCircleCubeScene") {
         AssertThat(coordinate2, Equals(Coordinate{3, 4}));
     });
 
-    it("can get Qt position (rect) from a cell", []() {
+    it("can get Qt position (rect) from a tile", []() {
         SetupQtApp app;
 
         GameCircleCube              game{5, 10};
-        QtGameCircleCubeSceneParams sceneParams{.cellWidth = 6, .cellHeight = 10};
+        QtGameCircleCubeSceneParams sceneParams{.tileWidth = 6, .tileHeight = 10};
         QtGameCircleCubeScene       scene(game, sceneParams);
         game.MoveCircleTo({1, 2});
         auto* circle = scene.GetCircle();
 
         auto actual   = scene.TileToPosition({1, 2});
         auto expected = BoundingBox{
-            {1 * sceneParams.cellWidth,                         2 * sceneParams.cellHeight},
-            {1 * sceneParams.cellWidth + sceneParams.cellWidth,
-             2 * sceneParams.cellHeight + sceneParams.cellHeight                          },
+            {1 * sceneParams.tileWidth,                         2 * sceneParams.tileHeight},
+            {1 * sceneParams.tileWidth + sceneParams.tileWidth,
+             2 * sceneParams.tileHeight + sceneParams.tileHeight                          },
         };
         AssertThat(actual.topLeft.x, Equals(expected.topLeft.x));
         AssertThat(actual.topLeft.y, Equals(expected.topLeft.y));
@@ -111,7 +111,7 @@ Describe("QtGameCircleCubeScene") {
         SetupQtApp app;
 
         GameCircleCube              game{5, 10};
-        QtGameCircleCubeSceneParams sceneParams{.cellWidth = 6, .cellHeight = 10};
+        QtGameCircleCubeSceneParams sceneParams{.tileWidth = 6, .tileHeight = 10};
         QtGameCircleCubeScene       scene(game, sceneParams);
         game.MoveCircleTo({1, 2});
         auto* circle = scene.GetCircle();
@@ -131,6 +131,4 @@ Describe("QtGameCircleCubeScene") {
 
         AssertThat(game.GetCircleTile(), Equals(Coordinate{3, 4}));
     });
-
-    // .... TODO ...
 }
