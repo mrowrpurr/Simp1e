@@ -1,0 +1,6 @@
+target("Game 0 - Grid Game Template")
+    add_files("Game 0 - Grid Game Template.cpp")
+    set_kind("binary")
+    add_qt()
+    add_string_formatting()
+    add_logging_support_for_binaries()
