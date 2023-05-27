@@ -1,10 +1,15 @@
 #pragma once
 
+#include "../Tile.h"
 #include "../TileGrid.h"
+#include "UIColor.h"
+#include "UIImage.h"
+#include "UITile.h"
 
 namespace Prototyping::UI {
     struct UITileGrid {
         enum class RenderingStyle { Grid, Trimetric };
+
         struct Config {
             TileGrid*      grid           = nullptr;
             RenderingStyle renderingStyle = RenderingStyle::Grid;
@@ -13,5 +18,28 @@ namespace Prototyping::UI {
             uint32_t       padding        = 4;
             bool           showGrid       = true;
         };
+
+        struct Element {
+            Tile::Position position;
+            uint32_t       width;
+            uint32_t       height;
+        };
+
+        virtual UITile*  GetTile(const Tile::Position& position) { return nullptr; }
+        virtual bool     SetBackgroundColor(const UIColor& color) { return false; }
+        virtual bool     AddBackgroundImage(const UIImage& image) { return false; }
+        virtual bool     RemoveBackgroundImage(const UIImage& image) { return false; }
+        virtual Element* AddCircle(
+            const Tile::Position& position, const UIColor& color, uint32_t diameter
+        ) {
+            return nullptr;
+        }
+        virtual Element* AddRectangle(
+            const Tile::Position& position, const UIColor& color, uint32_t width, uint32_t height
+        ) {
+            return nullptr;
+        }
+        virtual bool RemoveElement(Element* element) { return false; }
+        virtual bool MoveElement(Element* element, const Tile::Position& position) { return false; }
     };
 }
