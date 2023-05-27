@@ -1,6 +1,5 @@
 #pragma once
 
 namespace Prototyping {
-
-    class Board {};
+    class Tile {};
 }

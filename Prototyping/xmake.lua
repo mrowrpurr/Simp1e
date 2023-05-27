@@ -6,6 +6,7 @@ function prototype(target_name)
         add_string_formatting()
         add_logging_support_for_binaries()
         add_includedirs("include")
+        add_deps("Prototyping Shared Library")
 
     test_target("[test] " .. target_name)
         add_includedirs("include")
