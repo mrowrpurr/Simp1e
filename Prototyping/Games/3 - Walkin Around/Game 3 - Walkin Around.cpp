@@ -11,5 +11,6 @@ int main() {
             .tileHeight     = 64,
             .padding        = 8,
     });
+    uiTileGrid->AddCircle({2, 4}, UI::UIColor::Magenta(), 25);
     UI::Qt::Run();
 }

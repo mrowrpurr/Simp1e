@@ -4,6 +4,7 @@
 #include <QWidget>
 
 #include "../UITileGrid.h"
+#include "QtCircle.h"
 #include "QtScene.h"
 #include "QtView.h"
 
@@ -27,6 +28,19 @@ namespace Prototyping::UI::Qt {
             _layout.addWidget(_view);
             _window.setLayout(&_layout);
             _window.show();
+        }
+
+    protected:
+        UITileGridElement* AddCircle(
+            const Tile::Position& position, const UIColor& color, uint32_t diameter
+        ) override {
+            auto element = new QtCircle(color, diameter);
+            _scene->addItem(element);
+            element->setPos(
+                position.x * _config.tileWidth + _config.padding,
+                position.y * _config.tileHeight + _config.padding
+            );
+            return nullptr;  // TODO
         }
 
     private:

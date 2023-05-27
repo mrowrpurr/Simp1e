@@ -5,6 +5,7 @@
 #include "UIColor.h"
 #include "UIImage.h"
 #include "UITile.h"
+#include "UITileGridElement.h"
 
 namespace Prototyping::UI {
     struct UITileGrid {
@@ -19,27 +20,19 @@ namespace Prototyping::UI {
             bool           showGrid       = true;
         };
 
-        struct Element {
-            Tile::Position position;
-            uint32_t       width;
-            uint32_t       height;
-        };
-
-        virtual UITile*  GetTile(const Tile::Position& position) { return nullptr; }
-        virtual bool     SetBackgroundColor(const UIColor& color) { return false; }
-        virtual bool     AddBackgroundImage(const UIImage& image) { return false; }
-        virtual bool     RemoveBackgroundImage(const UIImage& image) { return false; }
-        virtual Element* AddCircle(
+        virtual UITile*            GetTile(const Tile::Position& position) { return nullptr; }
+        virtual bool               SetBackgroundColor(const UIColor& color) { return false; }
+        virtual bool               AddBackgroundImage(const UIImage& image) { return false; }
+        virtual bool               RemoveBackgroundImage(const UIImage& image) { return false; }
+        virtual UITileGridElement* AddCircle(
             const Tile::Position& position, const UIColor& color, uint32_t diameter
         ) {
             return nullptr;
         }
-        virtual Element* AddRectangle(
+        virtual UITileGridElement* AddRectangle(
             const Tile::Position& position, const UIColor& color, uint32_t width, uint32_t height
         ) {
             return nullptr;
         }
-        virtual bool RemoveElement(Element* element) { return false; }
-        virtual bool MoveElement(Element* element, const Tile::Position& position) { return false; }
     };
 }
