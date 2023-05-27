@@ -13,11 +13,8 @@ namespace Prototyping::UI::Qt {
         QApplication& Get() { return _::qtApp; }
     }
 
-    std::unique_ptr<UITileGrid> CreateTileGrid(
-        TileGrid*                  tileGrid,
-        UITileGrid::RenderingStyle renderingStyle = UITileGrid::RenderingStyle::Grid
-    ) {
-        return std::make_unique<QtTileGrid>(tileGrid, renderingStyle);
+    std::unique_ptr<UITileGrid> CreateTileGrid(const UITileGrid::Config& config) {
+        return std::make_unique<QtTileGrid>(config);
     }
 
     int Run() { return Application::Get().exec(); }
