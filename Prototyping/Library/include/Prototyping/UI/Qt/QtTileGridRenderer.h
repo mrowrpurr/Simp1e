@@ -6,7 +6,6 @@
 #include "../UIPosition.h"
 #include "../UISize.h"
 
-
 namespace Prototyping::UI::Qt {
 
     struct QtTileGridRenderer {

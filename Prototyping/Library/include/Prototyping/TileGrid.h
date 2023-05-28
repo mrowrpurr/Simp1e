@@ -21,8 +21,6 @@ namespace Prototyping {
         uint32_t GetRows() const { return _rows; }
         uint32_t GetColumns() const { return _columns; }
 
-        std::unique_ptr<Tile>& GetTile(uint32_t row, uint32_t column) {
-            return _tiles[row][column];
-        }
+        Tile* GetTile(uint32_t row, uint32_t column) { return _tiles.at(row).at(column).get(); }
     };
 }

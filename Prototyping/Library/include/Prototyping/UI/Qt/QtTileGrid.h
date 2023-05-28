@@ -49,21 +49,25 @@ namespace Prototyping::UI::Qt {
             auto gridSize = _renderer->InitializeGrid();
 
             // add some padding to the scene
-            // auto padding   = 50;
-            // auto sceneRect = _scene->sceneRect();
-            // _scene->setSceneRect(
-            //     sceneRect.x() - padding, sceneRect.y() - padding, sceneRect.width() + padding *
-            //     2, sceneRect.height() + padding * 2
-            // );
+            auto padding   = 50;
+            auto sceneRect = _scene->sceneRect();
+            _scene->setSceneRect(
+                sceneRect.x() - padding, sceneRect.y() - padding, sceneRect.width() + padding * 2,
+                sceneRect.height() + padding * 2
+            );
             _view->setHorizontalScrollBarPolicy(::Qt::ScrollBarAlwaysOff);
             _view->setVerticalScrollBarPolicy(::Qt::ScrollBarAlwaysOff);
-
             _layout.addWidget(_view);
             _window.setLayout(&_layout);
-            _window.show();
         }
 
-    protected:
+        QWidget* GetWidget() override { return &_window; }
+
+        bool ShowAsWindow() override {
+            _window.show();
+            return true;
+        }
+
         UITileGridElement* AddCircle(
             const Tile::Position& position, const UIColor& color, uint32_t diameter
         ) override {

@@ -12,14 +12,12 @@ namespace Prototyping::UI::Qt {
         UITileGrid::Config& _config;
         QtScene*            _scene;
 
-        int HEX_WIDTH      = 30;
-        int HEX_HEIGHT     = 31;
-        int DIAMOND_WIDTH  = 60;
-        int DIAMOND_HEIGHT = 30;
-        // int DIAMOND_ROWS     = 30;
-        // int DIAMOND_COLUMNS  = 10;
-        int HEX_OFFSET_X = -45;
-        int HEX_OFFSET_Y = 3;
+        int HEX_WIDTH      = 60;
+        int HEX_HEIGHT     = 60;
+        int DIAMOND_WIDTH  = 120;
+        int DIAMOND_HEIGHT = 60;
+        int HEX_OFFSET_X   = -90;
+        int HEX_OFFSET_Y   = 0;
 
         QGraphicsPolygonItem* createDiamondTile(
             int x, int y, int width, int height, bool isGray = false

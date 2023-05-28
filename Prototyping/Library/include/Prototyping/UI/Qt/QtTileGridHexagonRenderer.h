@@ -13,7 +13,7 @@ namespace Prototyping::UI::Qt {
         UITileGrid::Config& _config;
         QtScene*            _scene;
         // sizes
-        float hexagonSide = 20.0f;  // Length of one side of a hexagon
+        float hexagonSide = 40.0f;  // Length of one side of a hexagon
         float aspectRatio = 0.6f;   // Adjust this to make hexagons taller or shorter - was 0.8f
         float height      = sqrt(3.0f) * hexagonSide * aspectRatio;  // Height of a hexagon
         float width       = 2.0f * hexagonSide;                      // Width of a hexagon

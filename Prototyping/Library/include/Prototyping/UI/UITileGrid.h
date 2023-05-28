@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QWidget>
+
 #include "../Tile.h"
 #include "../TileGrid.h"
 #include "UIColor.h"
@@ -21,6 +23,9 @@ namespace Prototyping::UI {
             bool           displayCoordinates = true;
         };
 
+        virtual ~UITileGrid() = default;
+        virtual bool               ShowAsWindow() { return false; }
+        virtual QWidget*           GetWidget() { return nullptr; }
         virtual UITile*            GetTile(const Tile::Position& position) { return nullptr; }
         virtual bool               SetBackgroundColor(const UIColor& color) { return false; }
         virtual bool               AddBackgroundImage(const UIImage& image) { return false; }
