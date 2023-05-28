@@ -16,14 +16,15 @@
 #include <QGraphicsView>
 #include <QPen>
 
-const int HEX_WIDTH       = 30;
-const int HEX_HEIGHT      = 30;
-const int DIAMOND_WIDTH   = 60;
-const int DIAMOND_HEIGHT  = 30;
-const int DIAMOND_ROWS    = 10;
-const int DIAMOND_COLUMNS = 10;
-const int HEX_OFFSET_X    = -45;
-int       HEX_OFFSET_Y    = 18;
+const int HEX_WIDTH        = 30;
+const int HEX_HEIGHT       = 31;
+const int DIAMOND_WIDTH    = 60;
+const int DIAMOND_HEIGHT   = 30;
+const int DIAMOND_ROWS     = 30;
+const int DIAMOND_COLUMNS  = 10;
+const int HEX_OFFSET_X     = -45;
+int       HEX_OFFSET_Y     = 3;
+const int DIAMOND_OFFSET_Y = -1 * DIAMOND_ROWS * DIAMOND_HEIGHT / 2.0;
 
 QGraphicsPolygonItem* createDiamondTile(int x, int y, int width, int height, bool isGray) {
     QPointF topPoint(x, y);
@@ -36,7 +37,8 @@ QGraphicsPolygonItem* createDiamondTile(int x, int y, int width, int height, boo
 
     QGraphicsPolygonItem* diamondTile = new QGraphicsPolygonItem(diamondPolygon);
     diamondTile->setPen(Qt::NoPen);
-    diamondTile->setBrush(isGray ? Qt::gray : Qt::lightGray);
+    if (isGray) diamondTile->setBrush(QBrush(QColor(255, 0, 0, 50)));
+    else diamondTile->setBrush(QBrush(QColor(255, 0, 0, 100)));
 
     return diamondTile;
 }
@@ -55,7 +57,7 @@ QGraphicsPolygonItem* createHexagon(int x, int y, int width, int height) {
     hexagonPolygon << top << topRight << bottomRight << bottom << bottomLeft << topLeft;
 
     QGraphicsPolygonItem* hexagonItem = new QGraphicsPolygonItem(hexagonPolygon);
-    hexagonItem->setPen(QPen(Qt::black, 2));
+    hexagonItem->setPen(QPen(Qt::blue, 1));
     hexagonItem->setBrush(Qt::NoBrush);
 
     return hexagonItem;
@@ -68,26 +70,46 @@ int main(int argc, char** argv) {
     // Create the diamond grid
     for (int row = 0; row < DIAMOND_ROWS; ++row) {
         for (int column = 0; column < DIAMOND_COLUMNS; ++column) {
-            int x = column * DIAMOND_WIDTH / 2 + row * DIAMOND_WIDTH / 2;
-            int y = row * DIAMOND_HEIGHT / 2 - column * DIAMOND_HEIGHT / 2;
-            scene.addItem(
-                createDiamondTile(x, y, DIAMOND_WIDTH, DIAMOND_HEIGHT, (row + column) % 2 == 0)
+            int  x    = column * DIAMOND_WIDTH + (row % 2 == 0 ? 0 : DIAMOND_WIDTH / 2);
+            int  y    = row * DIAMOND_HEIGHT / 2 + DIAMOND_OFFSET_Y;
+            auto item = createDiamondTile(x, y, DIAMOND_WIDTH, DIAMOND_HEIGHT, (row) % 2 == 0);
+            scene.addItem(item);
+
+            QGraphicsTextItem* textItem =
+                scene.addText(QString::number(row) + "," + QString::number(column));
+            auto center = item->boundingRect().center();
+            textItem->setPos(
+                center.x() - textItem->boundingRect().width() / 2,
+                center.y() - textItem->boundingRect().height() / 2
             );
+            textItem->setDefaultTextColor(Qt::red);
+            textItem->setFont(QFont("Arial", 5));
         }
     }
 
     // Calculate the number of hexes to create based on the size of the diamond grid
     int hexColumns = DIAMOND_COLUMNS * DIAMOND_WIDTH / HEX_WIDTH;
-    int hexRows    = DIAMOND_ROWS * DIAMOND_HEIGHT / (HEX_HEIGHT * 3 / 4);
+    int hexRows    = (DIAMOND_ROWS * DIAMOND_HEIGHT + DIAMOND_OFFSET_Y) / (HEX_HEIGHT * 3 / 4);
 
     HEX_OFFSET_Y += -(DIAMOND_ROWS * DIAMOND_HEIGHT / 2);
 
     // Create the hex grid
     for (int row = 0; row < hexRows; ++row) {
         for (int column = 0; column < hexColumns; ++column) {
-            int x = HEX_WIDTH * column + (row % 2 == 0 ? 0 : HEX_WIDTH / 2) + HEX_OFFSET_X;
-            int y = HEX_HEIGHT * 3 / 4 * row + HEX_OFFSET_Y;  // changed the y calculation
-            scene.addItem(createHexagon(x, y, HEX_WIDTH, HEX_HEIGHT));
+            int  x    = HEX_WIDTH * column + (row % 2 == 0 ? 0 : HEX_WIDTH / 2) + HEX_OFFSET_X;
+            int  y    = HEX_HEIGHT * 3 / 4 * row + HEX_OFFSET_Y;  // changed the y calculation
+            auto item = createHexagon(x, y, HEX_WIDTH, HEX_HEIGHT);
+            scene.addItem(item);
+
+            QGraphicsTextItem* textItem =
+                scene.addText(QString::number(row) + "," + QString::number(column));
+            auto center = item->boundingRect().center();
+            textItem->setPos(
+                center.x() - textItem->boundingRect().width() / 2,
+                center.y() - textItem->boundingRect().height() / 2 + 5
+            );
+            textItem->setDefaultTextColor(Qt::blue);
+            textItem->setFont(QFont("Arial", 5));
         }
     }
 
