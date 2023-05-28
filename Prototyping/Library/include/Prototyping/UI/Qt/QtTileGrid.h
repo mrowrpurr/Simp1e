@@ -28,15 +28,25 @@ namespace Prototyping::UI::Qt {
             : _config(config), _scene(scene) {}
 
         UISize InitializeGrid() override {
-            if (_config.showGrid) {
-                for (uint32_t x = 0; x < _config.grid->GetColumns(); x++) {
-                    for (uint32_t y = 0; y < _config.grid->GetRows(); y++) {
+            for (uint32_t row = 0; row < _config.grid->GetRows(); row++) {
+                for (uint32_t col = 0; col < _config.grid->GetColumns(); col++) {
+                    if (_config.showGrid) {
                         auto rect = QRectF(
-                            x * _config.tileWidth + _config.padding,
-                            y * _config.tileHeight + _config.padding, _config.tileWidth,
+                            col * _config.tileWidth + _config.padding,
+                            row * _config.tileHeight + _config.padding, _config.tileWidth,
                             _config.tileHeight
                         );
                         _scene->addRect(rect, QPen(::Qt::black));
+                    }
+                    if (_config.displayCoordinates) {
+                        auto text = _scene->addText(
+                            QString("(%1, %2)").arg(row).arg(col), QFont("Arial", 5)
+                        );
+                        text->setDefaultTextColor(::Qt::lightGray);
+                        text->setPos(
+                            col * _config.tileWidth + _config.padding,
+                            row * _config.tileHeight + _config.padding
+                        );
                     }
                 }
             }
@@ -87,6 +97,17 @@ namespace Prototyping::UI::Qt {
                         item->setPen(QPen(::Qt::black, 1));
                         item->setBrush(::Qt::white);
                         _scene->addItem(item);
+                    }
+                    if (_config.displayCoordinates) {
+                        auto text = _scene->addText(
+                            QString("(%1, %2)").arg(row).arg(col), QFont("Arial", 5)
+                        );
+                        text->setDefaultTextColor(::Qt::lightGray);
+                        auto center = polygon.boundingRect().center();
+                        text->setPos(
+                            center.x() - text->boundingRect().width() / 2,
+                            center.y() - text->boundingRect().height() / 2
+                        );
                     }
                 }
             }
