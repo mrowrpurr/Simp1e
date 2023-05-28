@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QGraphicsTextItem>
+#include <QMessageBox>
 
 #include "../UIPosition.h"
 #include "../UISize.h"
@@ -24,8 +25,7 @@ namespace Prototyping::UI::Qt {
                 for (uint32_t col = 0; col < _config.grid->GetColumns(); col++) {
                     if (_config.showGrid) {
                         auto rect = QRectF(
-                            col * _config.tileWidth + _config.padding,
-                            row * _config.tileHeight + _config.padding, _config.tileWidth,
+                            col * _config.tileWidth, row * _config.tileHeight, _config.tileWidth,
                             _config.tileHeight
                         );
                         _scene->addRect(rect, QPen(::Qt::black));
@@ -35,26 +35,25 @@ namespace Prototyping::UI::Qt {
                             QString("(%1, %2)").arg(row).arg(col), QFont("Arial", 5)
                         );
                         text->setDefaultTextColor(::Qt::lightGray);
-                        text->setPos(
-                            col * _config.tileWidth + _config.padding,
-                            row * _config.tileHeight + _config.padding
-                        );
+                        text->setPos(col * _config.tileWidth, row * _config.tileHeight);
                     }
                 }
             }
             return UISize{
-                _config.grid->GetColumns() * _config.tileWidth + _config.padding * 2,
-                _config.grid->GetRows() * _config.tileHeight + _config.padding * 2};
+                _config.grid->GetColumns() * _config.tileWidth,
+                _config.grid->GetRows() * _config.tileHeight};
         }
 
         UIPosition GetTileCenter(const Tile::Position& position) override {
             return UIPosition{
-                static_cast<double>(
-                    position.y * _config.tileWidth + _config.tileWidth / 2 + _config.padding / 2
-                ),
-                static_cast<double>(
-                    position.x * _config.tileHeight + _config.tileHeight / 2 + _config.padding / 2
-                )};
+                static_cast<double>(position.y * _config.tileWidth + _config.tileWidth / 2 / 2),
+                static_cast<double>(position.x * _config.tileHeight + _config.tileHeight / 2 / 2)};
+        }
+
+        Tile::Position ScenePositionToTilePosition(const UIPosition& position) override {
+            return Tile::Position{
+                static_cast<uint32_t>(position.y() / _config.tileHeight),
+                static_cast<uint32_t>(position.x() / _config.tileWidth)};
         }
     };
 }

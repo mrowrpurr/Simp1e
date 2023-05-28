@@ -75,5 +75,21 @@ namespace Prototyping::UI::Qt {
 
             return UIPosition{center.x(), center.y()};
         }
+
+        Tile::Position ScenePositionToTilePosition(const UIPosition& position) override {
+            qreal tileWidth  = _config.tileWidth;
+            qreal tileHeight = _config.tileHeight;
+            qreal x          = position.x();
+            qreal y          = position.y();
+
+            // The coordinates of the scene point corresponding to the diamond grid point (0, 0).
+            qreal origin_x = 0.0;
+            qreal origin_y = tileHeight / 2;
+
+            int col = round(2 * (x - origin_x) / tileWidth);
+            int row = round(2 * (y - origin_y - tileHeight / 2) / tileHeight);
+
+            return Tile::Position{static_cast<uint32_t>(row), static_cast<uint32_t>(col)};
+        }
     };
 }

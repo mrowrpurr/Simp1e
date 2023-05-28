@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QWidget>
+#include <functional>
 
 #include "../Tile.h"
 #include "../TileGrid.h"
@@ -40,5 +41,8 @@ namespace Prototyping::UI {
         ) {
             return nullptr;
         }
+        virtual bool OnLeftClick(std::function<void(const Tile::Position&)>) { return false; }
+        virtual bool OnRightClick(std::function<void(const Tile::Position&)>) { return false; }
+        virtual bool OnMiddleClick(std::function<void(const Tile::Position&)>) { return false; }
     };
 }

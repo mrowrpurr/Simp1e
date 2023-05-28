@@ -2,6 +2,7 @@
 
 #include <QVBoxLayout>
 #include <QWidget>
+#include <functional>
 
 #include "../UIPosition.h"
 #include "../UISize.h"
@@ -16,22 +17,18 @@
 
 namespace Prototyping::UI::Qt {
 
-    // TODO: padding support
-
-    //
-
     class QtTileGrid : public UITileGrid {
         UITileGrid::Config _config;
         QWidget            _window;  // <-- concrete instance (* are children of this)
         QVBoxLayout        _layout;  // <-- concrete instance (* are children of this)
         QtView*            _view;
         QtScene*           _scene;
-        std::unique_ptr<QtTileGridRenderer> _renderer;
+        std::unique_ptr<QtTileGridRenderer>                     _renderer;
+        std::vector<std::function<void(const Tile::Position&)>> _tileLeftClickHandlers;
+        std::vector<std::function<void(const Tile::Position&)>> _tileRightClickHandlers;
+        std::vector<std::function<void(const Tile::Position&)>> _tileMiddleClickHandlers;
 
-    public:
-        QtTileGrid(const Config& config) : _config(config) {
-            _scene = new QtScene();
-            _view  = new QtView(_scene);
+        void SetupRenderer() {
             switch (_config.renderingStyle) {
                 case RenderingStyle::Grid:
                     _renderer.reset(new QtTileGridRectangleRenderer(_config, _scene));
@@ -46,15 +43,41 @@ namespace Prototyping::UI::Qt {
                     _renderer.reset(new QtTileGridTilesAndHexagonsRenderer(_config, _scene));
                     break;
             }
-            auto gridSize = _renderer->InitializeGrid();
+        }
 
-            // add some padding to the scene
-            auto padding   = 50;
-            auto sceneRect = _scene->sceneRect();
-            _scene->setSceneRect(
-                sceneRect.x() - padding, sceneRect.y() - padding, sceneRect.width() + padding * 2,
-                sceneRect.height() + padding * 2
-            );
+        void ListenForSceneEvents() {
+            _scene->OnLeftClick([this](const QPointF& position) {
+                auto tilePosition =
+                    _renderer->ScenePositionToTilePosition({position.x(), position.y()});
+                for (auto& handler : _tileLeftClickHandlers) handler(tilePosition);
+            });
+            _scene->OnRightClick([this](const QPointF& position) {
+                auto tilePosition =
+                    _renderer->ScenePositionToTilePosition({position.x(), position.y()});
+                for (auto& handler : _tileRightClickHandlers) handler(tilePosition);
+            });
+            _scene->OnMiddleClick([this](const QPointF& position) {
+                auto tilePosition =
+                    _renderer->ScenePositionToTilePosition({position.x(), position.y()});
+                for (auto& handler : _tileMiddleClickHandlers) handler(tilePosition);
+            });
+        }
+
+    public:
+        QtTileGrid(const Config& config) : _config(config) {
+            _scene = new QtScene();
+            SetupRenderer();
+            auto gridSize = _renderer->InitializeGrid();
+            ListenForSceneEvents();
+
+            // auto padding   = 50;
+            // auto sceneRect = _scene->sceneRect();
+            // _scene->setSceneRect(
+            //     sceneRect.x() - padding, sceneRect.y() - padding, sceneRect.width() + padding *
+            //     2, sceneRect.height() + padding * 2
+            // );
+
+            _view = new QtView(_scene);
             _view->setHorizontalScrollBarPolicy(::Qt::ScrollBarAlwaysOff);
             _view->setVerticalScrollBarPolicy(::Qt::ScrollBarAlwaysOff);
             _layout.addWidget(_view);
@@ -65,6 +88,19 @@ namespace Prototyping::UI::Qt {
 
         bool ShowAsWindow() override {
             _window.show();
+            return true;
+        }
+
+        bool OnLeftClick(std::function<void(const Tile::Position&)> handler) override {
+            _tileLeftClickHandlers.push_back(handler);
+            return true;
+        }
+        bool OnRightClick(std::function<void(const Tile::Position&)> handler) override {
+            _tileRightClickHandlers.push_back(handler);
+            return true;
+        }
+        bool OnMiddleClick(std::function<void(const Tile::Position&)> handler) override {
+            _tileMiddleClickHandlers.push_back(handler);
             return true;
         }
 

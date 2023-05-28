@@ -19,7 +19,7 @@ namespace Prototyping::UI::Qt {
         std::string GetDockNameForRenderingStyle(UITileGrid::RenderingStyle renderingStyle) {
             switch (renderingStyle) {
                 case UITileGrid::RenderingStyle::Grid:
-                    return "Grid";
+                    return "Rectangles";
                 case UITileGrid::RenderingStyle::Isometric:
                     return "Isometric";
                 case UITileGrid::RenderingStyle::Hexagons:
@@ -62,7 +62,19 @@ namespace Prototyping::UI::Qt {
             _window.show();
         }
 
-    protected:
+        bool OnLeftClick(std::function<void(const Tile::Position&)> handler) override {
+            for (auto& tileGrid : _qtTileGrids) tileGrid->OnLeftClick(handler);
+            return true;
+        }
+        bool OnRightClick(std::function<void(const Tile::Position&)> handler) override {
+            for (auto& tileGrid : _qtTileGrids) tileGrid->OnRightClick(handler);
+            return true;
+        }
+        bool OnMiddleClick(std::function<void(const Tile::Position&)> handler) override {
+            for (auto& tileGrid : _qtTileGrids) tileGrid->OnMiddleClick(handler);
+            return true;
+        }
+
         UITileGridElement* AddCircle(
             const Tile::Position& position, const UIColor& color, uint32_t diameter
         ) override {

@@ -9,8 +9,11 @@
 namespace Prototyping::UI::Qt {
 
     struct QtTileGridRenderer {
-        virtual UISize     InitializeGrid() { return {}; }
-        virtual UIPosition GetTileCenter(const Tile::Position& position) { return {}; }
-        virtual QPolygonF  GetTileBounds(const Tile::Position& position) { return {}; }
+        virtual UISize         InitializeGrid() { return {}; }
+        virtual UIPosition     GetTileCenter(const Tile::Position& position) { return {}; }
+        virtual QPolygonF      GetTileBounds(const Tile::Position& position) { return {}; }
+        virtual Tile::Position ScenePositionToTilePosition(const UIPosition& position) {
+            return {};
+        }
     };
 }
