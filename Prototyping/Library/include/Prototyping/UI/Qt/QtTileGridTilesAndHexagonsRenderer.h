@@ -34,8 +34,8 @@ namespace Prototyping::UI::Qt {
 
             QGraphicsPolygonItem* diamondTile = new QGraphicsPolygonItem(diamondPolygon);
             diamondTile->setPen(::Qt::NoPen);
-            if (isGray) diamondTile->setBrush(QBrush(QColor(255, 0, 0, 50)));
-            else diamondTile->setBrush(QBrush(QColor(255, 0, 0, 100)));
+            if (isGray) diamondTile->setBrush(QBrush(QColor(255, 0, 0, 75)));
+            else diamondTile->setBrush(QBrush(QColor(255, 0, 0, 25)));
 
             return diamondTile;
         }
@@ -135,19 +135,34 @@ namespace Prototyping::UI::Qt {
             return {};
         }
 
+        UIPosition GetHexTileCenter(const Tile::Position& position) {
+            int DIAMOND_ROWS     = _config.grid->GetRows();
+            int DIAMOND_COLUMNS  = _config.grid->GetColumns();
+            int DIAMOND_OFFSET_Y = -1 * DIAMOND_ROWS * DIAMOND_HEIGHT / 2.0;
+            HEX_OFFSET_Y += -(DIAMOND_ROWS * DIAMOND_HEIGHT / 2);
+
+            int x =
+                HEX_WIDTH * position.y + (position.y % 2 == 0 ? 0 : HEX_WIDTH / 2) + HEX_OFFSET_X;
+            int y =
+                HEX_HEIGHT * 3 / 4 * position.x + (HEX_OFFSET_Y / 2);  // changed the y calculation
+            auto item   = createHexagon(x, y, HEX_WIDTH, HEX_HEIGHT);
+            auto center = item->boundingRect().center();
+            return UIPosition{center.x(), center.y()};
+        }
+
         UIPosition GetDiamondTileCenter(const Tile::Position& position) {
             int  DIAMOND_ROWS     = _config.grid->GetRows();
             int  DIAMOND_OFFSET_Y = -1 * DIAMOND_ROWS * DIAMOND_HEIGHT / 2.0;
-            int  x    = position.x * DIAMOND_WIDTH + (position.y % 2 == 0 ? 0 : DIAMOND_WIDTH / 2);
-            int  y    = position.y * DIAMOND_HEIGHT / 2 + DIAMOND_OFFSET_Y;
+            int  x    = position.y * DIAMOND_WIDTH + (position.y % 2 == 0 ? 0 : DIAMOND_WIDTH / 2);
+            int  y    = position.x * DIAMOND_HEIGHT / 2 + DIAMOND_OFFSET_Y;
             auto item = createDiamondTile(x, y, DIAMOND_WIDTH, DIAMOND_HEIGHT);
-            return UIPosition{
-                static_cast<uint32_t>(item->boundingRect().center().x()),
-                static_cast<uint32_t>(item->boundingRect().center().y())};
+            auto center = item->boundingRect().center();
+            return UIPosition{center.x(), center.y()};
         }
 
         UIPosition GetTileCenter(const Tile::Position& position) override {
-            return GetDiamondTileCenter(position);
+            // return GetDiamondTileCenter(position);
+            return GetHexTileCenter(position);
         }
     };
 }

@@ -49,8 +49,12 @@ namespace Prototyping::UI::Qt {
 
         UIPosition GetTileCenter(const Tile::Position& position) override {
             return UIPosition{
-                position.y * _config.tileWidth + _config.tileWidth / 2 + _config.padding / 2,
-                position.x * _config.tileHeight + _config.tileHeight / 2 + _config.padding / 2};
+                static_cast<double>(
+                    position.y * _config.tileWidth + _config.tileWidth / 2 + _config.padding / 2
+                ),
+                static_cast<double>(
+                    position.x * _config.tileHeight + _config.tileHeight / 2 + _config.padding / 2
+                )};
         }
     };
 }

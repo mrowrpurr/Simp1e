@@ -95,7 +95,7 @@ namespace Prototyping::UI::Qt {
 
             auto center = polygon.boundingRect().center();
 
-            return UIPosition{static_cast<uint32_t>(center.x()), static_cast<uint32_t>(center.y())};
+            return UIPosition{center.x(), center.y()};
         }
     };
 }

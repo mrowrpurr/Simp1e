@@ -1,17 +1,15 @@
 #pragma once
 
-#include <cstdint>
-
 namespace Prototyping::UI {
     class UIPosition {
-        uint32_t _x = 0;
-        uint32_t _y = 0;
+        double _x = 0;
+        double _y = 0;
 
     public:
         UIPosition() = default;
-        UIPosition(uint32_t x, uint32_t y) : _x(x), _y(y) {}
+        UIPosition(double x, double y) : _x(x), _y(y) {}
 
-        uint32_t x() const { return _x; }
-        uint32_t y() const { return _y; }
+        double x() const { return _x; }
+        double y() const { return _y; }
     };
 }
