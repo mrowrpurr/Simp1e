@@ -9,7 +9,7 @@
 
 namespace Prototyping::UI {
     struct UITileGrid {
-        enum class RenderingStyle { Grid, Trimetric };
+        enum class RenderingStyle { Grid, Isometric };
 
         struct Config {
             TileGrid*      grid           = nullptr;

@@ -53,12 +53,12 @@ namespace Prototyping::UI::Qt {
     };
 
     // TODO: padding support
-    class QtTileGridTrimetricRenderer : public QtTileGridRenderer {
+    class QtTileGridIsometricRenderer : public QtTileGridRenderer {
         UITileGrid::Config& _config;
         QtScene*            _scene;
 
     public:
-        QtTileGridTrimetricRenderer(UITileGrid::Config& config, QtScene* scene)
+        QtTileGridIsometricRenderer(UITileGrid::Config& config, QtScene* scene)
             : _config(config), _scene(scene) {}
 
         UISize InitializeGrid() override {
@@ -92,6 +92,23 @@ namespace Prototyping::UI::Qt {
             }
             return UISize{uiWidth, uiHeight};
         }
+
+        UIPosition GetTileCenter(const Tile::Position& position) override {
+            qreal tileWidth  = _config.tileWidth;
+            qreal tileHeight = _config.tileHeight;
+            qreal x          = (position.y - position.x) * tileWidth / 2;
+            qreal y          = (position.x + position.y) * tileHeight / 2;
+            auto  top        = QPointF(x, y);
+            auto  bottom     = QPointF(x, y + tileHeight);
+            auto  right      = QPointF(x + tileWidth / 2, y + tileHeight / 2);
+            auto  left       = QPointF(x - tileWidth / 2, y + tileHeight / 2);
+
+            QPolygonF polygon;
+            polygon << top << right << bottom << left;
+            auto center = polygon.boundingRect().center();
+
+            return UIPosition{static_cast<uint32_t>(center.x()), static_cast<uint32_t>(center.y())};
+        }
     };
 
     //
@@ -112,8 +129,8 @@ namespace Prototyping::UI::Qt {
                 case RenderingStyle::Grid:
                     _renderer.reset(new QtTileGridRectangleRenderer(_config, _scene));
                     break;
-                case RenderingStyle::Trimetric:
-                    _renderer.reset(new QtTileGridTrimetricRenderer(_config, _scene));
+                case RenderingStyle::Isometric:
+                    _renderer.reset(new QtTileGridIsometricRenderer(_config, _scene));
                     break;
             }
             auto gridSize = _renderer->InitializeGrid();

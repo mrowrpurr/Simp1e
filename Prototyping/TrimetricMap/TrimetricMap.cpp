@@ -6,6 +6,7 @@
 #include <QPen>
 #include <map>
 
+// This is actually Isometric ;)
 class TrimetricMap {
 public:
     TrimetricMap(int rows, int cols)
