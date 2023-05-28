@@ -44,6 +44,12 @@ namespace Prototyping::UI::Qt {
                 _config.grid->GetColumns() * _config.tileWidth + _config.padding * 2,
                 _config.grid->GetRows() * _config.tileHeight + _config.padding * 2};
         }
+
+        UIPosition GetTileCenter(const Tile::Position& position) override {
+            return UIPosition{
+                position.x * _config.tileWidth + _config.tileWidth / 2 + _config.padding / 2,
+                position.y * _config.tileHeight + _config.tileHeight / 2 + _config.padding / 2};
+        }
     };
 
     // TODO: padding support
@@ -122,9 +128,10 @@ namespace Prototyping::UI::Qt {
         ) override {
             auto element = new QtCircle(color, diameter);
             _scene->addItem(element);
+            auto center = _renderer->GetTileCenter(position);
             element->setPos(
-                position.x * _config.tileWidth + _config.padding,
-                position.y * _config.tileHeight + _config.padding
+                center.x() - static_cast<uint32_t>(diameter / 2),
+                center.y() - static_cast<uint32_t>(diameter / 2)
             );
             return nullptr;  // TODO
         }
