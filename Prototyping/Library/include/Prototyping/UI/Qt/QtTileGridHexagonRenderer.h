@@ -97,5 +97,19 @@ namespace Prototyping::UI::Qt {
 
             return UIPosition{center.x(), center.y()};
         }
+
+        Tile::Position ScenePositionToTilePosition(const UIPosition& position) override {
+            float x = position.x();
+            float y = position.y();
+
+            float u = x / (width / 2);
+            float v = (y - (height / 2) * static_cast<double>(static_cast<int>(u) % 2)) /
+                      (3 * height / 4);
+
+            int col = floor(u);
+            int row = floor(v - static_cast<double>(col % 2) / 2);
+
+            return Tile::Position{static_cast<uint32_t>(row), static_cast<uint32_t>(col)};
+        }
     };
 }

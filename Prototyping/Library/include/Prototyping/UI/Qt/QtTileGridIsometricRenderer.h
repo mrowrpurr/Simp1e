@@ -82,14 +82,28 @@ namespace Prototyping::UI::Qt {
             qreal x          = position.x();
             qreal y          = position.y();
 
-            // The coordinates of the scene point corresponding to the diamond grid point (0, 0).
-            qreal origin_x = 0.0;
-            qreal origin_y = tileHeight / 2;
+            for (int row = 0; row < _config.grid->GetRows(); row++) {
+                for (int col = 0; col < _config.grid->GetColumns(); col++) {
+                    qreal tileX  = (col - row) * tileWidth / 2;
+                    qreal tileY  = (row + col) * tileHeight / 2;
+                    auto  top    = QPointF(tileX, tileY);
+                    auto  bottom = QPointF(tileX, tileY + tileHeight);
+                    auto  right  = QPointF(tileX + tileWidth / 2, tileY + tileHeight / 2);
+                    auto  left   = QPointF(tileX - tileWidth / 2, tileY + tileHeight / 2);
 
-            int col = round(2 * (x - origin_x) / tileWidth);
-            int row = round(2 * (y - origin_y - tileHeight / 2) / tileHeight);
+                    QPolygonF polygon;
+                    polygon << top << right << bottom << left;
 
-            return Tile::Position{static_cast<uint32_t>(row), static_cast<uint32_t>(col)};
+                    if (polygon.containsPoint(QPointF(x, y), ::Qt::OddEvenFill)) {
+                        return Tile::Position{
+                            static_cast<uint32_t>(row), static_cast<uint32_t>(col)};
+                    }
+                }
+            }
+
+            // Point does not belong to any tile.
+            // Return an invalid position.
+            return Tile::Position{UINT32_MAX, UINT32_MAX};
         }
     };
 }
