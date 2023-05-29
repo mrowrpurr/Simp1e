@@ -11,10 +11,10 @@
 namespace Prototyping::UI::Qt {
 
     class QtMutlipleTileGrids : public UITileGrid {
-        UITileGrid::Config                       _config;
-        std::vector<std::unique_ptr<QtTileGrid>> _qtTileGrids;
+        UITileGrid::Config       _config;
+        std::vector<QtTileGrid*> _qtTileGrids;
 
-        QMainWindow _window;
+        QMainWindow* _window;
 
         std::string GetDockNameForRenderingStyle(UITileGrid::RenderingStyle renderingStyle) {
             switch (renderingStyle) {
@@ -32,12 +32,12 @@ namespace Prototyping::UI::Qt {
         }
 
         void CenterWindow() {
-            _window.adjustSize();
+            _window->adjustSize();
             auto* screen   = QGuiApplication::primaryScreen();
             auto  geometry = screen->availableGeometry();
-            int   x        = (geometry.width() - _window.width()) / 2;
-            int   y        = (geometry.height() - _window.height()) / 2;
-            _window.move(x, y);
+            int   x        = (geometry.width() - _window->width()) / 2;
+            int   y        = (geometry.height() - _window->height()) / 2;
+            _window->move(x, y);
         }
 
     public:
@@ -45,6 +45,7 @@ namespace Prototyping::UI::Qt {
             const Config& config, std::vector<UITileGrid::RenderingStyle> renderingStyles
         )
             : _config(config) {
+            _window                = new QMainWindow();
             QDockWidget* firstDock = nullptr;
             for (auto style : renderingStyles) {
                 Config gridConfig         = config;
@@ -52,14 +53,13 @@ namespace Prototyping::UI::Qt {
                 auto* tileGrid            = new QtTileGrid(gridConfig);
                 auto* dock = new QDockWidget(GetDockNameForRenderingStyle(style).c_str());
                 dock->setWidget(tileGrid->GetWidget());
-                _window.addDockWidget(::Qt::DockWidgetArea::LeftDockWidgetArea, dock);
-                _qtTileGrids.push_back(std::unique_ptr<QtTileGrid>(tileGrid));
+                _window->addDockWidget(::Qt::DockWidgetArea::LeftDockWidgetArea, dock);
+                _qtTileGrids.push_back(tileGrid);
                 if (!firstDock) firstDock = dock;
-                else _window.tabifyDockWidget(firstDock, dock);
+                else _window->tabifyDockWidget(firstDock, dock);
             }
-            _window.setWindowTitle("Multiple Tile Grids");
             CenterWindow();
-            _window.show();
+            _window->show();
         }
 
         bool OnLeftClick(std::function<void(const Tile::Position&)> handler, uint32_t layer)
