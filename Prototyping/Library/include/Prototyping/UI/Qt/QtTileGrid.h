@@ -129,6 +129,13 @@ namespace Prototyping::UI::Qt {
             return _renderer->GetTile(position);
         }
 
+        TileGrid* GetGrid(uint32_t layer = 0) override { return _renderer->GetGrid(layer); }
+
+        UITileGrid* GetGridForRenderingStyle(RenderingStyle renderingStyle) override {
+            if (_config.renderingStyle == renderingStyle) return this;
+            return nullptr;
+        }
+
         bool SetTileObstacle(const Tile::Position& position, bool isObstacle = true) override {
             auto* tile = _renderer->GetTile(position);
             if (!tile) {

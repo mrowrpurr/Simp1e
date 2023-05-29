@@ -30,6 +30,11 @@ namespace Prototyping::UI::Qt {
             return nullptr;
         }
 
+        TileGrid* GetGrid(uint32_t layer = 0) override {
+            if (layer == 0) return _config.grid;
+            else return nullptr;
+        }
+
         UISize InitializeGrid() override {
             uint32_t uiWidth    = 0;
             uint32_t uiHeight   = 0;

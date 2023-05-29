@@ -33,9 +33,33 @@ int main() {
     });
     uiGrid->OnMiddleClick(
         [&](Tile::Position position) {
-            if (!circleLayer2)
-                circleLayer2 = uiGrid->AddCircle({position.x, position.y, 1}, {0, 0, 255}, 35);
-            else uiGrid->MoveElement(circleLayer2, position);
+            auto* isoHexUIGrid = uiGrid->GetGridForRenderingStyle(
+                UI::UITileGrid::RenderingStyle::IsometricWithHexagons
+            );
+            if (isoHexUIGrid) {
+                auto* layer2Grid = isoHexUIGrid->GetGrid(1);
+                if (layer2Grid) {
+                    if (!circleLayer2)
+                        circleLayer2 =
+                            isoHexUIGrid->AddCircle({position.x, position.y, 1}, {0, 0, 255}, 35);
+                    else {
+                        auto* startTile =
+                            layer2Grid->GetTile(circle->GetPosition().x, circle->GetPosition().y);
+                        auto* endTile = layer2Grid->GetTile(position.x, position.y);
+                        if (!startTile || !endTile) {
+                            qDebug() << "Invalid start or end tile";
+                            return;
+                        }
+                        qDebug() << "A* Search - Start tile:" << startTile->GetPosition().x
+                                 << startTile->GetPosition().y;
+                        auto path = AStar::GetShortestPath(*layer2Grid, startTile, endTile, true);
+                        qDebug() << "Path length:" << path.size();
+                        for (auto& tile : path) {
+                            qDebug() << "Tile:" << tile.x() << tile.y();
+                        }
+                    }
+                }
+            }
         },
         1
     );

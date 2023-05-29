@@ -22,18 +22,23 @@ namespace Prototyping::AStar {
                 for (int y = -1; y <= 1; ++y) {
                     if (x == 0 && y == 0)  // skip the current tile
                         continue;
-
                     if (!diagonalMovementAllowed &&
                         std::abs(x) == std::abs(y))  // skip diagonal tiles
                         continue;
 
                     uint32_t checkX = tile.x() + x;
                     uint32_t checkY = tile.y() + y;
-
                     // check if the tile coordinates are within the map
                     if (checkX >= 0 && checkX < grid.size() && checkY >= 0 &&
                         checkY < grid[0].size()) {
-                        neighbours.push_back(&grid[checkX][checkY]);
+                        // Other checks
+                        auto* thisTile = &grid[checkX][checkY];
+                        if (thisTile->IsObstacle()) continue;  // skip obstacles (walls, etc.
+                        if (thisTile->z() != tile.z())
+                            continue;  // skip tiles on other layers (floors, etc. )
+
+                        // Howdy, neighbour!
+                        neighbours.push_back(thisTile);
                     }
                 }
             }

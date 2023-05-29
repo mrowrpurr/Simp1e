@@ -12,9 +12,10 @@
 namespace Prototyping::UI::Qt {
 
     class QtMutlipleTileGrids : public UITileGrid {
-        UITileGrid::Config                     _config;
-        std::vector<QtTileGrid*>               _qtTileGrids;
-        std::unordered_set<UITileGridElement*> _elements;
+        UITileGrid::Config                                          _config;
+        std::vector<QtTileGrid*>                                    _qtTileGrids;
+        std::unordered_map<UITileGrid::RenderingStyle, QtTileGrid*> _qtTileGridsByRenderingStyle;
+        std::unordered_set<UITileGridElement*>                      _elements;
 
         QMainWindow* _window;
 
@@ -57,6 +58,7 @@ namespace Prototyping::UI::Qt {
                 dock->setWidget(tileGrid->GetWidget());
                 _window->addDockWidget(::Qt::DockWidgetArea::LeftDockWidgetArea, dock);
                 _qtTileGrids.push_back(tileGrid);
+                _qtTileGridsByRenderingStyle[style] = tileGrid;
                 if (!firstDock) firstDock = dock;
                 else _window->tabifyDockWidget(firstDock, dock);
             }
@@ -64,9 +66,21 @@ namespace Prototyping::UI::Qt {
             _window->show();
         }
 
+        UITileGrid* GetGridForRenderingStyle(UITileGrid::RenderingStyle renderingStyle) override {
+            auto found = _qtTileGridsByRenderingStyle.find(renderingStyle);
+            if (found == _qtTileGridsByRenderingStyle.end()) return nullptr;
+            return found->second;
+        }
+
         UITile* GetTile(const Tile::Position& position) override {
             // This won't work with multi!
             qDebug() << "GetTile not implemented for QtMutlipleTileGrids";
+            return nullptr;
+        }
+
+        TileGrid* GetGrid(uint32_t layer = 0) override {
+            // This won't work with multi!
+            qDebug() << "GetGrid not implemented for QtMutlipleTileGrids";
             return nullptr;
         }
 

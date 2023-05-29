@@ -25,10 +25,14 @@ namespace Prototyping::UI {
         };
 
         virtual ~UITileGrid() = default;
-        virtual bool     ShowAsWindow() { return false; }
-        virtual QWidget* GetWidget() { return nullptr; }
-        virtual UITile*  GetTile(const Tile::Position& position) { return nullptr; }
-        virtual bool     SetTileObstacle(const Tile::Position& position, bool isObstacle = true) {
+        virtual bool        ShowAsWindow() { return false; }
+        virtual QWidget*    GetWidget() { return nullptr; }
+        virtual TileGrid*   GetGrid(uint32_t layer = 0) { return nullptr; }
+        virtual UITileGrid* GetGridForRenderingStyle(RenderingStyle renderingStyle) {
+            return nullptr;
+        }
+        virtual UITile* GetTile(const Tile::Position& position) { return nullptr; }
+        virtual bool    SetTileObstacle(const Tile::Position& position, bool isObstacle = true) {
             return false;
         }
         virtual bool SetBackgroundColor(const UIColor& color) { return false; }

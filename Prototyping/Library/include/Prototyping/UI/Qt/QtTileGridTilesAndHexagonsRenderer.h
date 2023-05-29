@@ -71,6 +71,12 @@ namespace Prototyping::UI::Qt {
             return nullptr;
         }
 
+        TileGrid* GetGrid(uint32_t layer = 0) override {
+            if (layer == 0) return _config.grid;
+            else if (layer == 1) return &_hexGrid;
+            else return nullptr;
+        }
+
         UISize InitializeGrid() override {
             // Ignore the configuration ones for now ;)
             // qreal    tileWidth  = _config.tileWidth;

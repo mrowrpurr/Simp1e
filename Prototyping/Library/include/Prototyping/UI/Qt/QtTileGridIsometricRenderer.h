@@ -17,12 +17,16 @@ namespace Prototyping::UI::Qt {
     public:
         QtTileGridIsometricRenderer(UITileGrid::Config& config, QtScene* scene)
             : _config(config), _scene(scene) {}
-        //////////////////////////////
 
         UITile* GetTile(const Tile::Position& position) override {
             auto it = _tiles.find(position);
             if (it != _tiles.end()) return it->second;
             return nullptr;
+        }
+
+        TileGrid* GetGrid(uint32_t layer = 0) override {
+            if (layer == 0) return _config.grid;
+            else return nullptr;
         }
 
         UISize InitializeGrid() override {
