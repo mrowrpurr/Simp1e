@@ -21,17 +21,32 @@ namespace Prototyping::AStar {
             // list of the six direction vectors for a hex grid
             // with corresponding cost multipliers
             std::vector<std::pair<std::pair<int, int>, double>> directions = {
-                {std::make_pair(-1, 1),  1.0}, // northeast
-                {std::make_pair(0,  1),  1.5}, // east
-                {std::make_pair(1,  1),  1.0}, // southeast
-                {std::make_pair(1,  0),  1.5}, // southwest
-                {std::make_pair(0,  -1), 1.5}, // west
-                {std::make_pair(-1, 0),  1.0}  // northwest
+                {std::make_pair(-1, 0),  1.5}, // west
+                {std::make_pair(1,  0),  1.5}, // east
+                {std::make_pair(0,  -1), 1.0}, // northwest if x is even, northeast if x is odd
+                {std::make_pair(0,  1),  1.0}, // southwest if x is even, southeast if x is odd
+                {std::make_pair(-1, -1), 1.0}, // northwest if x is odd, northeast if x is even
+                {std::make_pair(1,  1),  1.0}  // southwest if x is odd, southeast if x is even
             };
 
             for (auto& dir : directions) {
-                uint32_t checkX         = tile.x() + dir.first.first;
-                uint32_t checkY         = tile.y() + dir.first.second;
+                int dx = dir.first.first;
+                int dy = dir.first.second;
+
+                if (tile.x() % 2 == 0) {
+                    if (dx == -1 && dy == -1)  // northwest if x is odd
+                        continue;
+                    if (dx == 1 && dy == 1)  // southwest if x is odd
+                        continue;
+                } else {
+                    if (dx == 0 && dy == -1)  // northwest if x is even
+                        continue;
+                    if (dx == 0 && dy == 1)  // southwest if x is even
+                        continue;
+                }
+
+                uint32_t checkX         = tile.x() + dx;
+                uint32_t checkY         = tile.y() + dy;
                 double   costMultiplier = dir.second;
 
                 // check if the tile coordinates are within the map
