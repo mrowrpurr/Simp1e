@@ -136,29 +136,24 @@ namespace Prototyping::AStar {
             // check the neighbours of the current tile
             for (AStarTile* neighbour :
                  Utility::GetNeighbours(grid, *currentTile, diagonalMovementAllowed)) {
-                // More expensive diagonal movement
-                // float gCost = currentTile->gCost + std::hypot(
-                //                                        neighbour->x() - currentTile->x(),
-                //                                        neighbour->y() - currentTile->y()
-                //                                    );
-
                 // Less expensive diagonal movement
                 float gCost = currentTile->gCost + ((neighbour->x() - currentTile->x() != 0 &&
                                                      neighbour->y() - currentTile->y() != 0)
                                                         ? 1
-                                                        : 1);
+                                                        : 0.6f);
 
                 // Skip neighbour if it is in the closed list
                 if (std::find(closedList.begin(), closedList.end(), neighbour) != closedList.end())
                     continue;
                 if (neighbour->IsObstacle()) continue;
 
-                float hCost =
-                    std::hypot(neighbour->x() - endTile.x(), neighbour->y() - endTile.y());
+                float dx    = std::abs(static_cast<int>(neighbour->x() - endTile.x()));
+                float dy    = std::abs(static_cast<int>(neighbour->y() - endTile.y()));
+                float hCost = std::max(dx, dy);
 
                 // if the new path to the neighbour is shorter or if the neighbour has not been
                 // processed
-                if (!neighbour->parent || gCost < neighbour->gCost) {
+                if (!neighbour->IsObstacle() && !neighbour->parent || gCost < neighbour->gCost) {
                     neighbour->gCost  = gCost;
                     neighbour->hCost  = hCost;
                     neighbour->parent = currentTile;
