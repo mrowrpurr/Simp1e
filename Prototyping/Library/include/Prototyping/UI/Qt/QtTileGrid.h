@@ -3,7 +3,9 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <functional>
+#include <memory>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "../UIPosition.h"
 #include "../UISize.h"
@@ -30,7 +32,8 @@ namespace Prototyping::UI::Qt {
         std::unordered_map<uint32_t, std::vector<std::function<void(const Tile::Position&)>>>
             _tileRightClickHandlers;
         std::unordered_map<uint32_t, std::vector<std::function<void(const Tile::Position&)>>>
-            _tileMiddleClickHandlers;
+                                               _tileMiddleClickHandlers;
+        std::unordered_set<UITileGridElement*> _elements;
 
         void SetupRenderer() {
             switch (_config.renderingStyle) {
@@ -109,6 +112,10 @@ namespace Prototyping::UI::Qt {
             _window.setLayout(&_layout);
         }
 
+        ~QtTileGrid() override {
+            for (auto elementPtr : _elements) delete elementPtr;
+        }
+
         QWidget* GetWidget() override { return &_window; }
 
         bool ShowAsWindow() override {
@@ -132,37 +139,36 @@ namespace Prototyping::UI::Qt {
             return true;
         }
 
+        bool MoveElement(UITileGridElement* element, const Tile::Position& position) override {
+            try {
+                auto* qtElement = std::any_cast<QGraphicsObject*>(element->GetElement());
+                if (!qtElement) return false;
+                auto center = _renderer->GetTileCenter(position);
+                qtElement->setPos(
+                    center.x() - static_cast<uint32_t>(qtElement->boundingRect().width() / 2),
+                    center.y() - static_cast<uint32_t>(qtElement->boundingRect().height() / 2)
+                );
+                return true;
+            } catch (const std::bad_any_cast& e) {
+                qDebug() << e.what();
+                return false;
+            }
+        }
+
         UITileGridElement* AddCircle(
             const Tile::Position& position, const UIColor& color, uint32_t diameter
         ) override {
-            if (QtTileGridTilesAndHexagonsRenderer* renderer =
-                    dynamic_cast<QtTileGridTilesAndHexagonsRenderer*>(_renderer.get())) {
-                auto element = new QtCircle(color, diameter);
-                _scene->addItem(element);
-                auto center = renderer->GetDiamondTileCenter(position);
-                element->setPos(
-                    center.x() - static_cast<uint32_t>(diameter / 2),
-                    center.y() - static_cast<uint32_t>(diameter / 2)
-                );
-
-                auto element2 = new QtCircle({0, 255, 0}, diameter);
-                _scene->addItem(element2);
-                auto center2 = renderer->GetHexTileCenter(position);
-                element2->setPos(
-                    center2.x() - static_cast<uint32_t>(diameter / 2),
-                    center2.y() - static_cast<uint32_t>(diameter / 2)
-                );
-            } else {
-                auto element = new QtCircle(color, diameter);
-                _scene->addItem(element);
-                auto center = _renderer->GetTileCenter(position);
-                element->setPos(
-                    center.x() - static_cast<uint32_t>(diameter / 2),
-                    center.y() - static_cast<uint32_t>(diameter / 2)
-                );
-            }
-
-            return nullptr;  // TODO
+            auto circle = new QtCircle(color, diameter);
+            _scene->addItem(circle);
+            auto center = _renderer->GetTileCenter(position);
+            circle->setPos(
+                center.x() - static_cast<uint32_t>(diameter / 2),
+                center.y() - static_cast<uint32_t>(diameter / 2)
+            );
+            QGraphicsObject* ptr     = circle;
+            auto*            element = new UITileGridElement(position, ptr);
+            _elements.insert(element);
+            return element;
         }
     };
 }

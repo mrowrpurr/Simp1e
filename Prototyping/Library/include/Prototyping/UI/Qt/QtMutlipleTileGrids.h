@@ -4,6 +4,7 @@
 #include <QGuiApplication>
 #include <QMainWindow>
 #include <QScreen>
+#include <unordered_map>
 
 #include "../UITileGrid.h"
 #include "QtTileGrid.h"
@@ -78,11 +79,38 @@ namespace Prototyping::UI::Qt {
             return true;
         }
 
+        bool MoveElement(UITileGridElement* element, const Tile::Position& position) override {
+            try {
+                auto elements =
+                    std::any_cast<std::vector<UITileGridElement*>>(element->GetElement());
+                for (size_t i = 0; i < _qtTileGrids.size(); ++i)
+                    _qtTileGrids[i]->MoveElement(elements.at(i), position);
+                return true;
+            } catch (const std::bad_any_cast&) {
+                return false;
+            }
+        }
+
+        bool RemoveElement(UITileGridElement* element) override {
+            try {
+                auto elements =
+                    std::any_cast<std::vector<UITileGridElement*>>(element->GetElement());
+                for (size_t i = 0; i < _qtTileGrids.size(); ++i)
+                    _qtTileGrids[i]->RemoveElement(elements.at(i));
+                return true;
+            } catch (const std::bad_any_cast&) {
+                return false;
+            }
+        }
+
         UITileGridElement* AddCircle(
             const Tile::Position& position, const UIColor& color, uint32_t diameter
         ) override {
-            for (auto& tileGrid : _qtTileGrids) tileGrid->AddCircle(position, color, diameter);
-            return nullptr;
+            std::vector<UITileGridElement*> elements;
+            for (auto& tileGrid : _qtTileGrids)
+                elements.push_back(tileGrid->AddCircle(position, color, diameter));
+            auto* element = new UITileGridElement(position, elements);
+            return element;
         }
     };
 }

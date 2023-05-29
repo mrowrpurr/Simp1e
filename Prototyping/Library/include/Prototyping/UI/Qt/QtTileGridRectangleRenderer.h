@@ -51,8 +51,8 @@ namespace Prototyping::UI::Qt {
 
         UIPosition GetTileCenter(const Tile::Position& position) override {
             return UIPosition{
-                static_cast<double>(position.y * _config.tileWidth + _config.tileWidth / 2 / 2),
-                static_cast<double>(position.x * _config.tileHeight + _config.tileHeight / 2 / 2)};
+                static_cast<double>(position.y * _config.tileWidth + _config.tileWidth / 2),
+                static_cast<double>(position.x * _config.tileHeight + _config.tileHeight / 2)};
         }
 
         std::unordered_map<uint32_t, Tile::Position> ScenePositionToTilePositions(

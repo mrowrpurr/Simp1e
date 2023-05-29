@@ -7,25 +7,18 @@ using namespace Prototyping;
 
 int main() {
     TileGrid grid{20, 10};
-    auto     uiTileGrid = UI::Qt::CreateMultiTileGrid({
-            .grid = &grid,
+
+    auto uiGrid = UI::Qt::CreateMultiTileGrid({
+        .grid = &grid,
     });
 
-    uiTileGrid->OnLeftClick([](Tile::Position position) {
-        auto message =
-            QString("[Default Layer] Left click on tile (%1, %2)").arg(position.x).arg(position.y);
-        QMessageBox::information(nullptr, "Left click", message);
-    });
-    uiTileGrid->OnRightClick(
-        [](Tile::Position position) {
-            auto message =
-                QString("[Layer 1] Left click on tile (%1, %2)").arg(position.x).arg(position.y);
-            QMessageBox::information(nullptr, "Left click", message);
-        },
-        1
-    );
+    auto* circle = uiGrid->AddCircle({2, 4}, UI::UIColor::Magenta(), 25);
 
-    uiTileGrid->AddCircle({2, 4}, UI::UIColor::Magenta(), 25);
+    // uiGrid->OnLeftClick([&](Tile::Position position) { uiGrid->MoveElement(circle, position); });
+    uiGrid->OnLeftClick([&](Tile::Position position) {
+        qDebug() << "Left click at" << position.x << position.y;
+        uiGrid->AddCircle(position, {0, 255, 0}, 25);
+    });
 
     return UI::Qt::Run();
 }

@@ -150,15 +150,13 @@ namespace Prototyping::UI::Qt {
 
         UIPosition GetHexTileCenter(const Tile::Position& position) {
             int DIAMOND_ROWS     = _config.grid->GetRows();
-            int DIAMOND_COLUMNS  = _config.grid->GetColumns();
             int DIAMOND_OFFSET_Y = -1 * DIAMOND_ROWS * DIAMOND_HEIGHT / 2.0;
-            HEX_OFFSET_Y += -(DIAMOND_ROWS * DIAMOND_HEIGHT / 2);
 
             int x =
-                HEX_WIDTH * position.y + (position.y % 2 == 0 ? 0 : HEX_WIDTH / 2) + HEX_OFFSET_X;
-            int y =
-                HEX_HEIGHT * 3 / 4 * position.x + (HEX_OFFSET_Y / 2);  // changed the y calculation
-            auto item   = createHexagon(x, y, HEX_WIDTH, HEX_HEIGHT);
+                HEX_WIDTH * position.y + (position.x % 2 == 0 ? 0 : HEX_WIDTH / 2) + HEX_OFFSET_X;
+            int  y = HEX_HEIGHT * 3 / 4 * position.x + HEX_OFFSET_Y;  // changed the y calculation
+            auto item = createHexagon(x, y, HEX_WIDTH, HEX_HEIGHT);
+
             auto center = item->boundingRect().center();
             return UIPosition{center.x(), center.y()};
         }
@@ -166,16 +164,16 @@ namespace Prototyping::UI::Qt {
         UIPosition GetDiamondTileCenter(const Tile::Position& position) {
             int  DIAMOND_ROWS     = _config.grid->GetRows();
             int  DIAMOND_OFFSET_Y = -1 * DIAMOND_ROWS * DIAMOND_HEIGHT / 2.0;
-            int  x    = position.y * DIAMOND_WIDTH + (position.y % 2 == 0 ? 0 : DIAMOND_WIDTH / 2);
+            int  x    = position.y * DIAMOND_WIDTH + (position.x % 2 == 0 ? 0 : DIAMOND_WIDTH / 2);
             int  y    = position.x * DIAMOND_HEIGHT / 2 + DIAMOND_OFFSET_Y;
             auto item = createDiamondTile(x, y, DIAMOND_WIDTH, DIAMOND_HEIGHT);
-            auto center = item->boundingRect().center();
+            auto center = item->polygon().boundingRect().center();
             return UIPosition{center.x(), center.y()};
         }
 
         UIPosition GetTileCenter(const Tile::Position& position) override {
-            // return GetDiamondTileCenter(position);
-            return GetHexTileCenter(position);
+            return GetDiamondTileCenter(position);
+            // return GetHexTileCenter(position);
         }
 
         std::unordered_map<uint32_t, Tile::Position> ScenePositionToTilePositions(

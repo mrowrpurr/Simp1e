@@ -64,7 +64,8 @@ end
 
 -- Call this in an existing target to configure it as a Qt application.
 function add_qt()
-    add_rules("qt.application")
+    add_rules("qt.console")
+    -- add_rules("qt.application")
     add_rules("qt.qrc")
     add_rules("qt.moc")
     add_qt_libs()
