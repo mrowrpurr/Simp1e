@@ -174,6 +174,7 @@ namespace Prototyping::UI::Qt {
             std::vector<Tile::Position> positions;
             for (auto& tile : tiles) positions.push_back(tile.tile->GetPosition());
             return positions;
+            return {};
         }
 
         bool SetTileObstacle(const Tile::Position& position, bool isObstacle = true) override {
@@ -232,6 +233,7 @@ namespace Prototyping::UI::Qt {
             UITileGridElement* element, const Tile::Position& position, double duration = 500,
             double delay = 0
         ) override {
+            if (!element) return false;
             qDebug() << "AnimatedMoveElement()" << position.x << position.y << position.z;
             if (_isAnimating) {
                 qDebug() << "AnimatedMoveElement() failed, already animating";

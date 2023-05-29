@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <utility>
 #include <vector>
 
 #include "../TileGrid.h"
@@ -11,54 +12,27 @@ namespace Prototyping::AStar {
 
     namespace Utility {
 
-        std::vector<AStarTile*> GetHexNeighbours(
+        std::vector<std::pair<AStarTile*, double>> GetHexNeighbours(
             std::vector<std::vector<AStarTile>>& grid, AStarTile& tile,
             bool diagonalMovementAllowed = true
         ) {
-            std::vector<AStarTile*> neighbours;
+            std::vector<std::pair<AStarTile*, double>> neighbours;
 
-            // list of the six direction vectors for a pointy-top hex grid
-            // std::vector<std::pair<int, int>> even_directions = {
-            //     {-1, 0 }, // northeast
-            //     {0,  1 }, // east
-            //     {1,  0 }, // southeast
-            //     {1,  -1}, // southwest
-            //     {0,  -1}, // west
-            //     {-1, -1}  // northwest
-            // };
-
-            // std::vector<std::pair<int, int>> odd_directions = {
-            //     {-1, 1 }, // northeast
-            //     {0,  1 }, // east
-            //     {1,  1 }, // southeast
-            //     {1,  0 }, // southwest
-            //     {0,  -1}, // west
-            //     {-1, 0 }  // northwest
-            // };
-
-            std::vector<std::pair<int, int>> even_directions = {
-                {-1, 0 }, // northeast
-                {0,  1 }, // east
-                {1,  -1}, // southeast
-                {1,  0 }, // southwest
-                {0,  -1}, // west
-                {-1, -1}  // northwest
+            // list of the six direction vectors for a hex grid
+            // with corresponding cost multipliers
+            std::vector<std::pair<std::pair<int, int>, double>> directions = {
+                {std::make_pair(-1, 1),  1.0}, // northeast
+                {std::make_pair(0,  1),  1.5}, // east
+                {std::make_pair(1,  1),  1.0}, // southeast
+                {std::make_pair(1,  0),  1.5}, // southwest
+                {std::make_pair(0,  -1), 1.5}, // west
+                {std::make_pair(-1, 0),  1.0}  // northwest
             };
-
-            std::vector<std::pair<int, int>> odd_directions = {
-                {-1, 1 }, // northeast
-                {0,  1 }, // east
-                {1,  1 }, // southeast
-                {1,  0 }, // southwest
-                {0,  -1}, // west
-                {-1, 0 }  // northwest
-            };
-
-            auto& directions = (tile.y() % 2 == 0) ? even_directions : odd_directions;
 
             for (auto& dir : directions) {
-                uint32_t checkX = tile.x() + dir.first;
-                uint32_t checkY = tile.y() + dir.second;
+                uint32_t checkX         = tile.x() + dir.first.first;
+                uint32_t checkY         = tile.y() + dir.first.second;
+                double   costMultiplier = dir.second;
 
                 // check if the tile coordinates are within the map
                 if (checkX >= 0 && checkX < grid.size() && checkY >= 0 && checkY < grid[0].size()) {
@@ -69,26 +43,22 @@ namespace Prototyping::AStar {
                     if (thisTile->z() != tile.z()) continue;
 
                     // Howdy, neighbour!
-                    neighbours.push_back(thisTile);
+                    neighbours.push_back({thisTile, costMultiplier});
                 }
             }
 
             return neighbours;
         }
 
-        // TODO update to only pay attention to other tiles on the same Z layer
-        std::vector<AStarTile*> GetRectangleNeighbours(
+        std::vector<std::pair<AStarTile*, double>> GetRectangleNeighbours(
             std::vector<std::vector<AStarTile>>& grid, AStarTile& tile, bool diagonalMovementAllowed
         ) {
-            std::vector<AStarTile*> neighbours;
+            std::vector<std::pair<AStarTile*, double>> neighbours;
 
             // check the tiles around the current tile
             for (int x = -1; x <= 1; ++x) {
                 for (int y = -1; y <= 1; ++y) {
                     if (x == 0 && y == 0)  // skip the current tile
-                        continue;
-                    if (!diagonalMovementAllowed &&
-                        std::abs(x) == std::abs(y))  // skip diagonal tiles
                         continue;
 
                     uint32_t checkX = tile.x() + x;
@@ -98,12 +68,16 @@ namespace Prototyping::AStar {
                         checkY < grid[0].size()) {
                         // Other checks
                         auto* thisTile = &grid[checkX][checkY];
-                        if (thisTile->IsObstacle()) continue;  // skip obstacles (walls, etc.
+                        if (thisTile->IsObstacle()) continue;  // skip obstacles (walls, etc.)
                         if (thisTile->z() != tile.z())
                             continue;  // skip tiles on other layers (floors, etc. )
 
                         // Howdy, neighbour!
-                        neighbours.push_back(thisTile);
+                        double costModifier = 1.0;
+                        if (diagonalMovementAllowed && std::abs(x) == std::abs(y)) {
+                            costModifier = 0.75;  // Example cost for diagonal movement
+                        }
+                        neighbours.push_back(std::make_pair(thisTile, costModifier));
                     }
                 }
             }
@@ -118,7 +92,7 @@ namespace Prototyping::AStar {
         // Initialize A* tile grid
         std::vector<std::vector<AStarTile>> grid;
 
-        // Loop throughthe TileGrid rows and columns, adding new AStarTiles to the grid vector
+        // Loop throughthe TileGrid rows and columns, adding new AStarTiles to the grid
         for (uint32_t row = 0; row < gameTileGrid.GetRows(); row++) {
             std::vector<AStarTile> gridRow;
             for (uint32_t col = 0; col < gameTileGrid.GetColumns(); col++)
@@ -155,21 +129,34 @@ namespace Prototyping::AStar {
                     ? Utility::GetHexNeighbours(grid, *currentTile, diagonalMovementAllowed)
                     : Utility::GetRectangleNeighbours(grid, *currentTile, diagonalMovementAllowed);
 
-            for (AStarTile* neighbour : neighbours) {
-                // Less expensive diagonal movement
-                float gCost = currentTile->gCost + ((neighbour->x() - currentTile->x() != 0 &&
-                                                     neighbour->y() - currentTile->y() != 0)
-                                                        ? 1
-                                                        : 0.6f);
+            for (auto& neighbourPair : neighbours) {
+                AStarTile* neighbour      = neighbourPair.first;
+                double     costMultiplier = neighbourPair.second;
+
+                // Apply cost multiplier to gCost
+                float gCost = currentTile->gCost + costMultiplier;
+                // float gCost = currentTile->gCost + ((neighbour->x() - currentTile->x() != 0 &&
+                //                                      neighbour->y() - currentTile->y() != 0)
+                //                                         ? costMultiplier
+                //                                         : 0.6f * costMultiplier);
 
                 // Skip neighbour if it is in the closed list
                 if (std::find(closedList.begin(), closedList.end(), neighbour) != closedList.end())
                     continue;
                 if (neighbour->IsObstacle()) continue;
 
-                float dx    = std::abs(static_cast<int>(neighbour->x() - endTile.x()));
-                float dy    = std::abs(static_cast<int>(neighbour->y() - endTile.y()));
-                float hCost = std::max(dx, dy);
+                // Assumes all movements are 1 unit
+                float dx = std::abs(static_cast<int>(neighbour->x() - endTile.x()));
+                float dy = std::abs(static_cast<int>(neighbour->y() - endTile.y()));
+                float hCost;
+
+                // Modify heuristic calculation for hex grid
+                if ((endTile.x() % 2 == 0 && endTile.y() % 2 == 0) ||
+                    (endTile.x() % 2 != 0 && endTile.y() % 2 != 0)) {
+                    hCost = dx + dy;
+                } else {
+                    hCost = dx + dy + 0.5;
+                }
 
                 // if the new path to the neighbour is shorter or if the neighbour has not been
                 // processed
@@ -199,4 +186,24 @@ namespace Prototyping::AStar {
         // no path could be found
         return {};
     }
+
+    // float dx    = std::abs(static_cast<int>(neighbour->x() - endTile.x()));
+    // float dy    = std::abs(static_cast<int>(neighbour->y() - endTile.y()));
+    // float hCost = std::max(dx, dy);
+
+    // for (AStarTile* neighbour : neighbours) {
+    //     // In hex grid, every move is equivalent, hence gCost should always
+    //     increment by 1. float gCost = currentTile->gCost + 1.0f;
+
+    //     // if (!hextiles) {
+    //     //     float gCost = currentTile->gCost + ((neighbour->x() -
+    //     currentTile->x()
+    //     != 0
+    //     //     &&
+    //     //                                          neighbour->y() -
+    //     currentTile->y()
+    //     != 0)
+    //     //                                             ? 1
+    //     //                                             : 0.6f);
+    //     // }
 }
