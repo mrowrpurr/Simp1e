@@ -66,6 +66,8 @@ namespace Prototyping::UI::Qt {
             _window->show();
         }
 
+        RenderingStyle GetRenderingStyle() override { return RenderingStyle::Multiple; }
+
         UITileGrid* GetGridForRenderingStyle(UITileGrid::RenderingStyle renderingStyle) override {
             auto found = _qtTileGridsByRenderingStyle.find(renderingStyle);
             if (found == _qtTileGridsByRenderingStyle.end()) return nullptr;
@@ -82,6 +84,13 @@ namespace Prototyping::UI::Qt {
             // This won't work with multi!
             qDebug() << "GetGrid not implemented for QtMutlipleTileGrids";
             return nullptr;
+        }
+
+        std::vector<Tile::Position> GetPath(
+            const Tile::Position& startPosition, const Tile::Position& endPosition,
+            bool hexgrid = false, bool allowDiagonalMovement = true
+        ) override {
+            return {};
         }
 
         bool SetTileObstacle(const Tile::Position& position, bool obstacle) override {
@@ -111,6 +120,25 @@ namespace Prototyping::UI::Qt {
                     std::any_cast<std::vector<UITileGridElement*>>(element->GetElement());
                 for (size_t i = 0; i < _qtTileGrids.size(); ++i)
                     _qtTileGrids[i]->MoveElement(elements.at(i), position);
+                return true;
+            } catch (const std::bad_any_cast&) {
+                return false;
+            }
+        }
+
+        bool AnimatedMoveElement(
+            UITileGridElement* element, const Tile::Position& position, double duration = 500,
+            double delay = 0
+        ) override {
+            try {
+                auto elements =
+                    std::any_cast<std::vector<UITileGridElement*>>(element->GetElement());
+                for (size_t i = 0; i < _qtTileGrids.size(); ++i) {
+                    qDebug(
+                    ) << "AnimatedMoveElement for grid: "
+                      << GetDockNameForRenderingStyle(_qtTileGrids[i]->GetRenderingStyle()).c_str();
+                    _qtTileGrids[i]->AnimatedMoveElement(elements.at(i), position, duration, delay);
+                }
                 return true;
             } catch (const std::bad_any_cast&) {
                 return false;

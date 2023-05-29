@@ -15,6 +15,7 @@ namespace Prototyping::UI {
         UITileGridElement(const Tile::Position& position, std::any element)
             : _position(position), _element(element) {}
 
+        void                  SetPosition(const Tile::Position& position) { _position = position; }
         const Tile::Position& GetPosition() const { return _position; }
         std::any&             GetElement() { return _element; }
     };

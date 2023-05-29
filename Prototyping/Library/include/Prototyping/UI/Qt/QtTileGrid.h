@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QPropertyAnimation>
+#include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <functional>
@@ -7,6 +9,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "../../AStar/AStar.h"
 #include "../UIPosition.h"
 #include "../UISize.h"
 #include "../UITileGrid.h"
@@ -21,6 +24,7 @@
 namespace Prototyping::UI::Qt {
 
     class QtTileGrid : public UITileGrid {
+        bool               _isAnimating = false;
         UITileGrid::Config _config;
         QWidget            _window;  // <-- concrete instance (* are children of this)
         QVBoxLayout        _layout;  // <-- concrete instance (* are children of this)
@@ -98,13 +102,6 @@ namespace Prototyping::UI::Qt {
             auto gridSize = _renderer->InitializeGrid();
             ListenForSceneEvents();
 
-            // auto padding   = 50;
-            // auto sceneRect = _scene->sceneRect();
-            // _scene->setSceneRect(
-            //     sceneRect.x() - padding, sceneRect.y() - padding, sceneRect.width() + padding *
-            //     2, sceneRect.height() + padding * 2
-            // );
-
             _view = new QtView(_scene);
             _view->setHorizontalScrollBarPolicy(::Qt::ScrollBarAlwaysOff);
             _view->setVerticalScrollBarPolicy(::Qt::ScrollBarAlwaysOff);
@@ -123,6 +120,8 @@ namespace Prototyping::UI::Qt {
             return true;
         }
 
+        RenderingStyle GetRenderingStyle() override { return _config.renderingStyle; }
+
         UITile* GetTile(const Tile::Position& position) override {
             qDebug() << "GetTile()" << position.x << position.y << position.z;
             qDebug() << "WARNING not recommended due to support for multiple layers";
@@ -134,6 +133,47 @@ namespace Prototyping::UI::Qt {
         UITileGrid* GetGridForRenderingStyle(RenderingStyle renderingStyle) override {
             if (_config.renderingStyle == renderingStyle) return this;
             return nullptr;
+        }
+
+        std::vector<Tile::Position> GetPath(
+            const Tile::Position& startPosition, const Tile::Position& endPosition,
+            bool hexgrid = false, bool allowDiagonalMovement = true
+        ) override {
+            qDebug() << "GetPath()" << startPosition.x << startPosition.y << startPosition.z
+                     << endPosition.x << endPosition.y << endPosition.z << hexgrid
+                     << allowDiagonalMovement;
+            bool isHexGrid = _config.renderingStyle == RenderingStyle::Hexagons ||
+                             (_config.renderingStyle == RenderingStyle::IsometricWithHexagons &&
+                              startPosition.z == 1);
+            qDebug() << "isHexGrid" << isHexGrid;
+            auto* grid = GetGrid(startPosition.z);
+            if (!grid) {
+                qDebug() << "GetPath() failed, grid not found at layer" << startPosition.z;
+                return {};
+            }
+            auto* start = grid->GetTile(startPosition.x, startPosition.y);
+            if (!start) {
+                qDebug() << "GetPath() failed, start tile not found at position" << startPosition.x
+                         << startPosition.y << startPosition.z;
+                return {};
+            }
+            auto* end = grid->GetTile(endPosition.x, endPosition.y);
+            if (!end) {
+                qDebug() << "GetPath() failed, end tile not found at position" << endPosition.x
+                         << endPosition.y << endPosition.z;
+                return {};
+            }
+            auto tiles = AStar::GetShortestPath(
+                *grid, start, end, isHexGrid, true
+            );  // TODO Read diagonal movement from _config
+            if (tiles.empty()) return {};
+            qDebug() << "GetPath() found path with" << tiles.size() << "tiles";
+            for (auto& tile : tiles)
+                qDebug() << tile.tile->GetPosition().x << tile.tile->GetPosition().y
+                         << tile.tile->GetPosition().z;
+            std::vector<Tile::Position> positions;
+            for (auto& tile : tiles) positions.push_back(tile.tile->GetPosition());
+            return positions;
         }
 
         bool SetTileObstacle(const Tile::Position& position, bool isObstacle = true) override {
@@ -172,6 +212,7 @@ namespace Prototyping::UI::Qt {
         bool MoveElement(UITileGridElement* element, const Tile::Position& position) override {
             try {
                 if (!element) return false;
+                qDebug() << "MoveElement()" << position.x << position.y << position.z;
                 auto* qtElement = std::any_cast<QtCircle*>(element->GetElement());
                 if (!qtElement) return false;
                 auto center = _renderer->GetTileCenter(position);
@@ -179,11 +220,49 @@ namespace Prototyping::UI::Qt {
                     center.x() - static_cast<uint32_t>(qtElement->boundingRect().width() / 2),
                     center.y() - static_cast<uint32_t>(qtElement->boundingRect().height() / 2)
                 );
+                element->SetPosition(position);
                 return true;
             } catch (const std::bad_any_cast& e) {
                 qDebug() << e.what();
                 return false;
             }
+        }
+
+        bool AnimatedMoveElement(
+            UITileGridElement* element, const Tile::Position& position, double duration = 500,
+            double delay = 0
+        ) override {
+            qDebug() << "AnimatedMoveElement()" << position.x << position.y << position.z;
+            if (_isAnimating) {
+                qDebug() << "AnimatedMoveElement() failed, already animating";
+                return false;
+            }
+            auto path = GetPath(element->GetPosition(), position);
+            if (path.empty()) return false;
+            if (delay) {
+                QTimer::singleShot(delay, [this, element, path, duration]() {
+                    double d = duration;
+                    for (auto& position : path) {
+                        qDebug() << "AnimatedMoveElement() QTimer::singleShot()" << position.x
+                                 << position.y << position.z << d;
+                        QTimer::singleShot(d, [this, element, position]() {
+                            MoveElement(element, position);
+                        });
+                        d += duration;
+                    }
+                });
+            } else {
+                auto d = duration;
+                for (auto& position : path) {
+                    qDebug() << "AnimatedMoveElement() QTimer::singleShot()" << position.x
+                             << position.y << position.z << duration;
+                    QTimer::singleShot(d, [this, element, position]() {
+                        MoveElement(element, position);
+                    });
+                    d += duration;
+                }
+            }
+            return true;
         }
 
         UITileGridElement* AddCircle(

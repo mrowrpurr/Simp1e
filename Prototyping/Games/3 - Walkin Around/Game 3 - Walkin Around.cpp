@@ -1,4 +1,3 @@
-#include "Prototyping/AStar/AStar.h"
 #include "Prototyping/Qt.h"
 
 using namespace Prototyping;
@@ -22,13 +21,7 @@ int main() {
                 qDebug() << "Invalid start or end tile";
                 return;
             }
-            qDebug() << "A* Search - Start tile:" << startTile->GetPosition().x
-                     << startTile->GetPosition().y;
-            auto path = AStar::GetShortestPath(grid, startTile, endTile, true);
-            qDebug() << "Path length:" << path.size();
-            for (auto& tile : path) {
-                qDebug() << "Tile:" << tile.x() << tile.y();
-            }
+            uiGrid->AnimatedMoveElement(circle, position);
         }
     });
     uiGrid->OnMiddleClick(
@@ -52,10 +45,11 @@ int main() {
                         }
                         qDebug() << "A* Search - Start tile:" << startTile->GetPosition().x
                                  << startTile->GetPosition().y;
-                        auto path = AStar::GetShortestPath(*layer2Grid, startTile, endTile, true);
+                        auto path =
+                            uiGrid->GetPath(startTile->GetPosition(), endTile->GetPosition());
                         qDebug() << "Path length:" << path.size();
                         for (auto& tile : path) {
-                            qDebug() << "Tile:" << tile.x() << tile.y();
+                            qDebug() << "Tile:" << tile.x << tile.y;
                         }
                     }
                 }

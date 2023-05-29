@@ -12,7 +12,15 @@
 
 namespace Prototyping::UI {
     struct UITileGrid {
-        enum class RenderingStyle { Grid, Isometric, Hexagons, IsometricWithHexagons };
+        enum class RenderingStyle {
+            None,
+            Grid,
+            Isometric,
+            Hexagons,
+            IsometricWithHexagons,
+            Multiple,
+            Other,
+        };
 
         struct Config {
             TileGrid*      grid               = nullptr;
@@ -25,12 +33,22 @@ namespace Prototyping::UI {
         };
 
         virtual ~UITileGrid() = default;
-        virtual bool        ShowAsWindow() { return false; }
-        virtual QWidget*    GetWidget() { return nullptr; }
-        virtual TileGrid*   GetGrid(uint32_t layer = 0) { return nullptr; }
+        virtual RenderingStyle              GetRenderingStyle() { return RenderingStyle::None; }
+        virtual bool                        ShowAsWindow() { return false; }
+        virtual QWidget*                    GetWidget() { return nullptr; }
+        virtual TileGrid*                   GetGrid(uint32_t layer = 0) { return nullptr; }
+        virtual std::vector<Tile::Position> GetPath(
+            const Tile::Position& startPosition, const Tile::Position& endPosition,
+            bool hexgrid = false, bool allowDiagonalMovement = true
+        ) {
+            return {};
+        }
+
+        // TODO remove if we don't need it, it's use for special support with the multigrid
         virtual UITileGrid* GetGridForRenderingStyle(RenderingStyle renderingStyle) {
             return nullptr;
         }
+
         virtual UITile* GetTile(const Tile::Position& position) { return nullptr; }
         virtual bool    SetTileObstacle(const Tile::Position& position, bool isObstacle = true) {
             return false;
@@ -39,6 +57,12 @@ namespace Prototyping::UI {
         virtual bool AddBackgroundImage(const UIImage& image) { return false; }
         virtual bool RemoveBackgroundImage(const UIImage& image) { return false; }
         virtual bool MoveElement(UITileGridElement* element, const Tile::Position& position) {
+            return false;
+        }
+        virtual bool AnimatedMoveElement(
+            UITileGridElement* element, const Tile::Position& position, double duration = 500,
+            double delay = 0
+        ) {
             return false;
         }
         virtual bool               RemoveElement(UITileGridElement* element) { return false; }

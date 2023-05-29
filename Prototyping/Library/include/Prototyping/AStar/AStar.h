@@ -11,18 +11,36 @@ namespace Prototyping::AStar {
 
     namespace Utility {
 
-        std::vector<AStarTile*> GetNeighbours(
+        std::vector<AStarTile*> GetHexNeighbours(
             std::vector<std::vector<AStarTile>>& grid, AStarTile& tile,
             bool diagonalMovementAllowed = true
         ) {
             std::vector<AStarTile*> neighbours;
 
             // list of the six direction vectors for a pointy-top hex grid
+            // std::vector<std::pair<int, int>> even_directions = {
+            //     {-1, 0 }, // northeast
+            //     {0,  1 }, // east
+            //     {1,  0 }, // southeast
+            //     {1,  -1}, // southwest
+            //     {0,  -1}, // west
+            //     {-1, -1}  // northwest
+            // };
+
+            // std::vector<std::pair<int, int>> odd_directions = {
+            //     {-1, 1 }, // northeast
+            //     {0,  1 }, // east
+            //     {1,  1 }, // southeast
+            //     {1,  0 }, // southwest
+            //     {0,  -1}, // west
+            //     {-1, 0 }  // northwest
+            // };
+
             std::vector<std::pair<int, int>> even_directions = {
                 {-1, 0 }, // northeast
                 {0,  1 }, // east
-                {1,  0 }, // southeast
-                {1,  -1}, // southwest
+                {1,  -1}, // southeast
+                {1,  0 }, // southwest
                 {0,  -1}, // west
                 {-1, -1}  // northwest
             };
@@ -62,8 +80,6 @@ namespace Prototyping::AStar {
         std::vector<AStarTile*> GetRectangleNeighbours(
             std::vector<std::vector<AStarTile>>& grid, AStarTile& tile, bool diagonalMovementAllowed
         ) {
-            // return GetIsometricNeighbours(grid, tile, diagonalMovementAllowed);
-
             std::vector<AStarTile*> neighbours;
 
             // check the tiles around the current tile
@@ -97,7 +113,7 @@ namespace Prototyping::AStar {
     }
 
     std::vector<AStarTile> GetShortestPath(
-        TileGrid& gameTileGrid, Tile* start, Tile* end, bool diagonalMovementAllowed
+        TileGrid& gameTileGrid, Tile* start, Tile* end, bool hextiles, bool diagonalMovementAllowed
     ) {
         // Initialize A* tile grid
         std::vector<std::vector<AStarTile>> grid;
@@ -134,8 +150,12 @@ namespace Prototyping::AStar {
             closedList.push_back(currentTile);
 
             // check the neighbours of the current tile
-            for (AStarTile* neighbour :
-                 Utility::GetNeighbours(grid, *currentTile, diagonalMovementAllowed)) {
+            auto neighbours =
+                (hextiles)
+                    ? Utility::GetHexNeighbours(grid, *currentTile, diagonalMovementAllowed)
+                    : Utility::GetRectangleNeighbours(grid, *currentTile, diagonalMovementAllowed);
+
+            for (AStarTile* neighbour : neighbours) {
                 // Less expensive diagonal movement
                 float gCost = currentTile->gCost + ((neighbour->x() - currentTile->x() != 0 &&
                                                      neighbour->y() - currentTile->y() != 0)
