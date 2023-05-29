@@ -50,6 +50,7 @@ namespace Prototyping::UI::Qt {
         }
 
         UIPosition GetTileCenter(const Tile::Position& position) override {
+            if (position.z != 0) return UIPosition::Invalid();
             return UIPosition{
                 static_cast<double>(position.y * _config.tileWidth + _config.tileWidth / 2),
                 static_cast<double>(position.x * _config.tileHeight + _config.tileHeight / 2)};

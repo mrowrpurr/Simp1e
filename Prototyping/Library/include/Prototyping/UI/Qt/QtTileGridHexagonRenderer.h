@@ -80,6 +80,8 @@ namespace Prototyping::UI::Qt {
         }
 
         UIPosition GetTileCenter(const Tile::Position& position) override {
+            if (position.z != 0) return UIPosition::Invalid();
+
             qreal tileWidth  = _config.tileWidth;
             qreal tileHeight = _config.tileHeight;
 

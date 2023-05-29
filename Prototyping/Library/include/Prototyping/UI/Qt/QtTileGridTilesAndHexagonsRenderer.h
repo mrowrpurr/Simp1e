@@ -12,7 +12,7 @@ namespace Prototyping::UI::Qt {
     class QtTileGridTilesAndHexagonsRenderer : public QtTileGridRenderer {
         UITileGrid::Config& _config;
         QtScene*            _scene;
-        TileGrid            _hexGrid{0, 0};
+        TileGrid            _hexGrid{0, 0, 1};
 
         int HEX_WIDTH      = 60;
         int HEX_HEIGHT     = 60;
@@ -118,7 +118,7 @@ namespace Prototyping::UI::Qt {
             for (int row = 0; row < hexRows; ++row) {
                 for (int column = 0; column < hexColumns; ++column) {
                     int  x = HEX_WIDTH * column + (row % 2 == 0 ? 0 : HEX_WIDTH / 2) + HEX_OFFSET_X;
-                    int  y = HEX_HEIGHT * 3 / 4 * row + HEX_OFFSET_Y;  // changed the y calculation
+                    int  y = HEX_HEIGHT * 3 / 4 * row + HEX_OFFSET_Y;
                     auto item = createHexagon(x, y, HEX_WIDTH, HEX_HEIGHT);
                     _scene->addItem(item);
 
@@ -145,7 +145,6 @@ namespace Prototyping::UI::Qt {
             }
 
             return UISize{uiWidth, uiHeight};
-            return {};
         }
 
         UIPosition GetHexTileCenter(const Tile::Position& position) {
@@ -172,8 +171,9 @@ namespace Prototyping::UI::Qt {
         }
 
         UIPosition GetTileCenter(const Tile::Position& position) override {
-            return GetDiamondTileCenter(position);
-            // return GetHexTileCenter(position);
+            if (position.z == 0) return GetDiamondTileCenter(position);
+            else if (position.z == 1) return GetHexTileCenter(position);
+            else return UIPosition::Invalid();
         }
 
         std::unordered_map<uint32_t, Tile::Position> ScenePositionToTilePositions(

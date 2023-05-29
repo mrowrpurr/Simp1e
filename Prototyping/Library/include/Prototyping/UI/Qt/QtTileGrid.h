@@ -158,15 +158,20 @@ namespace Prototyping::UI::Qt {
         UITileGridElement* AddCircle(
             const Tile::Position& position, const UIColor& color, uint32_t diameter
         ) override {
-            auto circle = new QtCircle(color, diameter);
-            _scene->addItem(circle);
             auto center = _renderer->GetTileCenter(position);
+            if (!UIPosition::IsValid(center)) return nullptr;
+
+            auto circle = new QtCircle(color, diameter);
             circle->setPos(
                 center.x() - static_cast<uint32_t>(diameter / 2),
                 center.y() - static_cast<uint32_t>(diameter / 2)
             );
+            _scene->addItem(circle);
+
+            // TODO try without this line
             QGraphicsObject* ptr     = circle;
             auto*            element = new UITileGridElement(position, ptr);
+
             _elements.insert(element);
             return element;
         }

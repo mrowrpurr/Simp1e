@@ -66,14 +66,21 @@ namespace Prototyping::UI::Qt {
         }
 
         UIPosition GetTileCenter(const Tile::Position& position) override {
-            qreal tileWidth  = _config.tileWidth;
-            qreal tileHeight = _config.tileHeight;
-            qreal x          = (position.y - position.x) * tileWidth / 2;
-            qreal y          = (position.x + position.y) * tileHeight / 2;
-            auto  top        = QPointF(x, y);
-            auto  bottom     = QPointF(x, y + tileHeight);
-            auto  right      = QPointF(x + tileWidth / 2, y + tileHeight / 2);
-            auto  left       = QPointF(x - tileWidth / 2, y + tileHeight / 2);
+            if (position.z != 0) return UIPosition::Invalid();
+
+            uint32_t uiWidth    = 0;
+            uint32_t uiHeight   = 0;
+            qreal    tileWidth  = _config.tileWidth;
+            qreal    tileHeight = _config.tileHeight;
+            int      positionX  = position.x;
+            int      positionY  = position.y;
+
+            qreal x      = (positionY - positionX) * tileWidth / 2;  // <--- crazy number
+            qreal y      = (positionX + positionY) * tileHeight / 2;
+            auto  top    = QPointF(x, y);
+            auto  bottom = QPointF(x, y + tileHeight);
+            auto  right  = QPointF(x + tileWidth / 2, y + tileHeight / 2);
+            auto  left   = QPointF(x - tileWidth / 2, y + tileHeight / 2);
 
             QPolygonF polygon;
             polygon << top << right << bottom << left;

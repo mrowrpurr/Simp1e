@@ -15,5 +15,11 @@ namespace Prototyping::UI {
 
         double x() const { return _x; }
         double y() const { return _y; }
+
+        bool operator==(const UIPoint& other) const { return _x == other._x && _y == other._y; }
+        bool operator!=(const UIPoint& other) const { return !(*this == other); }
+
+        static UIPoint Invalid() { return UIPoint{UINT32_MAX, UINT32_MAX}; }
+        static bool    IsValid(const UIPoint& point) { return point != Invalid(); }
     };
 }
