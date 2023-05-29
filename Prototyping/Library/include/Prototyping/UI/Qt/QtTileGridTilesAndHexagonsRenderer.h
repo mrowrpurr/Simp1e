@@ -4,6 +4,7 @@
 
 #include "../UITileGrid.h"
 #include "QtScene.h"
+#include "QtTile.h"
 #include "QtTileGridRenderer.h"
 
 namespace Prototyping::UI::Qt {
@@ -11,6 +12,7 @@ namespace Prototyping::UI::Qt {
     class QtTileGridTilesAndHexagonsRenderer : public QtTileGridRenderer {
         UITileGrid::Config& _config;
         QtScene*            _scene;
+        TileGrid            _hexGrid{0, 0};
 
         int HEX_WIDTH      = 60;
         int HEX_HEIGHT     = 60;
@@ -83,6 +85,11 @@ namespace Prototyping::UI::Qt {
                         createDiamondTile(x, y, DIAMOND_WIDTH, DIAMOND_HEIGHT, (row) % 2 == 0);
                     _scene->addItem(item);
 
+                    // put down the base tile for tracking
+                    auto* tile   = _config.grid->GetTile(row, column);
+                    auto  qtTile = new QtTile(tile, item->polygon());
+                    _scene->addItem(qtTile);
+
                     auto bottomRight = item->boundingRect().bottomRight();
                     if (uiWidth < bottomRight.x()) uiWidth = bottomRight.x();
                     if (uiHeight < bottomRight.y()) uiHeight = bottomRight.y();
@@ -103,6 +110,8 @@ namespace Prototyping::UI::Qt {
             int hexColumns = DIAMOND_COLUMNS * DIAMOND_WIDTH / HEX_WIDTH;
             int hexRows = (DIAMOND_ROWS * DIAMOND_HEIGHT + DIAMOND_OFFSET_Y) / (HEX_HEIGHT * 3 / 4);
 
+            _hexGrid.Resize(hexRows, hexColumns);
+
             HEX_OFFSET_Y += -(DIAMOND_ROWS * DIAMOND_HEIGHT / 2);
 
             // Create the hex grid
@@ -112,6 +121,12 @@ namespace Prototyping::UI::Qt {
                     int  y = HEX_HEIGHT * 3 / 4 * row + HEX_OFFSET_Y;  // changed the y calculation
                     auto item = createHexagon(x, y, HEX_WIDTH, HEX_HEIGHT);
                     _scene->addItem(item);
+
+                    // put down the base tile for tracking
+                    auto* tile   = _hexGrid.GetTile(row, column);
+                    auto  qtTile = new QtTile(tile, item->polygon());
+                    qtTile->SetLayer(1);
+                    _scene->addItem(qtTile);
 
                     auto bottomRight = item->boundingRect().bottomRight();
                     if (uiWidth < bottomRight.x()) uiWidth = bottomRight.x();
@@ -161,6 +176,17 @@ namespace Prototyping::UI::Qt {
         UIPosition GetTileCenter(const Tile::Position& position) override {
             // return GetDiamondTileCenter(position);
             return GetHexTileCenter(position);
+        }
+
+        std::unordered_map<uint32_t, Tile::Position> ScenePositionToTilePositions(
+            const UIPosition& position, uint32_t layer = 0
+        ) override {
+            std::unordered_map<uint32_t, Tile::Position> result;
+            auto items = _scene->items({position.x(), position.y()});
+            for (auto* item : items)
+                if (auto* tile = dynamic_cast<QtTile*>(item))
+                    result[tile->GetLayer()] = tile->GetPosition();
+            return result;
         }
     };
 }

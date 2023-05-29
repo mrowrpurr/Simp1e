@@ -4,6 +4,7 @@
 
 #include "../UITileGrid.h"
 #include "QtScene.h"
+#include "QtTile.h"
 #include "QtTileGridRenderer.h"
 
 namespace Prototyping::UI::Qt {
@@ -36,6 +37,11 @@ namespace Prototyping::UI::Qt {
 
                     if (uiWidth < right.x()) uiWidth = right.x();
                     if (uiHeight < bottom.y()) uiHeight = bottom.y();
+
+                    // put down the base tile for tracking
+                    auto* tile   = _config.grid->GetTile(row, col);
+                    auto  qtTile = new QtTile(tile, polygon);
+                    _scene->addItem(qtTile);
 
                     if (_config.showGrid) {
                         QGraphicsPolygonItem* item = new QGraphicsPolygonItem(polygon);
@@ -76,34 +82,15 @@ namespace Prototyping::UI::Qt {
             return UIPosition{center.x(), center.y()};
         }
 
-        Tile::Position ScenePositionToTilePosition(const UIPosition& position) override {
-            qreal tileWidth  = _config.tileWidth;
-            qreal tileHeight = _config.tileHeight;
-            qreal x          = position.x();
-            qreal y          = position.y();
-
-            for (int row = 0; row < _config.grid->GetRows(); row++) {
-                for (int col = 0; col < _config.grid->GetColumns(); col++) {
-                    qreal tileX  = (col - row) * tileWidth / 2;
-                    qreal tileY  = (row + col) * tileHeight / 2;
-                    auto  top    = QPointF(tileX, tileY);
-                    auto  bottom = QPointF(tileX, tileY + tileHeight);
-                    auto  right  = QPointF(tileX + tileWidth / 2, tileY + tileHeight / 2);
-                    auto  left   = QPointF(tileX - tileWidth / 2, tileY + tileHeight / 2);
-
-                    QPolygonF polygon;
-                    polygon << top << right << bottom << left;
-
-                    if (polygon.containsPoint(QPointF(x, y), ::Qt::OddEvenFill)) {
-                        return Tile::Position{
-                            static_cast<uint32_t>(row), static_cast<uint32_t>(col)};
-                    }
-                }
-            }
-
-            // Point does not belong to any tile.
-            // Return an invalid position.
-            return Tile::Position{UINT32_MAX, UINT32_MAX};
+        std::unordered_map<uint32_t, Tile::Position> ScenePositionToTilePositions(
+            const UIPosition& position, uint32_t layer = 0
+        ) override {
+            std::unordered_map<uint32_t, Tile::Position> result;
+            auto items = _scene->items({position.x(), position.y()});
+            for (auto* item : items)
+                if (auto* tile = dynamic_cast<QtTile*>(item))
+                    result[tile->GetLayer()] = tile->GetPosition();
+            return result;
         }
     };
 }

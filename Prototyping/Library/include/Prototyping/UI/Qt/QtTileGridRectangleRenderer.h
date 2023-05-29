@@ -7,6 +7,7 @@
 #include "../UISize.h"
 #include "../UITileGrid.h"
 #include "QtScene.h"
+#include "QtTile.h"
 #include "QtTileGridRenderer.h"
 
 namespace Prototyping::UI::Qt {
@@ -23,11 +24,15 @@ namespace Prototyping::UI::Qt {
         UISize InitializeGrid() override {
             for (uint32_t row = 0; row < _config.grid->GetRows(); row++) {
                 for (uint32_t col = 0; col < _config.grid->GetColumns(); col++) {
+                    auto rect = QRectF(
+                        col * _config.tileWidth, row * _config.tileHeight, _config.tileWidth,
+                        _config.tileHeight
+                    );
+                    // put down the base tile for tracking
+                    auto* tile   = _config.grid->GetTile(row, col);
+                    auto  qtTile = new QtTile(tile, rect);
+                    _scene->addItem(qtTile);
                     if (_config.showGrid) {
-                        auto rect = QRectF(
-                            col * _config.tileWidth, row * _config.tileHeight, _config.tileWidth,
-                            _config.tileHeight
-                        );
                         _scene->addRect(rect, QPen(::Qt::black));
                     }
                     if (_config.displayCoordinates) {
@@ -50,10 +55,15 @@ namespace Prototyping::UI::Qt {
                 static_cast<double>(position.x * _config.tileHeight + _config.tileHeight / 2 / 2)};
         }
 
-        Tile::Position ScenePositionToTilePosition(const UIPosition& position) override {
-            return Tile::Position{
-                static_cast<uint32_t>(position.y() / _config.tileHeight),
-                static_cast<uint32_t>(position.x() / _config.tileWidth)};
+        std::unordered_map<uint32_t, Tile::Position> ScenePositionToTilePositions(
+            const UIPosition& position, uint32_t layer = 0
+        ) override {
+            std::unordered_map<uint32_t, Tile::Position> result;
+            auto items = _scene->items({position.x(), position.y()});
+            for (auto* item : items)
+                if (auto* tile = dynamic_cast<QtTile*>(item))
+                    result[tile->GetLayer()] = tile->GetPosition();
+            return result;
         }
     };
 }

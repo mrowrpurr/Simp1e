@@ -3,6 +3,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <functional>
+#include <unordered_map>
 
 #include "../UIPosition.h"
 #include "../UISize.h"
@@ -23,10 +24,13 @@ namespace Prototyping::UI::Qt {
         QVBoxLayout        _layout;  // <-- concrete instance (* are children of this)
         QtView*            _view;
         QtScene*           _scene;
-        std::unique_ptr<QtTileGridRenderer>                     _renderer;
-        std::vector<std::function<void(const Tile::Position&)>> _tileLeftClickHandlers;
-        std::vector<std::function<void(const Tile::Position&)>> _tileRightClickHandlers;
-        std::vector<std::function<void(const Tile::Position&)>> _tileMiddleClickHandlers;
+        std::unique_ptr<QtTileGridRenderer> _renderer;
+        std::unordered_map<uint32_t, std::vector<std::function<void(const Tile::Position&)>>>
+            _tileLeftClickHandlers;
+        std::unordered_map<uint32_t, std::vector<std::function<void(const Tile::Position&)>>>
+            _tileRightClickHandlers;
+        std::unordered_map<uint32_t, std::vector<std::function<void(const Tile::Position&)>>>
+            _tileMiddleClickHandlers;
 
         void SetupRenderer() {
             switch (_config.renderingStyle) {
@@ -47,19 +51,40 @@ namespace Prototyping::UI::Qt {
 
         void ListenForSceneEvents() {
             _scene->OnLeftClick([this](const QPointF& position) {
-                auto tilePosition =
-                    _renderer->ScenePositionToTilePosition({position.x(), position.y()});
-                for (auto& handler : _tileLeftClickHandlers) handler(tilePosition);
+                auto tilePositions =
+                    _renderer->ScenePositionToTilePositions({position.x(), position.y()});
+                if (tilePositions.empty()) return;
+                for (auto& clickedTilePosition : tilePositions) {
+                    auto layer                      = clickedTilePosition.first;
+                    auto tilePosition               = clickedTilePosition.second;
+                    auto foundClickHandlersForLayer = _tileLeftClickHandlers.find(layer);
+                    if (foundClickHandlersForLayer == _tileLeftClickHandlers.end()) continue;
+                    for (auto& handler : foundClickHandlersForLayer->second) handler(tilePosition);
+                }
             });
             _scene->OnRightClick([this](const QPointF& position) {
-                auto tilePosition =
-                    _renderer->ScenePositionToTilePosition({position.x(), position.y()});
-                for (auto& handler : _tileRightClickHandlers) handler(tilePosition);
+                auto tilePositions =
+                    _renderer->ScenePositionToTilePositions({position.x(), position.y()});
+                if (tilePositions.empty()) return;
+                for (auto& clickedTilePosition : tilePositions) {
+                    auto layer                      = clickedTilePosition.first;
+                    auto tilePosition               = clickedTilePosition.second;
+                    auto foundClickHandlersForLayer = _tileRightClickHandlers.find(layer);
+                    if (foundClickHandlersForLayer == _tileRightClickHandlers.end()) continue;
+                    for (auto& handler : foundClickHandlersForLayer->second) handler(tilePosition);
+                }
             });
             _scene->OnMiddleClick([this](const QPointF& position) {
-                auto tilePosition =
-                    _renderer->ScenePositionToTilePosition({position.x(), position.y()});
-                for (auto& handler : _tileMiddleClickHandlers) handler(tilePosition);
+                auto tilePositions =
+                    _renderer->ScenePositionToTilePositions({position.x(), position.y()});
+                if (tilePositions.empty()) return;
+                for (auto& clickedTilePosition : tilePositions) {
+                    auto layer                      = clickedTilePosition.first;
+                    auto tilePosition               = clickedTilePosition.second;
+                    auto foundClickHandlersForLayer = _tileMiddleClickHandlers.find(layer);
+                    if (foundClickHandlersForLayer == _tileMiddleClickHandlers.end()) continue;
+                    for (auto& handler : foundClickHandlersForLayer->second) handler(tilePosition);
+                }
             });
         }
 
@@ -91,16 +116,19 @@ namespace Prototyping::UI::Qt {
             return true;
         }
 
-        bool OnLeftClick(std::function<void(const Tile::Position&)> handler) override {
-            _tileLeftClickHandlers.push_back(handler);
+        bool OnLeftClick(std::function<void(const Tile::Position&)> handler, uint32_t layer)
+            override {
+            _tileLeftClickHandlers[layer].push_back(handler);
             return true;
         }
-        bool OnRightClick(std::function<void(const Tile::Position&)> handler) override {
-            _tileRightClickHandlers.push_back(handler);
+        bool OnRightClick(std::function<void(const Tile::Position&)> handler, uint32_t layer)
+            override {
+            _tileRightClickHandlers[layer].push_back(handler);
             return true;
         }
-        bool OnMiddleClick(std::function<void(const Tile::Position&)> handler) override {
-            _tileMiddleClickHandlers.push_back(handler);
+        bool OnMiddleClick(std::function<void(const Tile::Position&)> handler, uint32_t layer)
+            override {
+            _tileMiddleClickHandlers[layer].push_back(handler);
             return true;
         }
 

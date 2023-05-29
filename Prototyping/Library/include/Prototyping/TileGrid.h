@@ -12,10 +12,21 @@ namespace Prototyping {
         uint32_t                                        _columns = 0;
         std::vector<std::vector<std::unique_ptr<Tile>>> _tiles;
 
-    public:
-        TileGrid(uint32_t columns, uint32_t rows) : _rows(rows), _columns(columns) {
+        void SetupTiles() {
             _tiles.resize(_rows);
             for (auto& row : _tiles) row.resize(_columns);
+            for (uint32_t row = 0; row < _rows; ++row)
+                for (uint32_t column = 0; column < _columns; ++column)
+                    _tiles.at(row).at(column) = std::make_unique<Tile>(Tile::Position{row, column});
+        }
+
+    public:
+        TileGrid(uint32_t rows, uint32_t columns) : _rows(rows), _columns(columns) { SetupTiles(); }
+
+        void Resize(uint32_t rows, uint32_t columns) {
+            _rows    = rows;
+            _columns = columns;
+            SetupTiles();
         }
 
         uint32_t GetRows() const { return _rows; }

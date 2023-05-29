@@ -41,8 +41,14 @@ namespace Prototyping::UI {
         ) {
             return nullptr;
         }
-        virtual bool OnLeftClick(std::function<void(const Tile::Position&)>) { return false; }
-        virtual bool OnRightClick(std::function<void(const Tile::Position&)>) { return false; }
-        virtual bool OnMiddleClick(std::function<void(const Tile::Position&)>) { return false; }
+        virtual bool OnLeftClick(std::function<void(const Tile::Position&)>, uint32_t layer = 0) {
+            return false;
+        }
+        virtual bool OnRightClick(std::function<void(const Tile::Position&)>, uint32_t layer = 0) {
+            return false;
+        }
+        virtual bool OnMiddleClick(std::function<void(const Tile::Position&)>, uint32_t layer = 0) {
+            return false;
+        }
     };
 }

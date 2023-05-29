@@ -62,16 +62,19 @@ namespace Prototyping::UI::Qt {
             _window.show();
         }
 
-        bool OnLeftClick(std::function<void(const Tile::Position&)> handler) override {
-            for (auto& tileGrid : _qtTileGrids) tileGrid->OnLeftClick(handler);
+        bool OnLeftClick(std::function<void(const Tile::Position&)> handler, uint32_t layer)
+            override {
+            for (auto& tileGrid : _qtTileGrids) tileGrid->OnLeftClick(handler, layer);
             return true;
         }
-        bool OnRightClick(std::function<void(const Tile::Position&)> handler) override {
-            for (auto& tileGrid : _qtTileGrids) tileGrid->OnRightClick(handler);
+        bool OnRightClick(std::function<void(const Tile::Position&)> handler, uint32_t layer)
+            override {
+            for (auto& tileGrid : _qtTileGrids) tileGrid->OnRightClick(handler, layer);
             return true;
         }
-        bool OnMiddleClick(std::function<void(const Tile::Position&)> handler) override {
-            for (auto& tileGrid : _qtTileGrids) tileGrid->OnMiddleClick(handler);
+        bool OnMiddleClick(std::function<void(const Tile::Position&)> handler, uint32_t layer)
+            override {
+            for (auto& tileGrid : _qtTileGrids) tileGrid->OnMiddleClick(handler, layer);
             return true;
         }
 

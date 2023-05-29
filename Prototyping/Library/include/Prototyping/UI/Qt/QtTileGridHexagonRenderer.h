@@ -4,6 +4,7 @@
 
 #include "../UITileGrid.h"
 #include "QtScene.h"
+#include "QtTile.h"
 #include "QtTileGridRenderer.h"
 
 namespace Prototyping::UI::Qt {
@@ -50,6 +51,11 @@ namespace Prototyping::UI::Qt {
 
                     if (uiWidth < middleRight.x()) uiWidth = middleRight.x();
                     if (uiHeight < bottom.y()) uiHeight = bottom.y();
+
+                    // Put down the base tile for tracking
+                    auto* tile   = _config.grid->GetTile(row, col);
+                    auto  qtTile = new QtTile(tile, polygon);
+                    _scene->addItem(qtTile);
 
                     if (_config.showGrid) {
                         QGraphicsPolygonItem* item = new QGraphicsPolygonItem(polygon);
@@ -98,18 +104,15 @@ namespace Prototyping::UI::Qt {
             return UIPosition{center.x(), center.y()};
         }
 
-        Tile::Position ScenePositionToTilePosition(const UIPosition& position) override {
-            float x = position.x();
-            float y = position.y();
-
-            float u = x / (width / 2);
-            float v = (y - (height / 2) * static_cast<double>(static_cast<int>(u) % 2)) /
-                      (3 * height / 4);
-
-            int col = floor(u);
-            int row = floor(v - static_cast<double>(col % 2) / 2);
-
-            return Tile::Position{static_cast<uint32_t>(row), static_cast<uint32_t>(col)};
+        std::unordered_map<uint32_t, Tile::Position> ScenePositionToTilePositions(
+            const UIPosition& position, uint32_t layer = 0
+        ) override {
+            std::unordered_map<uint32_t, Tile::Position> result;
+            auto items = _scene->items({position.x(), position.y()});
+            for (auto* item : items)
+                if (auto* tile = dynamic_cast<QtTile*>(item))
+                    result[tile->GetLayer()] = tile->GetPosition();
+            return result;
         }
     };
 }
