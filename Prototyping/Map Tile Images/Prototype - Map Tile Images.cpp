@@ -11,6 +11,7 @@ int main() {
     std::filesystem::path knight{imagesFolder / "293917.png"};
     std::filesystem::path innBuilding{imagesFolder / "11470.png"};
     std::filesystem::path tree{imagesFolder / "218087.png"};
+    std::filesystem::path road{imagesFolder / "264733.png"};
 
     TileGrid grid{20, 10};
 
@@ -22,6 +23,8 @@ int main() {
         if (!player) player = uiGrid->AddImage(position, knight);
         else uiGrid->AnimatedMoveElement(player, position);
     });
+    uiGrid->OnRightClick([&](Tile::Position position) { uiGrid->AddImage(position, road, true); });
+    uiGrid->OnMiddleClick([&](Tile::Position position) { uiGrid->AddImage(position, tree); });
 
     return UI::Qt::Run();
 }

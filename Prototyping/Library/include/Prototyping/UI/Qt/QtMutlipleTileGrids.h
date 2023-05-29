@@ -170,12 +170,12 @@ namespace Prototyping::UI::Qt {
         }
 
         UITileGridElement* AddImage(
-            const Tile::Position& position, const std::filesystem::path& imagePath, uint32_t width,
-            uint32_t height
+            const Tile::Position& position, const std::filesystem::path& imagePath,
+            bool angleTile = false
         ) override {
             std::vector<UITileGridElement*> elements;
             for (auto& tileGrid : _qtTileGrids)
-                elements.push_back(tileGrid->AddImage(position, imagePath, width, height));
+                elements.push_back(tileGrid->AddImage(position, imagePath, angleTile));
             auto* element = new UITileGridElement(position, elements);
             _elements.insert(element);
             return element;

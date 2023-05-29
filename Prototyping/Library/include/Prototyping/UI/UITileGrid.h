@@ -79,7 +79,7 @@ namespace Prototyping::UI {
         }
         virtual UITileGridElement* AddImage(
             const Tile::Position& position, const std::filesystem::path& imagePath,
-            uint32_t width = 0, uint32_t height = 0
+            bool angleTile = false
         ) {
             return nullptr;
         }

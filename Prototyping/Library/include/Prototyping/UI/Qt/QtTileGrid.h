@@ -287,8 +287,8 @@ namespace Prototyping::UI::Qt {
         }
 
         UITileGridElement* AddImage(
-            const Tile::Position& position, const std::filesystem::path& imagePath, uint32_t width,
-            uint32_t height
+            const Tile::Position& position, const std::filesystem::path& imagePath,
+            bool angleTile = false
         ) override {
             auto center = _renderer->GetTileCenter(position);
             if (!UIPosition::IsValid(center)) return nullptr;
@@ -296,6 +296,12 @@ namespace Prototyping::UI::Qt {
             auto image  = new QtImage(imagePath.string().c_str());
             image->SetPolygon(bounds);
             image->SetResize(true);
+            if (angleTile && _config.renderingStyle == RenderingStyle::Isometric ||
+                (_config.renderingStyle == RenderingStyle::IsometricWithHexagons && position.z == 0
+                )) {
+                qDebug() << "Rotating image 45 degrees";
+                image->SetRotate(-45);
+            }
             image->setPos(
                 center.x() - static_cast<uint32_t>(image->GetWidth() / 2),
                 center.y() - static_cast<uint32_t>(image->GetHeight() / 2)
