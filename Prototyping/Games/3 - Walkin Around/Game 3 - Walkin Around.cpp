@@ -1,9 +1,7 @@
+#include "Prototyping/AStar/AStar.h"
 #include "Prototyping/Qt.h"
 
 using namespace Prototyping;
-
-// TODO make this a library function
-#include <QMessageBox>
 
 UI::UITileGridElement* circle       = nullptr;
 UI::UITileGridElement* circleLayer2 = nullptr;
@@ -17,7 +15,21 @@ int main() {
 
     uiGrid->OnLeftClick([&](Tile::Position position) {
         if (!circle) circle = uiGrid->AddCircle(position, {255, 0, 0}, 20);
-        else uiGrid->MoveElement(circle, position);
+        else {
+            auto* startTile = grid.GetTile(circle->GetPosition().x, circle->GetPosition().y);
+            auto* endTile   = grid.GetTile(position.x, position.y);
+            if (!startTile || !endTile) {
+                qDebug() << "Invalid start or end tile";
+                return;
+            }
+            qDebug() << "A* Search - Start tile:" << startTile->GetPosition().x
+                     << startTile->GetPosition().y;
+            auto path = AStar::GetShortestPath(grid, startTile, endTile, true);
+            qDebug() << "Path length:" << path.size();
+            for (auto& tile : path) {
+                qDebug() << "Tile:" << tile.x() << tile.y();
+            }
+        }
     });
     uiGrid->OnMiddleClick(
         [&](Tile::Position position) {
