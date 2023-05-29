@@ -1,0 +1,6 @@
+target("Prototyping Shared Library")
+    set_kind("headeronly")
+    add_includedirs("include", {public = true})
+    add_qt_libs()
+    add_string_formatting()
+    add_logging()

@@ -1,0 +1,8 @@
+target("Prototype - Copy Paste onto Map")
+    add_files("Prototype - Copy Paste onto Map.cpp")
+    set_kind("binary")
+    add_qt()
+    add_includedirs(".")
+    add_string_formatting()
+    add_logging_support_for_binaries()
+    add_deps("Prototyping Shared Library")

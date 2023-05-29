@@ -89,7 +89,7 @@ namespace Simp1e::Editor::Windows {
         void ResetPreview() {
             if (_gbx_Preview) {
                 _layout_Window->removeWidget(_gbx_Preview);
-                delete _gbx_Preview;
+                // delete _gbx_Preview;
                 _gbx_Preview = nullptr;
             }
         }
