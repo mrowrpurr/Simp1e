@@ -123,6 +123,10 @@ namespace Prototyping::UI::Qt {
             return true;
         }
 
+        UITile* GetTile(const Tile::Position& position) override {
+            return _renderer->GetTile(position);
+        }
+
         bool OnLeftClick(std::function<void(const Tile::Position&)> handler, uint32_t layer)
             override {
             _tileLeftClickHandlers[layer].push_back(handler);

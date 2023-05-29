@@ -5,6 +5,7 @@
 namespace Prototyping {
     class Tile {
     public:
+        // TODO make this a class and replce all .x with .x() etc
         struct Position {
             uint32_t x = 0;
             uint32_t y = 0;
@@ -20,11 +21,17 @@ namespace Prototyping {
         };
 
     private:
+        bool     _isObstacle = false;
         Position _position;
 
     public:
-        Tile(const Position& position) : _position(position) {}
+        Tile(const Position& position, bool isObstacle = false)
+            : _position(position), _isObstacle(isObstacle) {}
 
+        // TODO make this upper case, everything should be except x() y() z() functions
         const Position& position() const { return _position; }
+
+        bool IsObstacle() const { return _isObstacle; }
+        void SetObstacle(bool isObstacle) { _isObstacle = isObstacle; }
     };
 }
