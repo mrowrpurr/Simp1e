@@ -11,10 +11,37 @@ namespace Prototyping::AStar {
 
     namespace Utility {
 
+        std::vector<AStarTile*> GetIsometricNeighbours(
+            std::vector<std::vector<AStarTile>>& grid, AStarTile& tile, bool diagonalMovementAllowed
+        ) {
+            std::vector<AStarTile*> neighbours;
+            int32_t                 dx[8] = {-1, 0, 1, 1, 1, 0, -1, -1};
+            int32_t                 dy[8] = {1, 1, 1, 0, -1, -1, -1, 0};
+
+            for (int direction = 0; direction < 8; ++direction) {
+                int32_t nx = tile.x() + dx[direction];
+                int32_t ny = tile.y() + dy[direction];
+
+                if (nx >= 0 && nx < grid.size() && ny >= 0 && ny < grid[0].size()) {
+                    auto* thisTile = &grid[nx][ny];
+
+                    if (thisTile->IsObstacle()) continue;  // skip obstacles (walls, etc.
+                    if (thisTile->z() != tile.z())
+                        continue;  // skip tiles on other layers (floors, etc. )
+
+                    neighbours.push_back(thisTile);
+                }
+            }
+
+            return neighbours;
+        }
+
         // TODO update to only pay attention to other tiles on the same Z layer
         std::vector<AStarTile*> GetNeighbours(
             std::vector<std::vector<AStarTile>>& grid, AStarTile& tile, bool diagonalMovementAllowed
         ) {
+            // return GetIsometricNeighbours(grid, tile, diagonalMovementAllowed);
+
             std::vector<AStarTile*> neighbours;
 
             // check the tiles around the current tile
@@ -87,10 +114,18 @@ namespace Prototyping::AStar {
             // check the neighbours of the current tile
             for (AStarTile* neighbour :
                  Utility::GetNeighbours(grid, *currentTile, diagonalMovementAllowed)) {
-                float gCost = currentTile->gCost + std::hypot(
-                                                       neighbour->x() - currentTile->x(),
-                                                       neighbour->y() - currentTile->y()
-                                                   );
+                // More expensive diagonal movement
+                // float gCost = currentTile->gCost + std::hypot(
+                //                                        neighbour->x() - currentTile->x(),
+                //                                        neighbour->y() - currentTile->y()
+                //                                    );
+
+                // Less expensive diagonal movement
+                float gCost = currentTile->gCost + ((neighbour->x() - currentTile->x() != 0 &&
+                                                     neighbour->y() - currentTile->y() != 0)
+                                                        ? 1
+                                                        : 1);
+
                 // Skip neighbour if it is in the closed list
                 if (std::find(closedList.begin(), closedList.end(), neighbour) != closedList.end())
                     continue;
