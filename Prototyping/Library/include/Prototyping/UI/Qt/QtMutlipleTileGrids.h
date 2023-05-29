@@ -12,8 +12,9 @@
 namespace Prototyping::UI::Qt {
 
     class QtMutlipleTileGrids : public UITileGrid {
-        UITileGrid::Config       _config;
-        std::vector<QtTileGrid*> _qtTileGrids;
+        UITileGrid::Config                     _config;
+        std::vector<QtTileGrid*>               _qtTileGrids;
+        std::unordered_set<UITileGridElement*> _elements;
 
         QMainWindow* _window;
 
@@ -108,6 +109,7 @@ namespace Prototyping::UI::Qt {
                     std::any_cast<std::vector<UITileGridElement*>>(element->GetElement());
                 for (size_t i = 0; i < _qtTileGrids.size(); ++i)
                     _qtTileGrids[i]->RemoveElement(elements.at(i));
+                _elements.erase(element);
                 return true;
             } catch (const std::bad_any_cast&) {
                 return false;
@@ -121,6 +123,7 @@ namespace Prototyping::UI::Qt {
             for (auto& tileGrid : _qtTileGrids)
                 elements.push_back(tileGrid->AddCircle(position, color, diameter));
             auto* element = new UITileGridElement(position, elements);
+            _elements.insert(element);
             return element;
         }
     };

@@ -14,7 +14,6 @@ namespace Prototyping::UI::Qt {
         QtCircle(const UIColor& color, uint32_t diameter)
             : _rect(0, 0, diameter, diameter), _color(color) {}
 
-    protected:
         QRectF boundingRect() const override { return _rect; }
 
         void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)

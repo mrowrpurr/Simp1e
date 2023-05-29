@@ -5,6 +5,9 @@ using namespace Prototyping;
 // TODO make this a library function
 #include <QMessageBox>
 
+UI::UITileGridElement* circle       = nullptr;
+UI::UITileGridElement* circleLayer2 = nullptr;
+
 int main() {
     TileGrid grid{20, 10};
 
@@ -12,14 +15,15 @@ int main() {
         .grid = &grid,
     });
 
-    auto* circle = uiGrid->AddCircle({2, 4}, UI::UIColor::Magenta(), 25);
-
     uiGrid->OnLeftClick([&](Tile::Position position) {
-        uiGrid->AddCircle(position, {0, 255, 0}, 25);
+        if (!circle) circle = uiGrid->AddCircle(position, {255, 0, 0}, 20);
+        else uiGrid->MoveElement(circle, position);
     });
     uiGrid->OnMiddleClick(
         [&](Tile::Position position) {
-            uiGrid->AddCircle({position.x, position.y, 1}, {0, 0, 255}, 35);
+            if (!circleLayer2)
+                circleLayer2 = uiGrid->AddCircle({position.x, position.y, 1}, {0, 0, 255}, 35);
+            else uiGrid->MoveElement(circleLayer2, position);
         },
         1
     );

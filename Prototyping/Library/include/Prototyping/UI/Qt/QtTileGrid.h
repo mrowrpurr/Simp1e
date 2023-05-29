@@ -164,7 +164,8 @@ namespace Prototyping::UI::Qt {
 
         bool MoveElement(UITileGridElement* element, const Tile::Position& position) override {
             try {
-                auto* qtElement = std::any_cast<QGraphicsObject*>(element->GetElement());
+                if (!element) return false;
+                auto* qtElement = std::any_cast<QtCircle*>(element->GetElement());
                 if (!qtElement) return false;
                 auto center = _renderer->GetTileCenter(position);
                 qtElement->setPos(
@@ -191,10 +192,7 @@ namespace Prototyping::UI::Qt {
             );
             _scene->addItem(circle);
 
-            // TODO try without this line
-            QGraphicsObject* ptr     = circle;
-            auto*            element = new UITileGridElement(position, ptr);
-
+            auto* element = new UITileGridElement(position, circle);
             _elements.insert(element);
             return element;
         }
