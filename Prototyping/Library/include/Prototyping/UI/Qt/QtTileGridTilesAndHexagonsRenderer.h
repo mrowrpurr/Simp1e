@@ -191,6 +191,33 @@ namespace Prototyping::UI::Qt {
             else return UIPosition::Invalid();
         }
 
+        QPolygonF GetHexTileBounds(const Tile::Position& position) {
+            int DIAMOND_ROWS     = _config.grid->GetRows();
+            int DIAMOND_OFFSET_Y = -1 * DIAMOND_ROWS * DIAMOND_HEIGHT / 2.0;
+
+            int x =
+                HEX_WIDTH * position.y + (position.x % 2 == 0 ? 0 : HEX_WIDTH / 2) + HEX_OFFSET_X;
+            int  y = HEX_HEIGHT * 3 / 4 * position.x + HEX_OFFSET_Y;  // changed the y calculation
+            auto item = createHexagon(x, y, HEX_WIDTH, HEX_HEIGHT);
+
+            return item->polygon();
+        }
+
+        QPolygonF GetDiamondTileBounds(const Tile::Position& position) {
+            int  DIAMOND_ROWS     = _config.grid->GetRows();
+            int  DIAMOND_OFFSET_Y = -1 * DIAMOND_ROWS * DIAMOND_HEIGHT / 2.0;
+            int  x    = position.y * DIAMOND_WIDTH + (position.x % 2 == 0 ? 0 : DIAMOND_WIDTH / 2);
+            int  y    = position.x * DIAMOND_HEIGHT / 2 + DIAMOND_OFFSET_Y;
+            auto item = createDiamondTile(x, y, DIAMOND_WIDTH, DIAMOND_HEIGHT);
+            return item->polygon();
+        }
+
+        QPolygonF GetTileBounds(const Tile::Position& position) override {
+            if (position.z == 0) return GetDiamondTileBounds(position);
+            else if (position.z == 1) return GetHexTileBounds(position);
+            else return QPolygonF();
+        }
+
         std::unordered_map<uint32_t, Tile::Position> ScenePositionToTilePositions(
             const UIPosition& position, uint32_t layer = 0
         ) override {

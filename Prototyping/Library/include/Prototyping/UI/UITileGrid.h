@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QWidget>
+#include <filesystem>
 #include <functional>
 
 #include "../Tile.h"
@@ -73,6 +74,12 @@ namespace Prototyping::UI {
         }
         virtual UITileGridElement* AddRectangle(
             const Tile::Position& position, const UIColor& color, uint32_t width, uint32_t height
+        ) {
+            return nullptr;
+        }
+        virtual UITileGridElement* AddImage(
+            const Tile::Position& position, const std::filesystem::path& imagePath,
+            uint32_t width = 0, uint32_t height = 0
         ) {
             return nullptr;
         }

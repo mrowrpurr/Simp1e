@@ -102,6 +102,29 @@ namespace Prototyping::UI::Qt {
             return UIPosition{center.x(), center.y()};
         }
 
+        QPolygonF GetTileBounds(const Tile::Position& position) override {
+            if (position.z != 0) return QPolygonF();
+
+            uint32_t uiWidth    = 0;
+            uint32_t uiHeight   = 0;
+            qreal    tileWidth  = _config.tileWidth;
+            qreal    tileHeight = _config.tileHeight;
+            int      positionX  = position.x;
+            int      positionY  = position.y;
+
+            qreal x      = (positionY - positionX) * tileWidth / 2;  // <--- crazy number
+            qreal y      = (positionX + positionY) * tileHeight / 2;
+            auto  top    = QPointF(x, y);
+            auto  bottom = QPointF(x, y + tileHeight);
+            auto  right  = QPointF(x + tileWidth / 2, y + tileHeight / 2);
+            auto  left   = QPointF(x - tileWidth / 2, y + tileHeight / 2);
+
+            QPolygonF polygon;
+            polygon << top << right << bottom << left;
+
+            return polygon;
+        }
+
         std::unordered_map<uint32_t, Tile::Position> ScenePositionToTilePositions(
             const UIPosition& position, uint32_t layer = 0
         ) override {

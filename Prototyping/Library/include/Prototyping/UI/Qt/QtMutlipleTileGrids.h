@@ -168,5 +168,17 @@ namespace Prototyping::UI::Qt {
             _elements.insert(element);
             return element;
         }
+
+        UITileGridElement* AddImage(
+            const Tile::Position& position, const std::filesystem::path& imagePath, uint32_t width,
+            uint32_t height
+        ) override {
+            std::vector<UITileGridElement*> elements;
+            for (auto& tileGrid : _qtTileGrids)
+                elements.push_back(tileGrid->AddImage(position, imagePath, width, height));
+            auto* element = new UITileGridElement(position, elements);
+            _elements.insert(element);
+            return element;
+        }
     };
 }

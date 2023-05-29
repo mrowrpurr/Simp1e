@@ -14,6 +14,7 @@
 #include "../UISize.h"
 #include "../UITileGrid.h"
 #include "QtCircle.h"
+#include "QtImage.h"
 #include "QtScene.h"
 #include "QtTileGridHexagonRenderer.h"
 #include "QtTileGridIsometricRenderer.h"
@@ -214,7 +215,7 @@ namespace Prototyping::UI::Qt {
             try {
                 if (!element) return false;
                 qDebug() << "MoveElement()" << position.x << position.y << position.z;
-                auto* qtElement = std::any_cast<QtCircle*>(element->GetElement());
+                auto* qtElement = std::any_cast<QGraphicsItem*>(element->GetElement());
                 if (!qtElement) return false;
                 auto center = _renderer->GetTileCenter(position);
                 qtElement->setPos(
@@ -272,7 +273,6 @@ namespace Prototyping::UI::Qt {
         ) override {
             auto center = _renderer->GetTileCenter(position);
             if (!UIPosition::IsValid(center)) return nullptr;
-
             auto circle = new QtCircle(color, diameter);
             circle->setPos(
                 center.x() - static_cast<uint32_t>(diameter / 2),
@@ -280,7 +280,31 @@ namespace Prototyping::UI::Qt {
             );
             _scene->addItem(circle);
 
-            auto* element = new UITileGridElement(position, circle);
+            QGraphicsItem* elementPtr = circle;
+            auto*          element    = new UITileGridElement(position, elementPtr);
+            _elements.insert(element);
+            return element;
+        }
+
+        UITileGridElement* AddImage(
+            const Tile::Position& position, const std::filesystem::path& imagePath, uint32_t width,
+            uint32_t height
+        ) override {
+            auto center = _renderer->GetTileCenter(position);
+            if (!UIPosition::IsValid(center)) return nullptr;
+            auto bounds = _renderer->GetTileBounds(position);
+            auto image  = new QtImage(imagePath.string().c_str());
+            image->SetPolygon(bounds);
+            image->SetResize(true);
+            image->setPos(
+                center.x() - static_cast<uint32_t>(image->GetWidth() / 2),
+                center.y() - static_cast<uint32_t>(image->GetHeight() / 2)
+            );
+            _scene->addItem(image);
+            _scene->update();
+
+            QGraphicsItem* elementPtr = image;
+            auto*          element    = new UITileGridElement(position, elementPtr);
             _elements.insert(element);
             return element;
         }

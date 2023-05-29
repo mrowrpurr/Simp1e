@@ -69,6 +69,17 @@ namespace Prototyping::UI::Qt {
                 static_cast<double>(position.x * _config.tileHeight + _config.tileHeight / 2)};
         }
 
+        QPolygonF GetTileBounds(const Tile::Position& position) override {
+            auto uiPosition = UIPosition{
+                static_cast<double>(position.y * _config.tileWidth + _config.tileWidth / 2),
+                static_cast<double>(position.x * _config.tileHeight + _config.tileHeight / 2)};
+            auto rect = QRectF(
+                uiPosition.x() - _config.tileWidth / 2, uiPosition.y() - _config.tileHeight / 2,
+                _config.tileWidth, _config.tileHeight
+            );
+            return QPolygonF(rect);
+        }
+
         std::unordered_map<uint32_t, Tile::Position> ScenePositionToTilePositions(
             const UIPosition& position, uint32_t layer = 0
         ) override {

@@ -117,6 +117,31 @@ namespace Prototyping::UI::Qt {
             return UIPosition{center.x(), center.y()};
         }
 
+        QPolygonF GetTileBounds(const Tile::Position& position) override {
+            if (position.z != 0) return QPolygonF();
+
+            qreal tileWidth  = _config.tileWidth;
+            qreal tileHeight = _config.tileHeight;
+
+            // Calculate the top-left point of the hexagon
+            float x = position.y * width + ((position.x % 2 == 0) ? 0.0f : width / 2.0f);
+            float y = position.x * height * 3.0f / 4.0f;
+
+            // Create a hexagon
+            QPointF topLeft(x, y);
+            QPointF topRight(x + width / 2.0f, y + height / 4.0f);
+            QPointF middleRight(x + width / 2.0f, y + height * 3.0f / 4.0f);
+            QPointF bottom(x, y + height);
+            QPointF middleLeft(x - width / 2.0f, y + height * 3.0f / 4.0f);
+            QPointF topLeftExtended(x - width / 2.0f, y + height / 4.0f);
+
+            QPolygonF polygon;
+            polygon << topLeft << topRight << middleRight << bottom << middleLeft
+                    << topLeftExtended;
+
+            return polygon;
+        }
+
         std::unordered_map<uint32_t, Tile::Position> ScenePositionToTilePositions(
             const UIPosition& position, uint32_t layer = 0
         ) override {

@@ -1,5 +1,5 @@
-target("Game 3 - Walkin Around")
-    add_files("Game 3 - Walkin Around.cpp")
+target("Prototype - Copy Paste onto Map")
+    add_files("Prototype - Copy Paste onto Map.cpp")
     set_kind("binary")
     add_qt()
     add_includedirs(".")
