@@ -11,24 +11,46 @@ namespace Prototyping::AStar {
 
     namespace Utility {
 
-        std::vector<AStarTile*> GetIsometricNeighbours(
-            std::vector<std::vector<AStarTile>>& grid, AStarTile& tile, bool diagonalMovementAllowed
+        std::vector<AStarTile*> GetNeighbours(
+            std::vector<std::vector<AStarTile>>& grid, AStarTile& tile,
+            bool diagonalMovementAllowed = true
         ) {
             std::vector<AStarTile*> neighbours;
-            int32_t                 dx[8] = {-1, 0, 1, 1, 1, 0, -1, -1};
-            int32_t                 dy[8] = {1, 1, 1, 0, -1, -1, -1, 0};
 
-            for (int direction = 0; direction < 8; ++direction) {
-                int32_t nx = tile.x() + dx[direction];
-                int32_t ny = tile.y() + dy[direction];
+            // list of the six direction vectors for a pointy-top hex grid
+            std::vector<std::pair<int, int>> even_directions = {
+                {-1, 0 }, // northeast
+                {0,  1 }, // east
+                {1,  0 }, // southeast
+                {1,  -1}, // southwest
+                {0,  -1}, // west
+                {-1, -1}  // northwest
+            };
 
-                if (nx >= 0 && nx < grid.size() && ny >= 0 && ny < grid[0].size()) {
-                    auto* thisTile = &grid[nx][ny];
+            std::vector<std::pair<int, int>> odd_directions = {
+                {-1, 1 }, // northeast
+                {0,  1 }, // east
+                {1,  1 }, // southeast
+                {1,  0 }, // southwest
+                {0,  -1}, // west
+                {-1, 0 }  // northwest
+            };
 
-                    if (thisTile->IsObstacle()) continue;  // skip obstacles (walls, etc.
-                    if (thisTile->z() != tile.z())
-                        continue;  // skip tiles on other layers (floors, etc. )
+            auto& directions = (tile.y() % 2 == 0) ? even_directions : odd_directions;
 
+            for (auto& dir : directions) {
+                uint32_t checkX = tile.x() + dir.first;
+                uint32_t checkY = tile.y() + dir.second;
+
+                // check if the tile coordinates are within the map
+                if (checkX >= 0 && checkX < grid.size() && checkY >= 0 && checkY < grid[0].size()) {
+                    auto thisTile = &grid[checkX][checkY];
+
+                    // Other checks
+                    if (thisTile->IsObstacle()) continue;
+                    if (thisTile->z() != tile.z()) continue;
+
+                    // Howdy, neighbour!
                     neighbours.push_back(thisTile);
                 }
             }
@@ -37,7 +59,7 @@ namespace Prototyping::AStar {
         }
 
         // TODO update to only pay attention to other tiles on the same Z layer
-        std::vector<AStarTile*> GetNeighbours(
+        std::vector<AStarTile*> GetRectangleNeighbours(
             std::vector<std::vector<AStarTile>>& grid, AStarTile& tile, bool diagonalMovementAllowed
         ) {
             // return GetIsometricNeighbours(grid, tile, diagonalMovementAllowed);
