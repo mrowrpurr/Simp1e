@@ -14,12 +14,19 @@ namespace Prototyping::UI::Qt {
 
     // TODO: padding support
     class QtTileGridRectangleRenderer : public QtTileGridRenderer {
-        UITileGrid::Config& _config;
-        QtScene*            _scene;
+        UITileGrid::Config&                         _config;
+        QtScene*                                    _scene;
+        std::unordered_map<Tile::Position, QtTile*> _tiles;
 
     public:
         QtTileGridRectangleRenderer(UITileGrid::Config& config, QtScene* scene)
             : _config(config), _scene(scene) {}
+
+        UITile* GetTile(const Tile::Position& position) override {
+            auto it = _tiles.find(position);
+            if (it != _tiles.end()) return it->second;
+            return nullptr;
+        }
 
         UISize InitializeGrid() override {
             for (uint32_t row = 0; row < _config.grid->GetRows(); row++) {
@@ -32,6 +39,7 @@ namespace Prototyping::UI::Qt {
                     auto* tile   = _config.grid->GetTile(row, col);
                     auto  qtTile = new QtTile(tile, rect);
                     _scene->addItem(qtTile);
+                    _tiles[tile->GetPosition()] = qtTile;
                     if (_config.showGrid) {
                         _scene->addRect(rect, QPen(::Qt::black));
                     }

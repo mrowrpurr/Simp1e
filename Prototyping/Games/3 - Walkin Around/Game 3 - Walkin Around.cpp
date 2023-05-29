@@ -25,7 +25,7 @@ int main() {
     );
     uiGrid->OnRightClick([&](Tile::Position position) {
         auto* element = uiGrid->AddCircle(position, {0, 0, 0}, 20);
-        // element->GetPosition().
+        uiGrid->SetTileObstacle(position);
     });
 
     return UI::Qt::Run();

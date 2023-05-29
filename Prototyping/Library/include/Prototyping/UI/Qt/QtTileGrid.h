@@ -124,7 +124,26 @@ namespace Prototyping::UI::Qt {
         }
 
         UITile* GetTile(const Tile::Position& position) override {
+            qDebug() << "GetTile()" << position.x << position.y << position.z;
+            qDebug() << "WARNING not recommended due to support for multiple layers";
             return _renderer->GetTile(position);
+        }
+
+        bool SetTileObstacle(const Tile::Position& position, bool isObstacle = true) override {
+            auto* tile = _renderer->GetTile(position);
+            if (!tile) {
+                qDebug() << "SetObstacle() failed, tile not found at position" << position.x
+                         << position.y << position.z;
+                return false;
+            }
+            if (!tile->GetTile()) {
+                qDebug() << "SetObstacle() failed, tile->GetTile() not found at position"
+                         << position.x << position.y << position.z;
+                return false;
+            }
+            tile->GetTile()->SetObstacle(isObstacle);
+            qDebug() << "SetObstacle()" << position.x << position.y << position.z << isObstacle;
+            return true;
         }
 
         bool OnLeftClick(std::function<void(const Tile::Position&)> handler, uint32_t layer)

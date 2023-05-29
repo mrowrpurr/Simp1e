@@ -10,9 +10,10 @@
 namespace Prototyping::UI::Qt {
 
     class QtTileGridTilesAndHexagonsRenderer : public QtTileGridRenderer {
-        UITileGrid::Config& _config;
-        QtScene*            _scene;
-        TileGrid            _hexGrid{0, 0, 1};
+        UITileGrid::Config&                         _config;
+        QtScene*                                    _scene;
+        TileGrid                                    _hexGrid{0, 0, 1};
+        std::unordered_map<Tile::Position, QtTile*> _tiles;
 
         int HEX_WIDTH      = 60;
         int HEX_HEIGHT     = 60;
@@ -64,6 +65,12 @@ namespace Prototyping::UI::Qt {
         QtTileGridTilesAndHexagonsRenderer(UITileGrid::Config& config, QtScene* scene)
             : _config(config), _scene(scene) {}
 
+        UITile* GetTile(const Tile::Position& position) override {
+            auto it = _tiles.find(position);
+            if (it != _tiles.end()) return it->second;
+            return nullptr;
+        }
+
         UISize InitializeGrid() override {
             // Ignore the configuration ones for now ;)
             // qreal    tileWidth  = _config.tileWidth;
@@ -89,6 +96,7 @@ namespace Prototyping::UI::Qt {
                     auto* tile   = _config.grid->GetTile(row, column);
                     auto  qtTile = new QtTile(tile, item->polygon());
                     _scene->addItem(qtTile);
+                    _tiles[tile->GetPosition()] = qtTile;
 
                     auto bottomRight = item->boundingRect().bottomRight();
                     if (uiWidth < bottomRight.x()) uiWidth = bottomRight.x();
@@ -127,6 +135,7 @@ namespace Prototyping::UI::Qt {
                     auto  qtTile = new QtTile(tile, item->polygon());
                     qtTile->SetLayer(1);
                     _scene->addItem(qtTile);
+                    _tiles[tile->GetPosition()] = qtTile;
 
                     auto bottomRight = item->boundingRect().bottomRight();
                     if (uiWidth < bottomRight.x()) uiWidth = bottomRight.x();

@@ -18,10 +18,17 @@ namespace Prototyping::UI::Qt {
         float aspectRatio = 0.6f;   // Adjust this to make hexagons taller or shorter - was 0.8f
         float height      = sqrt(3.0f) * hexagonSide * aspectRatio;  // Height of a hexagon
         float width       = 2.0f * hexagonSide;                      // Width of a hexagon
+        std::unordered_map<Tile::Position, QtTile*> _tiles;
 
     public:
         QtTileGridHexagonRenderer(UITileGrid::Config& config, QtScene* scene)
             : _config(config), _scene(scene) {}
+
+        UITile* GetTile(const Tile::Position& position) override {
+            auto it = _tiles.find(position);
+            if (it != _tiles.end()) return it->second;
+            return nullptr;
+        }
 
         UISize InitializeGrid() override {
             uint32_t uiWidth    = 0;
@@ -29,10 +36,8 @@ namespace Prototyping::UI::Qt {
             qreal    tileWidth  = _config.tileWidth;   // or use width
             qreal    tileHeight = _config.tileHeight;  // or use height
 
-            for (int row = 0; row < _config.grid->GetRows(); row++) {
-                for (int col = 0; col < _config.grid->GetColumns(); col++) {
-                    //////////////////////////////
-
+            for (uint32_t row = 0; row < _config.grid->GetRows(); row++) {
+                for (uint32_t col = 0; col < _config.grid->GetColumns(); col++) {
                     // Calculate the top-left point of the hexagon
                     float x = col * width + ((row % 2 == 0) ? 0.0f : width / 2.0f);
                     float y = row * height * 3.0f / 4.0f;
@@ -56,6 +61,7 @@ namespace Prototyping::UI::Qt {
                     auto* tile   = _config.grid->GetTile(row, col);
                     auto  qtTile = new QtTile(tile, polygon);
                     _scene->addItem(qtTile);
+                    _tiles[tile->GetPosition()] = qtTile;
 
                     if (_config.showGrid) {
                         QGraphicsPolygonItem* item = new QGraphicsPolygonItem(polygon);

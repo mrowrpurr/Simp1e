@@ -63,6 +63,17 @@ namespace Prototyping::UI::Qt {
             _window->show();
         }
 
+        UITile* GetTile(const Tile::Position& position) override {
+            // This won't work with multi!
+            qDebug() << "GetTile not implemented for QtMutlipleTileGrids";
+            return nullptr;
+        }
+
+        bool SetTileObstacle(const Tile::Position& position, bool obstacle) override {
+            for (auto& tileGrid : _qtTileGrids) tileGrid->SetTileObstacle(position, obstacle);
+            return true;
+        }
+
         bool OnLeftClick(std::function<void(const Tile::Position&)> handler, uint32_t layer)
             override {
             for (auto& tileGrid : _qtTileGrids) tileGrid->OnLeftClick(handler, layer);

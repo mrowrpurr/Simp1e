@@ -16,6 +16,7 @@ namespace Prototyping::UI::Qt {
         uint32_t GetLayer() const { return _layer; }
         void     SetLayer(uint32_t layer) { _layer = layer; }
 
+        Tile*          GetTile() override { return _tile; }
         Tile::Position GetPosition() const override { return _tile->position(); }
     };
 }

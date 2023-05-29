@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 
 namespace Prototyping {
     class Tile {
@@ -28,10 +29,27 @@ namespace Prototyping {
         Tile(const Position& position, bool isObstacle = false)
             : _position(position), _isObstacle(isObstacle) {}
 
-        // TODO make this upper case, everything should be except x() y() z() functions
-        const Position& position() const { return _position; }
+        [[deprecated("Use GetPosition() instead")]] const Position& position() const {
+            return _position;
+        }
+
+        const Position GetPosition() const { return _position; }
 
         bool IsObstacle() const { return _isObstacle; }
-        void SetObstacle(bool isObstacle) { _isObstacle = isObstacle; }
+        void SetObstacle(bool isObstacle = true) { _isObstacle = isObstacle; }
     };
+}
+
+namespace std {
+
+    template <>
+    struct hash<Prototyping::Tile::Position> {
+        std::size_t operator()(const Prototyping::Tile::Position& pos) const {
+            std::size_t h1 = std::hash<uint32_t>{}(pos.x);
+            std::size_t h2 = std::hash<uint32_t>{}(pos.y);
+            std::size_t h3 = std::hash<uint32_t>{}(pos.z);
+            return h1 ^ (h2 << 1) ^ (h3 << 2);  // Or any other kind of combination
+        }
+    };
+
 }

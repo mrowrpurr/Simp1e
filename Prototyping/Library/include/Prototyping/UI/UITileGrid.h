@@ -28,10 +28,13 @@ namespace Prototyping::UI {
         virtual bool     ShowAsWindow() { return false; }
         virtual QWidget* GetWidget() { return nullptr; }
         virtual UITile*  GetTile(const Tile::Position& position) { return nullptr; }
-        virtual bool     SetBackgroundColor(const UIColor& color) { return false; }
-        virtual bool     AddBackgroundImage(const UIImage& image) { return false; }
-        virtual bool     RemoveBackgroundImage(const UIImage& image) { return false; }
-        virtual bool     MoveElement(UITileGridElement* element, const Tile::Position& position) {
+        virtual bool     SetTileObstacle(const Tile::Position& position, bool isObstacle = true) {
+            return false;
+        }
+        virtual bool SetBackgroundColor(const UIColor& color) { return false; }
+        virtual bool AddBackgroundImage(const UIImage& image) { return false; }
+        virtual bool RemoveBackgroundImage(const UIImage& image) { return false; }
+        virtual bool MoveElement(UITileGridElement* element, const Tile::Position& position) {
             return false;
         }
         virtual bool               RemoveElement(UITileGridElement* element) { return false; }
