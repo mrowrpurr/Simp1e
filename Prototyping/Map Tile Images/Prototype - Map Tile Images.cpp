@@ -20,11 +20,21 @@ int main() {
     });
 
     uiGrid->OnLeftClick([&](Tile::Position position) {
-        if (!player) player = uiGrid->AddImage(position, knight);
-        else uiGrid->AnimatedMoveElement(player, position);
+        //
+        if (!inn) inn = uiGrid->AddImage(position, innBuilding);
+        else uiGrid->AnimatedMoveElement(inn, position);
     });
-    uiGrid->OnRightClick([&](Tile::Position position) { uiGrid->AddImage(position, road, true); });
-    uiGrid->OnMiddleClick([&](Tile::Position position) { uiGrid->AddImage(position, tree); });
+    uiGrid->OnRightClick([&](Tile::Position position) {
+        if (inn) uiGrid->SetMoveModeEnabled(inn, true);
+    });
+
+    // uiGrid->OnLeftClick([&](Tile::Position position) {
+    //     if (!player) player = uiGrid->AddImage(position, knight);
+    //     else uiGrid->AnimatedMoveElement(player, position);
+    // });
+    // uiGrid->OnRightClick([&](Tile::Position position) { uiGrid->AddImage(position, road, true);
+    // }); uiGrid->OnMiddleClick([&](Tile::Position position) { uiGrid->AddImage(position, tree);
+    // });
 
     return UI::Qt::Run();
 }

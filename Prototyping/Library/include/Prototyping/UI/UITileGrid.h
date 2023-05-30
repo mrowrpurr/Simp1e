@@ -66,7 +66,16 @@ namespace Prototyping::UI {
         ) {
             return false;
         }
-        virtual bool               RemoveElement(UITileGridElement* element) { return false; }
+        virtual bool RemoveElement(UITileGridElement* element) { return false; }
+        virtual bool SetResizeModeEnabled(UITileGridElement* element, bool enabled = true) {
+            return false;
+        }
+        virtual bool SetMoveModeEnabled(UITileGridElement* element, bool enabled = true) {
+            return false;
+        }
+        virtual bool SetRotateModeEnabled(UITileGridElement* element, bool enabled = true) {
+            return false;
+        }
         virtual UITileGridElement* AddCircle(
             const Tile::Position& position, const UIColor& color, uint32_t diameter
         ) {

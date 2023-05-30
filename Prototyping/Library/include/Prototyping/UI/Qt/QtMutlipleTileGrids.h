@@ -98,6 +98,40 @@ namespace Prototyping::UI::Qt {
             return true;
         }
 
+        bool SetResizeModeEnabled(UITileGridElement* element, bool enabled = true) override {
+            try {
+                auto elements =
+                    std::any_cast<std::vector<UITileGridElement*>>(element->GetElement());
+                for (size_t i = 0; i < _qtTileGrids.size(); ++i)
+                    _qtTileGrids[i]->SetResizeModeEnabled(elements.at(i), enabled);
+                return true;
+            } catch (const std::bad_any_cast&) {
+                return false;
+            }
+        }
+        bool SetMoveModeEnabled(UITileGridElement* element, bool enabled = true) override {
+            try {
+                auto elements =
+                    std::any_cast<std::vector<UITileGridElement*>>(element->GetElement());
+                for (size_t i = 0; i < _qtTileGrids.size(); ++i)
+                    _qtTileGrids[i]->SetMoveModeEnabled(elements.at(i), enabled);
+                return true;
+            } catch (const std::bad_any_cast&) {
+                return false;
+            }
+        }
+        bool SetRotateModeEnabled(UITileGridElement* element, bool enabled = true) override {
+            try {
+                auto elements =
+                    std::any_cast<std::vector<UITileGridElement*>>(element->GetElement());
+                for (size_t i = 0; i < _qtTileGrids.size(); ++i)
+                    _qtTileGrids[i]->SetRotateModeEnabled(elements.at(i), enabled);
+                return true;
+            } catch (const std::bad_any_cast&) {
+                return false;
+            }
+        }
+
         bool OnLeftClick(std::function<void(const Tile::Position&)> handler, uint32_t layer)
             override {
             for (auto& tileGrid : _qtTileGrids) tileGrid->OnLeftClick(handler, layer);

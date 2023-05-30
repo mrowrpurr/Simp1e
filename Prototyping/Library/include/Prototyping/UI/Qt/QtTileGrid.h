@@ -15,6 +15,7 @@
 #include "../UITileGrid.h"
 #include "QtCircle.h"
 #include "QtImage.h"
+#include "QtResizerMover.h"
 #include "QtScene.h"
 #include "QtTileGridHexagonRenderer.h"
 #include "QtTileGridIsometricRenderer.h"
@@ -53,6 +54,8 @@ namespace Prototyping::UI::Qt {
                     break;
                 case RenderingStyle::IsometricWithHexagons:
                     _renderer.reset(new QtTileGridTilesAndHexagonsRenderer(_config, _scene));
+                    break;
+                default:
                     break;
             }
         }
@@ -195,6 +198,30 @@ namespace Prototyping::UI::Qt {
             return true;
         }
 
+        bool SetResizeModeEnabled(UITileGridElement* element, bool enabled = true) override {
+            return true;
+        }
+        bool SetMoveModeEnabled(UITileGridElement* element, bool enabled = true) override {
+            try {
+                if (!element) return false;
+                auto* qtElement = std::any_cast<QGraphicsItem*>(element->GetElement());
+                if (!qtElement) return false;
+                //
+                // qtElement
+                // ...
+                RemoveElement(element);
+                //
+                return true;
+            } catch (const std::bad_any_cast& e) {
+                qDebug() << "SetMoveModeEnabled() failed, bad_any_cast" << e.what();
+                return false;
+            }
+            return true;
+        }
+        bool SetRotateModeEnabled(UITileGridElement* element, bool enabled = true) override {
+            return true;
+        }
+
         bool OnLeftClick(std::function<void(const Tile::Position&)> handler, uint32_t layer)
             override {
             _tileLeftClickHandlers[layer].push_back(handler);
@@ -209,6 +236,21 @@ namespace Prototyping::UI::Qt {
             override {
             _tileMiddleClickHandlers[layer].push_back(handler);
             return true;
+        }
+
+        bool RemoveElement(UITileGridElement* element) override {
+            try {
+                if (!element) return false;
+                qDebug() << "RemoveElement()";
+                auto* qtElement = std::any_cast<QGraphicsItem*>(element->GetElement());
+                if (!qtElement) return false;
+                _scene->removeItem(qtElement);
+                delete qtElement;
+                return true;
+            } catch (const std::bad_any_cast& e) {
+                qDebug() << e.what();
+                return false;
+            }
         }
 
         bool MoveElement(UITileGridElement* element, const Tile::Position& position) override {

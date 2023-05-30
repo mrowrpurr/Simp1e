@@ -7,6 +7,8 @@
 #include <QTransform>
 #include <memory>
 
+#include "QtMoveableResizableGraphicsItem.h"
+
 namespace Prototyping::UI::Qt {
     class QtImage : public QGraphicsPixmapItem {
         QString                  _imagePath;
