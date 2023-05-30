@@ -7,10 +7,10 @@
 #include <QTransform>
 #include <memory>
 
-#include "QtMoveableResizableGraphicsItem.h"
+#include "QtGraphicsItem.h"
 
 namespace Prototyping::UI::Qt {
-    class QtImage : public QGraphicsPixmapItem {
+    class QtImage : public Simp1eQtGraphicsItem {
         QString                  _imagePath;
         std::unique_ptr<QPixmap> _transformedImage;
 
@@ -25,7 +25,7 @@ namespace Prototyping::UI::Qt {
 
     public:
         QtImage(const QString& imagePath = "", QGraphicsItem* parent = nullptr)
-            : QGraphicsPixmapItem(parent) {
+            : Simp1eQtGraphicsItem(parent) {
             qDebug() << "QtImage::QtImage() " << imagePath;
             if (!imagePath.isEmpty()) SetImage(imagePath);
         }
@@ -110,6 +110,8 @@ namespace Prototyping::UI::Qt {
                 _transformedImage->setMask(bitmapMask);
 
                 _imageChanged = false;
+
+                updateBorder();
             }
         }
 
@@ -148,6 +150,7 @@ namespace Prototyping::UI::Qt {
             return _transformedImage ? _transformedImage->rect() : QRectF();
         }
 
+    protected:
         void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
             override {
             if (!_transformedImage) return;

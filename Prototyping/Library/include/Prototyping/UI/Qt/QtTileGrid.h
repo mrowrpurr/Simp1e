@@ -14,6 +14,7 @@
 #include "../UISize.h"
 #include "../UITileGrid.h"
 #include "QtCircle.h"
+#include "QtGraphicsItem.h"
 #include "QtImage.h"
 #include "QtResizerMover.h"
 #include "QtScene.h"
@@ -204,7 +205,7 @@ namespace Prototyping::UI::Qt {
         bool SetMoveModeEnabled(UITileGridElement* element, bool enabled = true) override {
             try {
                 if (!element) return false;
-                auto* qtElement = std::any_cast<QGraphicsItem*>(element->GetElement());
+                auto* qtElement = std::any_cast<Simp1eQtGraphicsItem*>(element->GetElement());
                 if (!qtElement) return false;
                 //
                 // qtElement
@@ -242,7 +243,7 @@ namespace Prototyping::UI::Qt {
             try {
                 if (!element) return false;
                 qDebug() << "RemoveElement()";
-                auto* qtElement = std::any_cast<QGraphicsItem*>(element->GetElement());
+                auto* qtElement = std::any_cast<Simp1eQtGraphicsItem*>(element->GetElement());
                 if (!qtElement) return false;
                 _scene->removeItem(qtElement);
                 delete qtElement;
@@ -257,12 +258,12 @@ namespace Prototyping::UI::Qt {
             try {
                 if (!element) return false;
                 qDebug() << "MoveElement()" << position.x << position.y << position.z;
-                auto* qtElement = std::any_cast<QGraphicsItem*>(element->GetElement());
+                auto* qtElement = std::any_cast<Simp1eQtGraphicsItem*>(element->GetElement());
                 if (!qtElement) return false;
                 auto center = _renderer->GetTileCenter(position);
                 qtElement->setPos(
-                    center.x() - static_cast<uint32_t>(qtElement->boundingRect().width() / 2),
-                    center.y() - static_cast<uint32_t>(qtElement->boundingRect().height() / 2)
+                    center.x() - static_cast<uint32_t>(qtElement->GetBoundingBox().width() / 2),
+                    center.y() - static_cast<uint32_t>(qtElement->GetBoundingBox().height() / 2)
                 );
                 element->SetPosition(position);
                 return true;
@@ -351,8 +352,8 @@ namespace Prototyping::UI::Qt {
             _scene->addItem(image);
             _scene->update();
 
-            QGraphicsItem* elementPtr = image;
-            auto*          element    = new UITileGridElement(position, elementPtr);
+            Simp1eQtGraphicsItem* elementPtr = image;
+            auto*                 element    = new UITileGridElement(position, elementPtr);
             _elements.insert(element);
             return element;
         }
