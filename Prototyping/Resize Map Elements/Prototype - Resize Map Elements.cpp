@@ -3,9 +3,9 @@
 using namespace Simp1e::Maps;
 using namespace Simp1e::UI;
 
-bool               playerBorderVisible = false;
-UITileGridElement* player              = nullptr;
-UITileGridElement* inn                 = nullptr;
+bool               resizingPlayer = false;
+UITileGridElement* player         = nullptr;
+UITileGridElement* inn            = nullptr;
 
 int main() {
     std::filesystem::path imagesFolder{std::getenv("Openclipart")};
@@ -26,8 +26,8 @@ int main() {
     });
     uiGrid->OnRightClick([&](TilePosition position) {
         if (player) {
-            playerBorderVisible = !playerBorderVisible;
-            uiGrid->SetBorder(player, playerBorderVisible, {255, 0, 255}, UILineStyle::Dotted);
+            resizingPlayer = !resizingPlayer;
+            uiGrid->SetMoveModeEnabled(player, resizingPlayer);
         }
     });
 

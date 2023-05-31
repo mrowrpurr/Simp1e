@@ -28,9 +28,9 @@ namespace Simp1e::UI {
         struct Config {
             Maps::TileGrid* grid               = nullptr;
             RenderingStyle  renderingStyle     = RenderingStyle::Grid;
-            uint32_t        tileWidth          = 64;
-            uint32_t        tileHeight         = 48;
-            uint32_t        padding            = 4;
+            uint32_t        tileWidth          = 128;
+            uint32_t        tileHeight         = 96;
+            uint32_t        padding            = 0;
             bool            showGrid           = true;
             bool            displayCoordinates = true;
         };

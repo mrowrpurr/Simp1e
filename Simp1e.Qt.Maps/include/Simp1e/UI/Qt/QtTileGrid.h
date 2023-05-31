@@ -101,6 +101,18 @@ namespace Simp1e::UI::Qt {
             });
         }
 
+        IQtGraphicsItem* GraphicsItemFromElement(UITileGridElement* element) {
+            try {
+                if (!element) return nullptr;
+                auto* qtElement = std::any_cast<IQtGraphicsItem*>(element->GetElement());
+                if (!qtElement) return nullptr;
+                return qtElement;
+            } catch (const std::bad_any_cast& e) {
+                qDebug() << "GetElement() failed, bad_any_cast" << e.what();
+                return nullptr;
+            }
+        }
+
     public:
         QtTileGrid(const Config& config) : _config(config) {
             _scene = new QtScene();
@@ -201,45 +213,36 @@ namespace Simp1e::UI::Qt {
         }
 
         bool SetResizeModeEnabled(UITileGridElement* element, bool enabled = true) override {
-            return true;
+            if (auto* graphicsItem = GraphicsItemFromElement(element)) {
+                graphicsItem->SetResizingMode(enabled);
+                return true;
+            }
+            return false;
         }
         bool SetMoveModeEnabled(UITileGridElement* element, bool enabled = true) override {
-            try {
-                if (!element) return false;
-                auto* qtElement = std::any_cast<QtGraphicsItem*>(element->GetElement());
-                if (!qtElement) return false;
-                //
-                // qtElement
-                // ...
-                RemoveElement(element);
-                //
+            if (auto* graphicsItem = GraphicsItemFromElement(element)) {
+                graphicsItem->SetMovingMode(enabled);
                 return true;
-            } catch (const std::bad_any_cast& e) {
-                qDebug() << "SetMoveModeEnabled() failed, bad_any_cast" << e.what();
-                return false;
             }
-            return true;
+            return false;
         }
         bool SetRotateModeEnabled(UITileGridElement* element, bool enabled = true) override {
-            return true;
+            if (auto* graphicsItem = GraphicsItemFromElement(element)) {
+                graphicsItem->SetRotatingMode(enabled);
+                return true;
+            }
+            return false;
         }
 
-        // TODO refactor the code which gets the element into something nicer :)
         bool SetBorder(
             UITileGridElement* element, bool enabled, UIColor color = {},
             UILineStyle style = UILineStyle::Solid
         ) override {
-            try {
-                if (!element) return false;
-                qDebug() << "SetBorder()";
-                auto* qtElement = std::any_cast<QtGraphicsItem*>(element->GetElement());
-                if (!qtElement) return false;
-                qtElement->SetBorder(enabled, color, style);
+            if (auto* graphicsItem = GraphicsItemFromElement(element)) {
+                graphicsItem->SetBorder(enabled, color, style);  // TODO convert to Qt types <---
                 return true;
-            } catch (const std::bad_any_cast& e) {
-                qDebug() << e.what();
-                return false;
             }
+            return false;
         }
 
         bool OnLeftClick(std::function<void(const Maps::TilePosition&)> handler, uint32_t layer)
@@ -259,37 +262,25 @@ namespace Simp1e::UI::Qt {
         }
 
         bool RemoveElement(UITileGridElement* element) override {
-            try {
-                if (!element) return false;
-                qDebug() << "RemoveElement()";
-                auto* qtElement = std::any_cast<QtGraphicsItem*>(element->GetElement());
-                if (!qtElement) return false;
-                _scene->removeItem(qtElement);
-                delete qtElement;
+            if (auto* graphicsItem = GraphicsItemFromElement(element)) {
+                _scene->removeItem(graphicsItem);
+                delete graphicsItem;
                 return true;
-            } catch (const std::bad_any_cast& e) {
-                qDebug() << e.what();
-                return false;
             }
+            return false;
         }
 
         bool MoveElement(UITileGridElement* element, const Maps::TilePosition& position) override {
-            try {
-                if (!element) return false;
-                qDebug() << "MoveElement()" << position.x << position.y << position.z;
-                auto* qtElement = std::any_cast<QtGraphicsItem*>(element->GetElement());
-                if (!qtElement) return false;
+            if (auto* graphicsItem = GraphicsItemFromElement(element)) {
                 auto center = _renderer->GetTileCenter(position);
-                qtElement->setPos(
-                    center.x() - static_cast<uint32_t>(qtElement->GetBoundingBox().width() / 2),
-                    center.y() - static_cast<uint32_t>(qtElement->GetBoundingBox().height() / 2)
+                graphicsItem->setPos(
+                    center.x() - static_cast<uint32_t>(
+                                     graphicsItem->GetBoundingBox().width() / 2
+                                 ),  // TODO convert to Qt types <---
+                    center.y() - static_cast<uint32_t>(graphicsItem->GetBoundingBox().height() / 2)
                 );
-                element->SetPosition(position);
-                return true;
-            } catch (const std::bad_any_cast& e) {
-                qDebug() << e.what();
-                return false;
             }
+            return false;
         }
 
         bool AnimatedMoveElement(
@@ -342,8 +333,8 @@ namespace Simp1e::UI::Qt {
             );
             _scene->addItem(circle);
 
-            QtGraphicsItem* elementPtr = circle;
-            auto*           element    = new UITileGridElement(position, elementPtr);
+            IQtGraphicsItem* elementPtr = circle;
+            auto*            element    = new UITileGridElement(position, elementPtr);
             _elements.insert(element);
             return element;
         }
@@ -371,8 +362,8 @@ namespace Simp1e::UI::Qt {
             _scene->addItem(image);
             _scene->update();
 
-            QtGraphicsItem* elementPtr = image;
-            auto*           element    = new UITileGridElement(position, elementPtr);
+            IQtGraphicsItem* elementPtr = image;
+            auto*            element    = new UITileGridElement(position, elementPtr);
             _elements.insert(element);
             return element;
         }
