@@ -1,5 +1,9 @@
 #pragma once
 
+#include <Simp1e/UI/UIPosition.h>
+#include <Simp1e/UI/UISize.h>
+#include <Simp1e/UI/UITileGrid.h>
+
 #include <QPropertyAnimation>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -10,9 +14,6 @@
 #include <unordered_set>
 
 #include "../../AStar/AStar.h"
-#include "../UIPosition.h"
-#include "../UISize.h"
-#include "../UITileGrid.h"
 #include "QtCircle.h"
 #include "QtGraphicsItem.h"
 #include "QtImage.h"

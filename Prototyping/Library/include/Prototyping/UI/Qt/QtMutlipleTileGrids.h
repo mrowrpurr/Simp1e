@@ -1,12 +1,14 @@
 #pragma once
 
+#include <Simp1e/UI/UITile.h>
+#include <Simp1e/UI/UITileGrid.h>
+
 #include <QDockWidget>
 #include <QGuiApplication>
 #include <QMainWindow>
 #include <QScreen>
 #include <unordered_map>
 
-#include "../UITileGrid.h"
 #include "QtTileGrid.h"
 
 namespace Simp1e::UI::Qt {

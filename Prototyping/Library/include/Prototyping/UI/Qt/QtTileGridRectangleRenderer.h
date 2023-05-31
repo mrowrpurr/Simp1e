@@ -1,11 +1,12 @@
 #pragma once
 
+#include <Simp1e/UI/UIPosition.h>
+#include <Simp1e/UI/UISize.h>
+#include <Simp1e/UI/UITileGrid.h>
+
 #include <QGraphicsTextItem>
 #include <QMessageBox>
 
-#include "../UIPosition.h"
-#include "../UISize.h"
-#include "../UITileGrid.h"
 #include "QtScene.h"
 #include "QtTile.h"
 #include "QtTileGridRenderer.h"

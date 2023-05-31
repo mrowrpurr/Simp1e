@@ -1,9 +1,9 @@
 #pragma once
 
+#include <Simp1e/UI/UITile.h>
+
 #include <QGraphicsPolygonItem>
 #include <cstdint>
-
-#include "../UITile.h"
 
 namespace Simp1e::UI::Qt {
     class QtTile : public UITile, public QGraphicsPolygonItem {

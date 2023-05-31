@@ -1,8 +1,9 @@
 #pragma once
 
+#include <Simp1e/UI/UITileGrid.h>
+
 #include <QGraphicsPolygonItem>
 
-#include "../UITileGrid.h"
 #include "QtScene.h"
 #include "QtTile.h"
 #include "QtTileGridRenderer.h"

@@ -2,13 +2,12 @@
 
 #include <Simp1e/Maps/Tile.h>
 #include <Simp1e/Maps/TileGrid.h>
+#include <Simp1e/UI/UIPosition.h>
+#include <Simp1e/UI/UISize.h>
+#include <Simp1e/UI/UITile.h>
 
 #include <QPolygonF>
 #include <unordered_map>
-
-#include "../UIPosition.h"
-#include "../UISize.h"
-#include "../UITile.h"
 
 namespace Simp1e::UI::Qt {
 
