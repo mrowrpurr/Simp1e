@@ -1,6 +1,12 @@
 #pragma once
 
 #include <Simp1e/Maps/AStar.h>
+#include <Simp1e/UI/Qt/QtCircle.h>
+#include <Simp1e/UI/Qt/QtGraphicsItem.h>
+#include <Simp1e/UI/Qt/QtImage.h>
+#include <Simp1e/UI/Qt/QtResizerMover.h>
+#include <Simp1e/UI/Qt/QtScene.h>
+#include <Simp1e/UI/Qt/QtView.h>
 #include <Simp1e/UI/UIPosition.h>
 #include <Simp1e/UI/UISize.h>
 #include <Simp1e/UI/UITileGrid.h>
@@ -14,16 +20,10 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "QtCircle.h"
-#include "QtGraphicsItem.h"
-#include "QtImage.h"
-#include "QtResizerMover.h"
-#include "QtScene.h"
-#include "QtTileGridHexagonRenderer.h"
-#include "QtTileGridIsometricRenderer.h"
-#include "QtTileGridRectangleRenderer.h"
-#include "QtTileGridTilesAndHexagonsRenderer.h"
-#include "QtView.h"
+#include "TileGridRenderers/QtTileGridHexagonRenderer.h"
+#include "TileGridRenderers/QtTileGridIsometricRenderer.h"
+#include "TileGridRenderers/QtTileGridRectangleRenderer.h"
+#include "TileGridRenderers/QtTileGridTilesAndHexagonsRenderer.h"
 
 namespace Simp1e::UI::Qt {
 

@@ -1,11 +1,11 @@
 #pragma once
 
 #include <Simp1e/Maps/TilePositionHash.h>
+#include <Simp1e/UI/Qt/QtScene.h>
 #include <Simp1e/UI/UITileGrid.h>
 
 #include <QGraphicsPolygonItem>
 
-#include "QtScene.h"
 #include "QtTile.h"
 #include "QtTileGridRenderer.h"
 

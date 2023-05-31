@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Simp1e/Maps/TilePositionHash.h>
+#include <Simp1e/UI/Qt/QtScene.h>
 #include <Simp1e/UI/UIPosition.h>
 #include <Simp1e/UI/UISize.h>
 #include <Simp1e/UI/UITileGrid.h>
@@ -7,7 +9,6 @@
 #include <QGraphicsTextItem>
 #include <QMessageBox>
 
-#include "QtScene.h"
 #include "QtTile.h"
 #include "QtTileGridRenderer.h"
 

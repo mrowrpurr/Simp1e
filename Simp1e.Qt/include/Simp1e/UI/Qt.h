@@ -1,11 +1,6 @@
-#include <Simp1e/UI/UITileGrid.h>
+#pragma once
 
 #include <QApplication>
-#include <memory>
-
-#include "Qt/QtMutlipleTileGrids.h"
-#include "Qt/QtTileGrid.h"
-
 
 namespace Simp1e::UI::Qt {
 
@@ -15,19 +10,6 @@ namespace Simp1e::UI::Qt {
             QApplication qtApp{_appArgc, nullptr};
         }
         QApplication& Get() { return _::qtApp; }
-    }
-
-    std::unique_ptr<UITileGrid> CreateTileGrid(const UITileGrid::Config& config) {
-        return std::make_unique<QtTileGrid>(config);
-    }
-
-    std::unique_ptr<UITileGrid> CreateMultiTileGrid(
-        const UITileGrid::Config&               config,
-        std::vector<UITileGrid::RenderingStyle> renderingStyles =
-            {UITileGrid::RenderingStyle::IsometricWithHexagons, UITileGrid::RenderingStyle::Grid,
-             UITileGrid::RenderingStyle::Hexagons, UITileGrid::RenderingStyle::Isometric}
-    ) {
-        return std::make_unique<QtMutlipleTileGrids>(config, renderingStyles);
     }
 
     int Run() {
