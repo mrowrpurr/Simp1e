@@ -9,7 +9,7 @@
 
 #include "AStarTile.h"
 
-namespace Prototyping::AStar {
+namespace Simp1e::AStar {
 
     namespace Utility {
 

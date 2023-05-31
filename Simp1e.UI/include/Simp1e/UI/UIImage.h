@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace Prototyping::UI {
+namespace Simp1e::UI {
     struct UIImage {
         std::string path;
     };

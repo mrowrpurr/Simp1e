@@ -10,7 +10,7 @@
 #include "../UISize.h"
 #include "../UITile.h"
 
-namespace Prototyping::UI::Qt {
+namespace Simp1e::UI::Qt {
 
     struct QtTileGridRenderer {
         virtual UISize     InitializeGrid() { return {}; }

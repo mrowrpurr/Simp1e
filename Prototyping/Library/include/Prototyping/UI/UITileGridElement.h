@@ -5,7 +5,7 @@
 #include <any>
 #include <cstdint>
 
-namespace Prototyping::UI {
+namespace Simp1e::UI {
 
     class UITileGridElement {
         Tile::Position _position;

@@ -6,7 +6,7 @@
 
 #include "QtMoveableResizableGraphicsItem.h"
 
-namespace Prototyping::UI::Qt {
+namespace Simp1e::UI::Qt {
 
     class Simp1eQtGraphicsItem : public QGraphicsItem {
     public:

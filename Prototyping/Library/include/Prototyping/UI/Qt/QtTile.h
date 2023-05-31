@@ -5,7 +5,7 @@
 
 #include "../UITile.h"
 
-namespace Prototyping::UI::Qt {
+namespace Simp1e::UI::Qt {
     class QtTile : public UITile, public QGraphicsPolygonItem {
         Tile*    _tile;
         uint32_t _layer = 0;

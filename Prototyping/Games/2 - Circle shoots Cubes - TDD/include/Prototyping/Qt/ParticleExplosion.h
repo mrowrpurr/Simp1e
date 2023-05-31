@@ -1,3 +1,3 @@
 #pragma once
 
-namespace Prototyping {}
+namespace Simp1e {}

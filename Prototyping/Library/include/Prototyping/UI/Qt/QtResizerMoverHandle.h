@@ -2,6 +2,6 @@
 
 #include <QGraphicsItem>
 
-namespace Prototyping::UI::Qt {
+namespace Simp1e::UI::Qt {
     class QtResizerMoverHandle : public QGraphicsItem {};
 }

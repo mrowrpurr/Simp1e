@@ -2,7 +2,7 @@
 
 #include "Coordinate.h"
 
-namespace Prototyping {
+namespace Simp1e {
 
     struct BoundingBox {
         Coordinate topLeft;

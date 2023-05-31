@@ -4,9 +4,9 @@
 
 #include "SpecHelper.h"
 
-namespace Prototyping {}
+namespace Simp1e {}
 
-using namespace Prototyping;
+using namespace Simp1e;
 
 struct SetupQtApp {
     int          argc = 0;

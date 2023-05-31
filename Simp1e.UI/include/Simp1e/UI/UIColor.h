@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace Prototyping::UI {
+namespace Simp1e::UI {
     struct UIColor {
         uint8_t red   = 0;
         uint8_t green = 0;

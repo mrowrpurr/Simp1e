@@ -8,7 +8,7 @@
 
 #include "CircleCubeSpecHelper.h"
 
-using namespace Prototyping;
+using namespace Simp1e;
 
 Describe("QtGameCircleCubeScene") {
     it("can specify tile width and height", []() {

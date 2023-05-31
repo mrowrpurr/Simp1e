@@ -10,7 +10,7 @@
 
 #include "../../../Coordinate.h"
 
-namespace Prototyping::Games::CircleCube {
+namespace Simp1e::Games::CircleCube {
 
     class GameCircleCube {
         uint32_t                       _rowCount    = 0;

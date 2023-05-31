@@ -9,7 +9,7 @@
 
 #include "QtGraphicsItem.h"
 
-namespace Prototyping::UI::Qt {
+namespace Simp1e::UI::Qt {
     class QtImage : public Simp1eQtGraphicsItem {
         QString                  _imagePath;
         std::unique_ptr<QPixmap> _transformedImage;

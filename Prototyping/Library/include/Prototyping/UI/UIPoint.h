@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace Prototyping::UI {
+namespace Simp1e::UI {
     class UIPoint {
         double _x = 0;
         double _y = 0;

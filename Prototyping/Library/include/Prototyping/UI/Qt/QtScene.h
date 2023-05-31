@@ -4,7 +4,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <functional>
 
-namespace Prototyping::UI::Qt {
+namespace Simp1e::UI::Qt {
     class QtScene : public QGraphicsScene {
         std::vector<std::function<void(QPointF)>> _leftClickHandlers;
         std::vector<std::function<void(QPointF)>> _rightClickHandlers;

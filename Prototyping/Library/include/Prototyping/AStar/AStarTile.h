@@ -2,7 +2,7 @@
 
 #include <Simp1e/Maps/Tile.h>
 
-namespace Prototyping::AStar {
+namespace Simp1e::AStar {
     struct AStarTile {
         /*
             A* stuff

@@ -2,7 +2,7 @@
 
 #include <QGraphicsItem>
 
-namespace Prototyping::UI::Qt {
+namespace Simp1e::UI::Qt {
     class QtMoveableResizableGraphicsItem : public QGraphicsItem {
         bool _supportsResize;
         bool _supportsRotation;

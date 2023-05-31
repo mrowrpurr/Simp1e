@@ -1,11 +1,11 @@
 #pragma once
 
+#include <Simp1e/UI/UIColor.h>
+
 #include <QGraphicsObject>
 #include <QPainter>
 
-#include "../UIColor.h"
-
-namespace Prototyping::UI::Qt {
+namespace Simp1e::UI::Qt {
     class QtCircle : public QGraphicsObject {
         QRectF  _rect;
         UIColor _color;

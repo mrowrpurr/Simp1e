@@ -4,7 +4,7 @@
 #include "Qt/QtMutlipleTileGrids.h"
 #include "Qt/QtTileGrid.h"
 
-namespace Prototyping::UI::Qt {
+namespace Simp1e::UI::Qt {
 
     namespace Application {
         namespace _ {
@@ -27,5 +27,11 @@ namespace Prototyping::UI::Qt {
         return std::make_unique<QtMutlipleTileGrids>(config, renderingStyles);
     }
 
-    int Run() { return Application::Get().exec(); }
+    int Run() {
+        auto& app = Application::Get();
+#ifdef _WIN32
+        app.setStyle("fusion");
+#endif
+        return app.exec();
+    }
 }

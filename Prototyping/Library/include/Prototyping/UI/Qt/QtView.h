@@ -2,7 +2,7 @@
 
 #include <QGraphicsView>
 
-namespace Prototyping::UI::Qt {
+namespace Simp1e::UI::Qt {
     class QtView : public QGraphicsView {
     public:
         QtView(QGraphicsScene* scene) : QGraphicsView(scene) {}

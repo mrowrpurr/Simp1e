@@ -7,12 +7,12 @@
 
 #include <Simp1e/Maps/TileGrid.h>
 
-#include "UIColor.h"
-#include "UIImage.h"
+#include <Simp1e/UI/UIColor.h>
+#include <Simp1e/UI/UIImage.h>
 #include "UITile.h"
 #include "UITileGridElement.h"
 
-namespace Prototyping::UI {
+namespace Simp1e::UI {
     struct UITileGrid {
         enum class RenderingStyle {
             None,
@@ -35,12 +35,12 @@ namespace Prototyping::UI {
         };
 
         virtual ~UITileGrid() = default;
-        virtual RenderingStyle              GetRenderingStyle() { return RenderingStyle::None; }
-        virtual bool                        ShowAsWindow() { return false; }
-        virtual QWidget*                    GetWidget() { return nullptr; }
-        virtual TileGrid*                   GetGrid(uint32_t layer = 0) { return nullptr; }
-        virtual std::vector<Tile::Position> GetPath(
-            const Tile::Position& startPosition, const Tile::Position& endPosition,
+        virtual RenderingStyle  GetRenderingStyle() { return RenderingStyle::None; }
+        virtual bool            ShowAsWindow() { return false; }
+        virtual QWidget*        GetWidget() { return nullptr; }
+        virtual Maps::TileGrid* GetGrid(uint32_t layer = 0) { return nullptr; }
+        virtual std::vector<Maps::Tile::Position> GetPath(
+            const Maps::Tile::Position& startPosition, const Maps::Tile::Position& endPosition,
             bool hexgrid = false, bool allowDiagonalMovement = true
         ) {
             return {};

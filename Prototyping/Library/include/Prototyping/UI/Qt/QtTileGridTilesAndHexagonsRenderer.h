@@ -7,7 +7,7 @@
 #include "QtTile.h"
 #include "QtTileGridRenderer.h"
 
-namespace Prototyping::UI::Qt {
+namespace Simp1e::UI::Qt {
 
     class QtTileGridTilesAndHexagonsRenderer : public QtTileGridRenderer {
         UITileGrid::Config&                         _config;

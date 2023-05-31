@@ -10,7 +10,7 @@
 #include "QtTile.h"
 #include "QtTileGridRenderer.h"
 
-namespace Prototyping::UI::Qt {
+namespace Simp1e::UI::Qt {
 
     // TODO: padding support
     class QtTileGridRectangleRenderer : public QtTileGridRenderer {

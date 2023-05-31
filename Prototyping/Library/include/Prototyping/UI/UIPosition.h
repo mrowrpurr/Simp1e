@@ -2,6 +2,6 @@
 
 #include "UIPoint.h"
 
-namespace Prototyping::UI {
+namespace Simp1e::UI {
     typedef UIPoint UIPosition;
 }

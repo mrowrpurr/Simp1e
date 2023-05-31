@@ -24,7 +24,7 @@
 #include "QtTileGridTilesAndHexagonsRenderer.h"
 #include "QtView.h"
 
-namespace Prototyping::UI::Qt {
+namespace Simp1e::UI::Qt {
 
     class QtTileGrid : public UITileGrid {
         bool               _isAnimating = false;

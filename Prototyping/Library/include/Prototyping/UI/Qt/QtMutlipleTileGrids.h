@@ -9,7 +9,7 @@
 #include "../UITileGrid.h"
 #include "QtTileGrid.h"
 
-namespace Prototyping::UI::Qt {
+namespace Simp1e::UI::Qt {
 
     class QtMutlipleTileGrids : public UITileGrid {
         UITileGrid::Config                                          _config;

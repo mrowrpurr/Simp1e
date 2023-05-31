@@ -1,6 +1,6 @@
 #include "Prototyping/Qt.h"
 
-using namespace Prototyping;
+using namespace Simp1e;
 
 UI::UITileGridElement* player = nullptr;
 UI::UITileGridElement* inn    = nullptr;

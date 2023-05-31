@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace Prototyping::UI {
+namespace Simp1e::UI {
     class UISize {
         double _width  = 0;
         double _height = 0;

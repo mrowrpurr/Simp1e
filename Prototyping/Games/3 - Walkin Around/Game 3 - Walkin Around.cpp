@@ -1,6 +1,6 @@
 #include "Prototyping/Qt.h"
 
-using namespace Prototyping;
+using namespace Simp1e;
 
 UI::UITileGridElement* circle       = nullptr;
 UI::UITileGridElement* circleLayer2 = nullptr;
