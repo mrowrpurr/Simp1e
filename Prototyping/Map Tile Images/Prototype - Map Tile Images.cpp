@@ -1,4 +1,4 @@
-#include "Prototyping/Qt.h"
+#include <Simp1e/Qt.h>
 
 using namespace Simp1e;
 
