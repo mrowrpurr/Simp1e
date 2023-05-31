@@ -12,7 +12,7 @@
 #include "../Core/GameCircleCube.h"
 #include "../Core/GameCircleCubeInputHandler.h"
 
-namespace Prototyping::Games::CircleCube {
+namespace Simp1e::Games::CircleCube {
 
     struct QtGameCircleCubeSceneParams {
         uint32_t tileWidth       = 0;

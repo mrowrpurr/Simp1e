@@ -1,32 +1,33 @@
-#include "Prototyping/Qt.h"
+#include <Simp1e/UI/Qt/Maps.h>
 
-using namespace Prototyping;
+using namespace Simp1e::Maps;
+using namespace Simp1e::UI;
 
-UI::UITileGridElement* circle       = nullptr;
-UI::UITileGridElement* circleLayer2 = nullptr;
+UITileGridElement* circle       = nullptr;
+UITileGridElement* circleLayer2 = nullptr;
 
 int main() {
     TileGrid grid{20, 10};
 
-    auto uiGrid = UI::Qt::CreateMultiTileGrid({
+    auto uiGrid = Simp1e::UI::Qt::CreateMultiTileGrid({
         .grid = &grid,
     });
 
-    uiGrid->OnLeftClick([&](Tile::Position position) {
+    uiGrid->OnLeftClick([&](TilePosition position) {
         if (!circle) circle = uiGrid->AddCircle(position, {255, 0, 0}, 20);
         else uiGrid->AnimatedMoveElement(circle, position);
     });
     uiGrid->OnMiddleClick(
-        [&](Tile::Position position) {
+        [&](TilePosition position) {
             if (!circleLayer2) circleLayer2 = uiGrid->AddCircle(position, {0, 255, 0}, 30);
             else uiGrid->AnimatedMoveElement(circleLayer2, position);
         },
         1
     );
-    uiGrid->OnRightClick([&](Tile::Position position) {
+    uiGrid->OnRightClick([&](TilePosition position) {
         auto* element = uiGrid->AddCircle(position, {0, 0, 0}, 20);
         uiGrid->SetTileObstacle(position);
     });
 
-    return UI::Qt::Run();
+    return Simp1e::UI::Qt::Run();
 }

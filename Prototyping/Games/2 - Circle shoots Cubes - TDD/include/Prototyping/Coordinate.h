@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <functional>
 
-namespace Prototyping {
+namespace Simp1e {
 
     struct Coordinate {
         uint32_t x = 0;
@@ -17,8 +17,8 @@ namespace Prototyping {
 // TODO test
 namespace std {
     template <>
-    struct hash<Prototyping::Coordinate> {
-        size_t operator()(const Prototyping::Coordinate& coordinate) const {
+    struct hash<Simp1e::Coordinate> {
+        size_t operator()(const Simp1e::Coordinate& coordinate) const {
             return (hash<uint32_t>()(coordinate.x) ^ (hash<uint32_t>()(coordinate.y) << 1));
         }
     };

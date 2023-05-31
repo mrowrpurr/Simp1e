@@ -2,6 +2,6 @@
 
 #include "GameSpecHelper.h"
 
-namespace Prototyping::Games::CircleCube {}
+namespace Simp1e::Games::CircleCube {}
 
-using namespace Prototyping::Games::CircleCube;
+using namespace Simp1e::Games::CircleCube;

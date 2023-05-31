@@ -1,9 +1,10 @@
-#include "Prototyping/Qt.h"
+#include <Simp1e/UI/Qt/Maps.h>
 
-using namespace Prototyping;
+using namespace Simp1e::Maps;
+using namespace Simp1e::UI;
 
-UI::UITileGridElement* player = nullptr;
-UI::UITileGridElement* inn    = nullptr;
+UITileGridElement* player = nullptr;
+UITileGridElement* inn    = nullptr;
 
 int main() {
     std::filesystem::path imagesFolder{std::getenv("Openclipart")};
@@ -15,16 +16,18 @@ int main() {
 
     TileGrid grid{20, 10};
 
-    auto uiGrid = UI::Qt::CreateMultiTileGrid({
+    auto uiGrid = Simp1e::UI::Qt::CreateMultiTileGrid({
         .grid = &grid,
     });
 
-    uiGrid->OnLeftClick([&](Tile::Position position) {
-        if (!player) player = uiGrid->AddImage(position, knight);
-        else uiGrid->AnimatedMoveElement(player, position);
+    uiGrid->OnLeftClick([&](TilePosition position) {
+        //
+        if (!inn) inn = uiGrid->AddImage(position, innBuilding);
+        else uiGrid->AnimatedMoveElement(inn, position);
     });
-    uiGrid->OnRightClick([&](Tile::Position position) { uiGrid->AddImage(position, road, true); });
-    uiGrid->OnMiddleClick([&](Tile::Position position) { uiGrid->AddImage(position, tree); });
+    uiGrid->OnRightClick([&](TilePosition position) {
+        if (inn) uiGrid->SetMoveModeEnabled(inn, true);
+    });
 
-    return UI::Qt::Run();
+    return Simp1e::UI::Qt::Run();
 }
