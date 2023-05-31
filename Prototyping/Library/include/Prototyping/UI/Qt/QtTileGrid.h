@@ -339,12 +339,12 @@ namespace Prototyping::UI::Qt {
             auto image  = new QtImage(imagePath.string().c_str());
             image->SetPolygon(bounds);
             image->SetResize(true);
-            if (angleTile && _config.renderingStyle == RenderingStyle::Isometric ||
-                (_config.renderingStyle == RenderingStyle::IsometricWithHexagons && position.z == 0
-                )) {
-                qDebug() << "Rotating image 45 degrees";
-                image->SetRotate(-45);
+            if (angleTile) {
+                if (_config.renderingStyle == RenderingStyle::Isometric) image->SetRotate(-45);
+                else if (_config.renderingStyle == RenderingStyle::IsometricWithHexagons && position.z == 0)
+                    image->SetRotate(45);
             }
+
             image->setPos(
                 center.x() - static_cast<uint32_t>(image->GetWidth() / 2),
                 center.y() - static_cast<uint32_t>(image->GetHeight() / 2)

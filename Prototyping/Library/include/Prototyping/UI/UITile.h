@@ -2,7 +2,8 @@
 
 #include <string>
 
-#include "../Tile.h"
+#include <Simp1e/Maps/Tile.h>
+
 #include "UIColor.h"
 #include "UIImage.h"
 

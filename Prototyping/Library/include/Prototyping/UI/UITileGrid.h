@@ -1,11 +1,12 @@
 #pragma once
 
+#include <Simp1e/Maps/Tile.h>
 #include <QWidget>
 #include <filesystem>
 #include <functional>
 
-#include "../Tile.h"
-#include "../TileGrid.h"
+#include <Simp1e/Maps/TileGrid.h>
+
 #include "UIColor.h"
 #include "UIImage.h"
 #include "UITile.h"

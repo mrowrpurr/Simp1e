@@ -1,11 +1,12 @@
 #pragma once
 
+#include <Simp1e/Maps/TileGrid.h>
+
 #include <algorithm>
 #include <cmath>
 #include <utility>
 #include <vector>
 
-#include "../TileGrid.h"
 #include "AStarTile.h"
 
 namespace Prototyping::AStar {

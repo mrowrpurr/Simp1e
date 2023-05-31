@@ -1,10 +1,11 @@
 #pragma once
 
+#include <Simp1e/Maps/Tile.h>
+#include <Simp1e/Maps/TileGrid.h>
+
 #include <QPolygonF>
 #include <unordered_map>
 
-#include "../../Tile.h"
-#include "../../TileGrid.h"
 #include "../UIPosition.h"
 #include "../UISize.h"
 #include "../UITile.h"

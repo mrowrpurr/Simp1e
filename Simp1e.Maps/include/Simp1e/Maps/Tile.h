@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <functional>
 
-namespace Prototyping {
+namespace Simp1e::Maps {
     class Tile {
     public:
         // TODO make this a class and replce all .x with .x() etc
@@ -43,8 +43,8 @@ namespace Prototyping {
 namespace std {
 
     template <>
-    struct hash<Prototyping::Tile::Position> {
-        std::size_t operator()(const Prototyping::Tile::Position& pos) const {
+    struct hash<Simp1e::Maps::Tile::Position> {
+        std::size_t operator()(const Simp1e::Maps::Tile::Position& pos) const {
             std::size_t h1 = std::hash<uint32_t>{}(pos.x);
             std::size_t h2 = std::hash<uint32_t>{}(pos.y);
             std::size_t h3 = std::hash<uint32_t>{}(pos.z);

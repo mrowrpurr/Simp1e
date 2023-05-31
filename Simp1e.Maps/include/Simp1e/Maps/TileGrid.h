@@ -6,7 +6,7 @@
 
 #include "Tile.h"
 
-namespace Prototyping {
+namespace Simp1e::Maps {
     class TileGrid {
         uint32_t                                        _layer   = 0;
         uint32_t                                        _rows    = 0;

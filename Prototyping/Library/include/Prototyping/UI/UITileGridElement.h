@@ -1,9 +1,9 @@
 #pragma once
 
+#include <Simp1e/Maps/Tile.h>
+
 #include <any>
 #include <cstdint>
-
-#include "../Tile.h"
 
 namespace Prototyping::UI {
 

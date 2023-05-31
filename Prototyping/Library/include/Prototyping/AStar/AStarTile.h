@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Tile.h"
+#include <Simp1e/Maps/Tile.h>
 
 namespace Prototyping::AStar {
     struct AStarTile {
