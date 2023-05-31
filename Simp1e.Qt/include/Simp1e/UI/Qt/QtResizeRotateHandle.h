@@ -31,14 +31,14 @@ namespace Simp1e::UI::Qt {
         };
 
     private:
-        QColor                                   _color{::Qt::black};
-        QRectF                                   _boundingBox{0, 0, 10, 10};
-        HandleResponsibility                     _responsibility;
-        HandlePosition                           _position;
-        QPointF                                  _resizeInitialMousePos;
-        QRectF                                   _resizeInitialBoundingBox;
-        qreal                                    _resizeInitialRotation = 0;
-        std::vector<std::function<void(QRectF)>> _onResizeCallbacks;
+        QColor                                          _color{::Qt::black};
+        QRectF                                          _boundingBox{0, 0, 10, 10};
+        HandleResponsibility                            _responsibility;
+        HandlePosition                                  _position;
+        QPointF                                         _resizeInitialMousePos;
+        QRectF                                          _resizeInitialBoundingBox;
+        qreal                                           _resizeInitialRotation = 0;
+        std::vector<std::function<void(QRectF, qreal)>> _onResizeCallbacks;
 
         ::Qt::CursorShape GetCursorShape() const {
             switch (_position) {
@@ -80,7 +80,7 @@ namespace Simp1e::UI::Qt {
 
         void SetColor(const QColor& color) { _color = color; }
         void SetSize(const QSizeF& size) { _boundingBox.setSize(size); }
-        void OnResize(std::function<void(QRectF)> callback) {
+        void OnResize(std::function<void(QRectF, qreal)> callback) {
             _onResizeCallbacks.push_back(callback);
         }
 
@@ -100,6 +100,7 @@ namespace Simp1e::UI::Qt {
             if (event->buttons() != ::Qt::MouseButton::LeftButton)
                 return QGraphicsItem::mousePressEvent(event);
 
+            _resizeInitialRotation    = parentItem()->rotation();
             _resizeInitialMousePos    = event->scenePos();
             _resizeInitialBoundingBox = parentItem()->boundingRect();
             event->accept();
@@ -115,12 +116,14 @@ namespace Simp1e::UI::Qt {
             if (i % 2 != 0) {
                 _resizeInitialMousePos    = event->scenePos();
                 _resizeInitialBoundingBox = parentItem()->boundingRect();
+                _resizeInitialRotation    = parentItem()->rotation();
             }
 
-            QPointF dragPos = event->scenePos();
-            qreal   dx      = dragPos.x() - _resizeInitialMousePos.x();
-            qreal   dy      = dragPos.y() - _resizeInitialMousePos.y();
-            QRectF  newRect = _resizeInitialBoundingBox;
+            QPointF dragPos     = event->scenePos();
+            qreal   dx          = dragPos.x() - _resizeInitialMousePos.x();
+            qreal   dy          = dragPos.y() - _resizeInitialMousePos.y();
+            QRectF  newRect     = _resizeInitialBoundingBox;
+            qreal   newRotation = _resizeInitialRotation;
 
             switch (_position) {
                 case HandlePosition::TopLeft:
@@ -150,7 +153,7 @@ namespace Simp1e::UI::Qt {
 
                 case HandlePosition::TopRotation:
                 case HandlePosition::BottomRotation:
-                    // TODO: Rotation
+                    newRotation += dx;
                     break;
 
                 default:
@@ -163,7 +166,7 @@ namespace Simp1e::UI::Qt {
             if (newRect.width() < 10.0) newRect.setWidth(10.0);
             if (newRect.height() < 10.0) newRect.setHeight(10.0);
 
-            for (auto& callback : _onResizeCallbacks) callback(newRect);
+            for (auto& callback : _onResizeCallbacks) callback(newRect, newRotation);
 
             event->accept();
         }

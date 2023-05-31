@@ -12,11 +12,13 @@ namespace Simp1e::UI::Qt {
         uint32_t         _padding = 20;
         std::unordered_map<QtResizeRotateHandle::HandlePosition, QtResizeRotateHandle*> _handles;
 
-        void OnResize(QRectF boundingBox) {
+        void OnResize(QRectF boundingBox, qreal rotation) {
             qDebug() << "Resize " << boundingBox;
             _parent->SetBoundingBox(boundingBox);
             _parent->UpdateBorder();
-            qDebug() << "parent now has bounding box of " << _parent->GetBoundingBox();
+            _parent->setRotation(rotation);
+            qDebug() << "parent now has bounding box of " << _parent->GetBoundingBox()
+                     << " and rotation of " << _parent->rotation();
             RepositionHandles(boundingBox);
         }
 
@@ -30,7 +32,9 @@ namespace Simp1e::UI::Qt {
                 handle->SetColor(::Qt::red);
             handle->setEnabled(true);
             _handles[position] = handle;
-            handle->OnResize([this](QRectF boundingBox) { OnResize(boundingBox); });
+            handle->OnResize([this](QRectF boundingBox, qreal rotation) {
+                OnResize(boundingBox, rotation);
+            });
         }
 
         void CreateResizerHandles() {
