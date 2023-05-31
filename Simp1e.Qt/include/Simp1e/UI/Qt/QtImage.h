@@ -27,7 +27,6 @@ namespace Simp1e::UI::Qt {
     public:
         QtImage(const QString& imagePath = "", QGraphicsItem* parent = nullptr)
             : QtGraphicsItem(parent) {
-            qDebug() << "QtImage::QtImage() " << imagePath;
             if (!imagePath.isEmpty()) SetImage(imagePath);
         }
 
@@ -39,7 +38,6 @@ namespace Simp1e::UI::Qt {
         }
 
         void SetSize(int width, int height) {
-            qDebug() << "QtImage::SetSize() " << width << "x" << height;
             if (width > 0 && height > 0 && (_width != width || _height != height)) {
                 _width        = width;
                 _height       = height;
@@ -75,8 +73,6 @@ namespace Simp1e::UI::Qt {
 
         void UpdateImage() {
             if (_imageChanged && _transformedImage) {
-                qDebug() << "QtImage::UpdateImage() " << _imagePath;
-
                 auto startingBoundingBox = _transformedImage->rect();
 
                 // if (_resize) {
@@ -147,14 +143,11 @@ namespace Simp1e::UI::Qt {
         void SetImage(const QString& imagePath) {
             if (imagePath.isEmpty()) return;
             if (!QFile::exists(imagePath)) return;
-            _imagePath = imagePath;  // just for logging
-            qDebug() << "QtImage::SetImage() loading image " << imagePath;
+            _imagePath        = imagePath;  // just for logging
             _originalImage    = QPixmap{imagePath};
             _transformedImage = std::make_unique<QPixmap>(_originalImage);
-            qDebug() << "QtImage::SetImage() loaded image " << imagePath << " "
-                     << _transformedImage->size();
-            _width  = _transformedImage->width();
-            _height = _transformedImage->height();
+            _width            = _transformedImage->width();
+            _height           = _transformedImage->height();
         }
 
         void SetImage(QPixmap image) {
@@ -165,7 +158,6 @@ namespace Simp1e::UI::Qt {
         void SetBoundingBox(const QRectF& boundingBox) override {
             QtGraphicsItem::SetBoundingBox(boundingBox);
             SetSize(boundingBox.width(), boundingBox.height());
-            qDebug() << "QtImage::SetBoundingBox() " << boundingBox;
             UpdateImage();
         }
 

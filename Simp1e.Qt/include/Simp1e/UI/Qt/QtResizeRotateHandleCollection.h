@@ -13,12 +13,9 @@ namespace Simp1e::UI::Qt {
         std::unordered_map<QtResizeRotateHandle::HandlePosition, QtResizeRotateHandle*> _handles;
 
         void OnResize(QRectF boundingBox, qreal rotation) {
-            qDebug() << "Resize " << boundingBox;
             _parent->SetBoundingBox(boundingBox);
             _parent->UpdateBorder();
             _parent->setRotation(rotation);
-            qDebug() << "parent now has bounding box of " << _parent->GetBoundingBox()
-                     << " and rotation of " << _parent->rotation();
             RepositionHandles(boundingBox);
         }
 
@@ -94,34 +91,42 @@ namespace Simp1e::UI::Qt {
         void Deactivate() { DestroyAllHandles(); }
 
         void RepositionHandles(QRectF itemBoundingBox) {
-            _handles[QtResizeRotateHandle::HandlePosition::Top]->setPos(
-                itemBoundingBox.left() + itemBoundingBox.width() / 2,
-                itemBoundingBox.top() - _padding
-            );
-            _handles[QtResizeRotateHandle::HandlePosition::Bottom]->setPos(
-                itemBoundingBox.left() + itemBoundingBox.width() / 2,
-                itemBoundingBox.bottom() + _padding
-            );
-            _handles[QtResizeRotateHandle::HandlePosition::Left]->setPos(
-                itemBoundingBox.left() - _padding,
-                itemBoundingBox.top() + itemBoundingBox.height() / 2
-            );
-            _handles[QtResizeRotateHandle::HandlePosition::Right]->setPos(
-                itemBoundingBox.right() + _padding,
-                itemBoundingBox.top() + itemBoundingBox.height() / 2
-            );
-            _handles[QtResizeRotateHandle::HandlePosition::TopLeft]->setPos(
-                itemBoundingBox.left() - _padding, itemBoundingBox.top() - _padding
-            );
-            _handles[QtResizeRotateHandle::HandlePosition::TopRight]->setPos(
-                itemBoundingBox.right() + _padding, itemBoundingBox.top() - _padding
-            );
-            _handles[QtResizeRotateHandle::HandlePosition::BottomLeft]->setPos(
-                itemBoundingBox.left() - _padding, itemBoundingBox.bottom() + _padding
-            );
-            _handles[QtResizeRotateHandle::HandlePosition::BottomRight]->setPos(
-                itemBoundingBox.right() + _padding, itemBoundingBox.bottom() + _padding
-            );
+            if (_handles.contains(QtResizeRotateHandle::HandlePosition::Top))
+                _handles[QtResizeRotateHandle::HandlePosition::Top]->setPos(
+                    itemBoundingBox.left() + itemBoundingBox.width() / 2,
+                    itemBoundingBox.top() - _padding
+                );
+            if (_handles.contains(QtResizeRotateHandle::HandlePosition::Bottom))
+                _handles[QtResizeRotateHandle::HandlePosition::Bottom]->setPos(
+                    itemBoundingBox.left() + itemBoundingBox.width() / 2,
+                    itemBoundingBox.bottom() + _padding
+                );
+            if (_handles.contains(QtResizeRotateHandle::HandlePosition::Left))
+                _handles[QtResizeRotateHandle::HandlePosition::Left]->setPos(
+                    itemBoundingBox.left() - _padding,
+                    itemBoundingBox.top() + itemBoundingBox.height() / 2
+                );
+            if (_handles.contains(QtResizeRotateHandle::HandlePosition::Right))
+                _handles[QtResizeRotateHandle::HandlePosition::Right]->setPos(
+                    itemBoundingBox.right() + _padding,
+                    itemBoundingBox.top() + itemBoundingBox.height() / 2
+                );
+            if (_handles.contains(QtResizeRotateHandle::HandlePosition::TopLeft))
+                _handles[QtResizeRotateHandle::HandlePosition::TopLeft]->setPos(
+                    itemBoundingBox.left() - _padding, itemBoundingBox.top() - _padding
+                );
+            if (_handles.contains(QtResizeRotateHandle::HandlePosition::TopRight))
+                _handles[QtResizeRotateHandle::HandlePosition::TopRight]->setPos(
+                    itemBoundingBox.right() + _padding, itemBoundingBox.top() - _padding
+                );
+            if (_handles.contains(QtResizeRotateHandle::HandlePosition::BottomLeft))
+                _handles[QtResizeRotateHandle::HandlePosition::BottomLeft]->setPos(
+                    itemBoundingBox.left() - _padding, itemBoundingBox.bottom() + _padding
+                );
+            if (_handles.contains(QtResizeRotateHandle::HandlePosition::BottomRight))
+                _handles[QtResizeRotateHandle::HandlePosition::BottomRight]->setPos(
+                    itemBoundingBox.right() + _padding, itemBoundingBox.bottom() + _padding
+                );
             if (_handles.find(QtResizeRotateHandle::HandlePosition::TopRotation) != _handles.end())
                 _handles[QtResizeRotateHandle::HandlePosition::TopRotation]->setPos(
                     itemBoundingBox.left() + itemBoundingBox.width() / 2,

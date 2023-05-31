@@ -29,7 +29,7 @@ int main() {
             resizingPlayer = !resizingPlayer;
             uiGrid->SetResizeModeEnabled(player, resizingPlayer);
             uiGrid->SetRotateModeEnabled(player, resizingPlayer);
-            uiGrid->SetMoveModeEnabled(player, resizingPlayer);
+            // uiGrid->SetMoveModeEnabled(player, resizingPlayer);
         }
     });
 

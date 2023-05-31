@@ -150,12 +150,12 @@ namespace Simp1e::UI::Qt {
                 case HandlePosition::Right:
                     newRect.setRight(newRect.right() + dx);
                     break;
-
                 case HandlePosition::TopRotation:
-                case HandlePosition::BottomRotation:
                     newRotation += dx;
                     break;
-
+                case HandlePosition::BottomRotation:
+                    newRotation -= dx;
+                    break;
                 default:
                     break;
             }
