@@ -27,6 +27,8 @@ int main() {
     uiGrid->OnRightClick([&](TilePosition position) {
         if (player) {
             resizingPlayer = !resizingPlayer;
+            uiGrid->SetResizeModeEnabled(player, resizingPlayer);
+            uiGrid->SetRotateModeEnabled(player, resizingPlayer);
             uiGrid->SetMoveModeEnabled(player, resizingPlayer);
         }
     });
