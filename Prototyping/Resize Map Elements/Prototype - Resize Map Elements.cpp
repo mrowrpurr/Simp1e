@@ -3,8 +3,9 @@
 using namespace Simp1e::Maps;
 using namespace Simp1e::UI;
 
-UITileGridElement* player = nullptr;
-UITileGridElement* inn    = nullptr;
+bool               playerBorderVisible = false;
+UITileGridElement* player              = nullptr;
+UITileGridElement* inn                 = nullptr;
 
 int main() {
     std::filesystem::path imagesFolder{std::getenv("Openclipart")};
@@ -21,12 +22,13 @@ int main() {
     });
 
     uiGrid->OnLeftClick([&](TilePosition position) {
-        //
-        if (!inn) inn = uiGrid->AddImage(position, innBuilding);
-        else uiGrid->AnimatedMoveElement(inn, position);
+        if (!player) player = uiGrid->AddImage(position, knight);
     });
     uiGrid->OnRightClick([&](TilePosition position) {
-        if (inn) uiGrid->SetMoveModeEnabled(inn, true);
+        if (player) {
+            playerBorderVisible = !playerBorderVisible;
+            uiGrid->SetBorder(player, playerBorderVisible, {255, 0, 255}, UILineStyle::Dotted);
+        }
     });
 
     return Simp1e::UI::Qt::Run();

@@ -111,7 +111,7 @@ namespace Simp1e::UI::Qt {
 
                 _imageChanged = false;
 
-                updateBorder();
+                UpdateBorder();
             }
         }
 

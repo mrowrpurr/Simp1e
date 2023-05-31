@@ -4,62 +4,52 @@
 #include <QGraphicsRectItem>
 #include <QPen>
 
+#include "IQtGraphicsItem.h"
 #include "QtMoveableResizableGraphicsItem.h"
+#include "QtUI.h"
 
 namespace Simp1e::UI::Qt {
 
-    class QtGraphicsItem : public QGraphicsItem {
+    class QtGraphicsItem : public IQtGraphicsItem {
+        QGraphicsRectItem* _borderRectItem;
+
     public:
         QtGraphicsItem(QGraphicsItem* parent = nullptr)
-            : QGraphicsItem(parent), borderItem(nullptr) {
+            : IQtGraphicsItem(parent), _borderRectItem(nullptr) {
             setFlags(QGraphicsItem::ItemIsMovable);
-
-            // Testing!
-            SetBorderVisible(true);
-        }
-
-        void SetBorderVisible(bool visible) {
-            if (visible && borderItem == nullptr) {
-                borderItem = new QGraphicsRectItem(this);
-                borderItem->setPen(QPen(::Qt::red, 1, ::Qt::DashLine));
-                borderItem->setZValue(zValue() - 1);
-                updateBorder();
-            } else if (!visible && borderItem != nullptr) {
-                delete borderItem;
-                borderItem = nullptr;
-            }
         }
 
         QRectF GetBoundingBox() const { return boundingRect(); }
+
+        bool SetBorder(bool enabled, UIColor color = {}, UILineStyle style = UILineStyle::Solid)
+            override {
+            if (_borderRectItem) {
+                delete _borderRectItem;
+                _borderRectItem = nullptr;
+            }
+            if (enabled) {
+                _borderRectItem = new QGraphicsRectItem(this);
+                _borderRectItem->setPen(QPen(ToQColor(color), 1, ToQtPenStyle(style)));
+                UpdateBorder();
+            }
+            return true;
+        }
+
+        void UpdateBorder() {
+            if (_borderRectItem != nullptr) {
+                _borderRectItem->setRect(boundingRect());
+            }
+        }
 
     protected:
         QVariant itemChange(GraphicsItemChange change, const QVariant& value) override {
             if ((change == QGraphicsItem::ItemPositionHasChanged ||
                  change == QGraphicsItem::ItemScaleHasChanged) &&
-                borderItem != nullptr) {
-                updateBorder();
+                _borderRectItem != nullptr) {
+                UpdateBorder();
             }
 
             return QGraphicsItem::itemChange(change, value);
         }
-
-        void updateBorder() {
-            if (borderItem != nullptr) {
-                borderItem->setRect(boundingRect());
-            }
-        }
-
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
-            override {
-            // Empty implementation for MyBaseItem
-        }
-
-        QRectF boundingRect() const override {
-            // Return default QRectF for MyBaseItem. It should be overridden in derived classes.
-            return QRectF();
-        }
-
-    private:
-        QGraphicsRectItem* borderItem;
     };
 }

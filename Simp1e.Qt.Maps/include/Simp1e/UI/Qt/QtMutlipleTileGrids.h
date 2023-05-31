@@ -134,6 +134,22 @@ namespace Simp1e::UI::Qt {
             }
         }
 
+        // TODO refactor the bit about getting the element into some helper plz
+        bool SetBorder(
+            UITileGridElement* element, bool enabled, UIColor color = {},
+            UILineStyle style = UILineStyle::Solid
+        ) override {
+            try {
+                auto elements =
+                    std::any_cast<std::vector<UITileGridElement*>>(element->GetElement());
+                for (size_t i = 0; i < _qtTileGrids.size(); ++i)
+                    _qtTileGrids[i]->SetBorder(elements.at(i), enabled, color, style);
+                return true;
+            } catch (const std::bad_any_cast&) {
+                return false;
+            }
+        }
+
         bool OnLeftClick(std::function<void(const Maps::TilePosition&)> handler, uint32_t layer)
             override {
             for (auto& tileGrid : _qtTileGrids) tileGrid->OnLeftClick(handler, layer);

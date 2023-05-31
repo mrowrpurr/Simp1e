@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Simp1e/Maps/Tile.h>
+#include <Simp1e/UI/UILineStyle.h>
 #include <QWidget>
 #include <filesystem>
 #include <functional>
@@ -75,6 +76,12 @@ namespace Simp1e::UI {
             return false;
         }
         virtual bool SetRotateModeEnabled(UITileGridElement* element, bool enabled = true) {
+            return false;
+        }
+        virtual bool SetBorder(
+            UITileGridElement* element, bool enabled, UIColor color = {},
+            UILineStyle style = UILineStyle::Solid
+        ) {
             return false;
         }
         virtual UITileGridElement* AddCircle(
