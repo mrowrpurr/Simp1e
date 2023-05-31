@@ -3,6 +3,7 @@
 #include <QCursor>
 #include <QEvent>
 #include <QGraphicsItem>
+#include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 #include <functional>
 #include <vector>
@@ -30,12 +31,14 @@ namespace Simp1e::UI::Qt {
         };
 
     private:
-        QColor                                                  _color{::Qt::black};
-        QRectF                                                  _boundingBox{0, 0, 10, 10};
-        HandleResponsibility                                    _responsibility;
-        HandlePosition                                          _position;
-        std::vector<std::function<void(QtResizeRotateHandle*)>> _onMouseEnterCallbacks;
-        std::vector<std::function<void(QtResizeRotateHandle*)>> _onMouseLeaveCallbacks;
+        QColor                                   _color{::Qt::black};
+        QRectF                                   _boundingBox{0, 0, 10, 10};
+        HandleResponsibility                     _responsibility;
+        HandlePosition                           _position;
+        QPointF                                  _resizeInitialMousePos;
+        QRectF                                   _resizeInitialBoundingBox;
+        qreal                                    _resizeInitialRotation = 0;
+        std::vector<std::function<void(QRectF)>> _onResizeCallbacks;
 
         ::Qt::CursorShape GetCursorShape() const {
             switch (_position) {
@@ -65,9 +68,8 @@ namespace Simp1e::UI::Qt {
 
     public:
         QtResizeRotateHandle(
-            HandlePosition       position,
-            HandleResponsibility responsibility = HandleResponsibility::Resize,
-            QGraphicsItem*       parent         = nullptr
+            QGraphicsItem* parent, HandlePosition position,
+            HandleResponsibility responsibility = HandleResponsibility::Resize
         )
             : _position(position), _responsibility(responsibility), QGraphicsItem(parent) {
             setAcceptHoverEvents(true);
@@ -78,12 +80,8 @@ namespace Simp1e::UI::Qt {
 
         void SetColor(const QColor& color) { _color = color; }
         void SetSize(const QSizeF& size) { _boundingBox.setSize(size); }
-
-        void OnMouseEnter(std::function<void(QtResizeRotateHandle*)> callback) {
-            _onMouseEnterCallbacks.push_back(callback);
-        }
-        void OnMouseLeave(std::function<void(QtResizeRotateHandle*)> callback) {
-            _onMouseLeaveCallbacks.push_back(callback);
+        void OnResize(std::function<void(QRectF)> callback) {
+            _onResizeCallbacks.push_back(callback);
         }
 
     protected:
@@ -98,5 +96,67 @@ namespace Simp1e::UI::Qt {
             setCursor(QCursor(GetCursorShape()));
         }
         void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override { unsetCursor(); }
+        void mousePressEvent(QGraphicsSceneMouseEvent* event) override {
+            if (event->buttons() != ::Qt::MouseButton::LeftButton)
+                return QGraphicsItem::mousePressEvent(event);
+
+            _resizeInitialMousePos    = event->scenePos();
+            _resizeInitialBoundingBox = parentItem()->boundingRect();
+            event->accept();
+        }
+        void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override {
+            if (event->buttons() != ::Qt::MouseButton::LeftButton)
+                return QGraphicsItem::mouseMoveEvent(event);
+
+            QPointF dragPos = event->scenePos();
+            qreal   dx      = dragPos.x() - _resizeInitialMousePos.x();
+            qreal   dy      = dragPos.y() - _resizeInitialMousePos.y();
+            QRectF  newRect = _resizeInitialBoundingBox;
+
+            switch (_position) {
+                case HandlePosition::TopLeft:
+                    newRect.setTopLeft(newRect.topLeft() + QPointF(dx, dy));
+                    break;
+                case HandlePosition::TopRight:
+                    newRect.setTopRight(newRect.topRight() + QPointF(dx, dy));
+                    break;
+                case HandlePosition::BottomLeft:
+                    newRect.setBottomLeft(newRect.bottomLeft() + QPointF(dx, dy));
+                    break;
+                case HandlePosition::BottomRight:
+                    newRect.setBottomRight(newRect.bottomRight() + QPointF(dx, dy));
+                    break;
+                case HandlePosition::Top:
+                    newRect.setTop(newRect.top() + dy);
+                    break;
+                case HandlePosition::Bottom:
+                    newRect.setBottom(newRect.bottom() + dy);
+                    break;
+                case HandlePosition::Left:
+                    newRect.setLeft(newRect.left() + dx);
+                    break;
+                case HandlePosition::Right:
+                    newRect.setRight(newRect.right() + dx);
+                    break;
+
+                case HandlePosition::TopRotation:
+                case HandlePosition::BottomRotation:
+                    // TODO: Rotation
+                    break;
+
+                default:
+                    break;
+            }
+
+            // TODO: maintain aspect ratio
+
+            // Prevent inverting rectangle when dragging past the opposite edge
+            if (newRect.width() < 10.0) newRect.setWidth(10.0);
+            if (newRect.height() < 10.0) newRect.setHeight(10.0);
+
+            for (auto& callback : _onResizeCallbacks) callback(newRect);
+
+            event->accept();
+        }
     };
 }

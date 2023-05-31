@@ -63,9 +63,5 @@ namespace Simp1e::UI::Qt {
             }
             return true;
         }
-
-        virtual void Resize(QRectF) {}
-        virtual void Rotate(int) {}
-        virtual void Move(QPointF) {}
     };
 }

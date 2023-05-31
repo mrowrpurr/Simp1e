@@ -8,12 +8,22 @@
 
 namespace Simp1e::UI::Qt {
 
-    struct IQtGraphicsItem : public QGraphicsItem {
+    class IQtGraphicsItem : public QGraphicsItem {
+        QRectF _boundingBox;
+
+    public:
         IQtGraphicsItem(QGraphicsItem* parent = nullptr) : QGraphicsItem(parent) {}
         virtual ~IQtGraphicsItem() = default;
 
         virtual QRectF GetBoundingBox() { return boundingRect(); }
-
+        virtual void   SetBoundingBox(const QRectF& boundingBox) {
+            _boundingBox = boundingBox;
+            OnSizeChanged();
+        }
+        virtual void OnSizeChanged() {
+            qDebug() << "IQtGraphicsItem::OnSizeChanged() " << _boundingBox;
+            UpdateBorder();
+        }
         virtual bool SetBorder(
             bool enabled, UIColor color = {}, UILineStyle style = UILineStyle::Solid
         ) {
@@ -30,6 +40,6 @@ namespace Simp1e::UI::Qt {
     protected:
         void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
             override {}
-        QRectF boundingRect() const override { return {}; }
+        QRectF boundingRect() const override { return _boundingBox; }
     };
 }

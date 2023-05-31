@@ -33,14 +33,14 @@ namespace Simp1e::UI::Qt {
             if (_borderRectItem != nullptr) _borderRectItem->setRect(boundingRect());
         }
 
-    protected:
-        QVariant itemChange(GraphicsItemChange change, const QVariant& value) override {
-            if ((change == QGraphicsItem::ItemPositionHasChanged ||
-                 change == QGraphicsItem::ItemScaleHasChanged) &&
-                _borderRectItem != nullptr) {
-                UpdateBorder();
-            }
-            return QGraphicsItem::itemChange(change, value);
-        }
+        // protected:
+        //     QVariant itemChange(GraphicsItemChange change, const QVariant& value) override {
+        //         if ((change == QGraphicsItem::ItemPositionHasChanged ||
+        //              change == QGraphicsItem::ItemScaleHasChanged) &&
+        //             _borderRectItem != nullptr) {
+        //             UpdateBorder();
+        //         }
+        //         return QGraphicsItem::itemChange(change, value);
+        //     }
     };
 }

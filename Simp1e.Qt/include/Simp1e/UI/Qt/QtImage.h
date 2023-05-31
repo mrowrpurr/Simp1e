@@ -38,6 +38,7 @@ namespace Simp1e::UI::Qt {
         }
 
         void SetSize(int width, int height) {
+            qDebug() << "QtImage::SetSize() " << width << "x" << height;
             if (width > 0 && height > 0 && (_width != width || _height != height)) {
                 _width        = width;
                 _height       = height;
@@ -75,11 +76,11 @@ namespace Simp1e::UI::Qt {
             if (_imageChanged && _transformedImage) {
                 qDebug() << "QtImage::UpdateImage() " << _imagePath;
 
-                if (_resize) {
-                    _transformedImage = std::make_unique<QPixmap>(
-                        _transformedImage->scaled(_width, _height, ::Qt::KeepAspectRatio)
-                    );
-                }
+                // if (_resize) {
+                _transformedImage = std::make_unique<QPixmap>(
+                    _transformedImage->scaled(_width, _height)  // , ::Qt::KeepAspectRatio)
+                );
+                // }
 
                 QTransform transform;
                 transform.rotate(_rotation);
@@ -145,6 +146,13 @@ namespace Simp1e::UI::Qt {
         }
 
         void SetImage(QPixmap image) { _transformedImage = std::make_unique<QPixmap>(image); }
+
+        void SetBoundingBox(const QRectF& boundingBox) override {
+            QtGraphicsItem::SetBoundingBox(boundingBox);
+            SetSize(boundingBox.width(), boundingBox.height());
+            qDebug() << "QtImage::SetBoundingBox() " << boundingBox;
+            UpdateImage();
+        }
 
         QRectF boundingRect() const override {
             return _transformedImage ? _transformedImage->rect() : QRectF();
