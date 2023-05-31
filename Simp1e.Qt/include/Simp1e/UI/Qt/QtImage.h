@@ -11,6 +11,7 @@
 
 namespace Simp1e::UI::Qt {
     class QtImage : public QtGraphicsItem {
+        QPixmap                  _originalImage;
         QString                  _imagePath;
         std::unique_ptr<QPixmap> _transformedImage;
 
@@ -76,9 +77,11 @@ namespace Simp1e::UI::Qt {
             if (_imageChanged && _transformedImage) {
                 qDebug() << "QtImage::UpdateImage() " << _imagePath;
 
+                auto startingBoundingBox = _transformedImage->rect();
+
                 // if (_resize) {
                 _transformedImage = std::make_unique<QPixmap>(
-                    _transformedImage->scaled(_width, _height)  // , ::Qt::KeepAspectRatio)
+                    _originalImage.scaled(_width, _height)  // , ::Qt::KeepAspectRatio)
                 );
                 // }
 
@@ -112,6 +115,14 @@ namespace Simp1e::UI::Qt {
 
                 _imageChanged = false;
 
+                // Change the position so that the image stays in the same place
+                auto newBoundingBox = _transformedImage->rect();
+                auto heightChange   = newBoundingBox.height() - startingBoundingBox.height();
+                auto widthChange    = newBoundingBox.width() - startingBoundingBox.width();
+
+                // setPos so that the bottom left of the image stays in the same place
+                setPos(pos().x() - widthChange / 2, pos().y() - heightChange);
+
                 UpdateBorder();
             }
         }
@@ -138,14 +149,18 @@ namespace Simp1e::UI::Qt {
             if (!QFile::exists(imagePath)) return;
             _imagePath = imagePath;  // just for logging
             qDebug() << "QtImage::SetImage() loading image " << imagePath;
-            _transformedImage = std::make_unique<QPixmap>(imagePath);
+            _originalImage    = QPixmap{imagePath};
+            _transformedImage = std::make_unique<QPixmap>(_originalImage);
             qDebug() << "QtImage::SetImage() loaded image " << imagePath << " "
                      << _transformedImage->size();
             _width  = _transformedImage->width();
             _height = _transformedImage->height();
         }
 
-        void SetImage(QPixmap image) { _transformedImage = std::make_unique<QPixmap>(image); }
+        void SetImage(QPixmap image) {
+            _originalImage    = image;
+            _transformedImage = std::make_unique<QPixmap>(image);
+        }
 
         void SetBoundingBox(const QRectF& boundingBox) override {
             QtGraphicsItem::SetBoundingBox(boundingBox);

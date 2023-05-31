@@ -104,9 +104,18 @@ namespace Simp1e::UI::Qt {
             _resizeInitialBoundingBox = parentItem()->boundingRect();
             event->accept();
         }
+
+        int i = 0;
+
         void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override {
             if (event->buttons() != ::Qt::MouseButton::LeftButton)
                 return QGraphicsItem::mouseMoveEvent(event);
+
+            i++;
+            if (i % 2 != 0) {
+                _resizeInitialMousePos    = event->scenePos();
+                _resizeInitialBoundingBox = parentItem()->boundingRect();
+            }
 
             QPointF dragPos = event->scenePos();
             qreal   dx      = dragPos.x() - _resizeInitialMousePos.x();
