@@ -6,9 +6,10 @@ add_requires_for_logging()
 add_requires_for_string_formatting()
 add_requires_for_specs()
 includes("Simp1e*/xmake.lua")
-includes("Prototyping/xmake.lua")
--- includes("Tests/xmake.lua")
+includes("Prototyping/**/xmake.lua")
 
+-- TODO : bring back testing
+-- includes("Tests/xmake.lua")
 -- target("Specs and Editor")
 --     set_kind("phony")
 --     add_deps("Simp1e Tests", "Simp1e Editor")

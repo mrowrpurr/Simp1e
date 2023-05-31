@@ -1,7 +1,0 @@
-target("Prototyping Shared Library")
-    set_kind("headeronly")
-    add_includedirs("include", {public = true})
-    add_qt_libs()
-    add_string_formatting()
-    add_logging()
-    add_deps("Simp1e.UI", "Simp1e.QT", "Simp1e.Maps", "Simp1e.UI.Maps", "Simp1e.QT.Maps")
