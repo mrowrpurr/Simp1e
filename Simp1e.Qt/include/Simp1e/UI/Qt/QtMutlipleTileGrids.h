@@ -76,26 +76,26 @@ namespace Simp1e::UI::Qt {
             return found->second;
         }
 
-        UITile* GetTile(const Tile::Position& position) override {
+        UITile* GetTile(const Maps::TilePosition& position) override {
             // This won't work with multi!
             qDebug() << "GetTile not implemented for QtMutlipleTileGrids";
             return nullptr;
         }
 
-        TileGrid* GetGrid(uint32_t layer = 0) override {
+        Maps::TileGrid* GetGrid(uint32_t layer = 0) override {
             // This won't work with multi!
             qDebug() << "GetGrid not implemented for QtMutlipleTileGrids";
             return nullptr;
         }
 
-        std::vector<Tile::Position> GetPath(
-            const Tile::Position& startPosition, const Tile::Position& endPosition,
+        std::vector<Maps::TilePosition> GetPath(
+            const Maps::TilePosition& startPosition, const Maps::TilePosition& endPosition,
             bool hexgrid = false, bool allowDiagonalMovement = true
         ) override {
             return {};
         }
 
-        bool SetTileObstacle(const Tile::Position& position, bool obstacle) override {
+        bool SetTileObstacle(const Maps::TilePosition& position, bool obstacle) override {
             for (auto& tileGrid : _qtTileGrids) tileGrid->SetTileObstacle(position, obstacle);
             return true;
         }
@@ -134,23 +134,23 @@ namespace Simp1e::UI::Qt {
             }
         }
 
-        bool OnLeftClick(std::function<void(const Tile::Position&)> handler, uint32_t layer)
+        bool OnLeftClick(std::function<void(const Maps::TilePosition&)> handler, uint32_t layer)
             override {
             for (auto& tileGrid : _qtTileGrids) tileGrid->OnLeftClick(handler, layer);
             return true;
         }
-        bool OnRightClick(std::function<void(const Tile::Position&)> handler, uint32_t layer)
+        bool OnRightClick(std::function<void(const Maps::TilePosition&)> handler, uint32_t layer)
             override {
             for (auto& tileGrid : _qtTileGrids) tileGrid->OnRightClick(handler, layer);
             return true;
         }
-        bool OnMiddleClick(std::function<void(const Tile::Position&)> handler, uint32_t layer)
+        bool OnMiddleClick(std::function<void(const Maps::TilePosition&)> handler, uint32_t layer)
             override {
             for (auto& tileGrid : _qtTileGrids) tileGrid->OnMiddleClick(handler, layer);
             return true;
         }
 
-        bool MoveElement(UITileGridElement* element, const Tile::Position& position) override {
+        bool MoveElement(UITileGridElement* element, const Maps::TilePosition& position) override {
             try {
                 auto elements =
                     std::any_cast<std::vector<UITileGridElement*>>(element->GetElement());
@@ -163,7 +163,7 @@ namespace Simp1e::UI::Qt {
         }
 
         bool AnimatedMoveElement(
-            UITileGridElement* element, const Tile::Position& position, double duration = 500,
+            UITileGridElement* element, const Maps::TilePosition& position, double duration = 500,
             double delay = 0
         ) override {
             try {
@@ -195,7 +195,7 @@ namespace Simp1e::UI::Qt {
         }
 
         UITileGridElement* AddCircle(
-            const Tile::Position& position, const UIColor& color, uint32_t diameter
+            const Maps::TilePosition& position, const UIColor& color, uint32_t diameter
         ) override {
             std::vector<UITileGridElement*> elements;
             for (auto& tileGrid : _qtTileGrids)
@@ -206,7 +206,7 @@ namespace Simp1e::UI::Qt {
         }
 
         UITileGridElement* AddImage(
-            const Tile::Position& position, const std::filesystem::path& imagePath,
+            const Maps::TilePosition& position, const std::filesystem::path& imagePath,
             bool angleTile = false
         ) override {
             std::vector<UITileGridElement*> elements;

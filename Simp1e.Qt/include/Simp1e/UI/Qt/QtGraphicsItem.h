@@ -8,9 +8,9 @@
 
 namespace Simp1e::UI::Qt {
 
-    class Simp1eQtGraphicsItem : public QGraphicsItem {
+    class QtGraphicsItem : public QGraphicsItem {
     public:
-        Simp1eQtGraphicsItem(QGraphicsItem* parent = nullptr)
+        QtGraphicsItem(QGraphicsItem* parent = nullptr)
             : QGraphicsItem(parent), borderItem(nullptr) {
             setFlags(QGraphicsItem::ItemIsMovable);
 

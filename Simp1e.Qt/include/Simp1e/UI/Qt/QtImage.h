@@ -10,7 +10,7 @@
 #include "QtGraphicsItem.h"
 
 namespace Simp1e::UI::Qt {
-    class QtImage : public Simp1eQtGraphicsItem {
+    class QtImage : public QtGraphicsItem {
         QString                  _imagePath;
         std::unique_ptr<QPixmap> _transformedImage;
 
@@ -25,7 +25,7 @@ namespace Simp1e::UI::Qt {
 
     public:
         QtImage(const QString& imagePath = "", QGraphicsItem* parent = nullptr)
-            : Simp1eQtGraphicsItem(parent) {
+            : QtGraphicsItem(parent) {
             qDebug() << "QtImage::QtImage() " << imagePath;
             if (!imagePath.isEmpty()) SetImage(imagePath);
         }

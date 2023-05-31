@@ -11,21 +11,21 @@
 namespace Simp1e::UI::Qt {
 
     class QtTileGridIsometricRenderer : public QtTileGridRenderer {
-        UITileGrid::Config&                         _config;
-        QtScene*                                    _scene;
-        std::unordered_map<Tile::Position, QtTile*> _tiles;
+        UITileGrid::Config&                             _config;
+        QtScene*                                        _scene;
+        std::unordered_map<Maps::TilePosition, QtTile*> _tiles;
 
     public:
         QtTileGridIsometricRenderer(UITileGrid::Config& config, QtScene* scene)
             : _config(config), _scene(scene) {}
 
-        UITile* GetTile(const Tile::Position& position) override {
+        UITile* GetTile(const Maps::TilePosition& position) override {
             auto it = _tiles.find(position);
             if (it != _tiles.end()) return it->second;
             return nullptr;
         }
 
-        TileGrid* GetGrid(uint32_t layer = 0) override {
+        Maps::TileGrid* GetGrid(uint32_t layer = 0) override {
             if (layer == 0) return _config.grid;
             else return nullptr;
         }
@@ -79,7 +79,7 @@ namespace Simp1e::UI::Qt {
             return UISize{uiWidth, uiHeight};
         }
 
-        UIPosition GetTileCenter(const Tile::Position& position) override {
+        UIPosition GetTileCenter(const Maps::TilePosition& position) override {
             if (position.z != 0) return UIPosition::Invalid();
 
             uint32_t uiWidth    = 0;
@@ -103,7 +103,7 @@ namespace Simp1e::UI::Qt {
             return UIPosition{center.x(), center.y()};
         }
 
-        QPolygonF GetTileBounds(const Tile::Position& position) override {
+        QPolygonF GetTileBounds(const Maps::TilePosition& position) override {
             if (position.z != 0) return QPolygonF();
 
             uint32_t uiWidth    = 0;
@@ -126,10 +126,10 @@ namespace Simp1e::UI::Qt {
             return polygon;
         }
 
-        std::unordered_map<uint32_t, Tile::Position> ScenePositionToTilePositions(
+        std::unordered_map<uint32_t, Maps::TilePosition> ScenePositionToTilePositions(
             const UIPosition& position, uint32_t layer = 0
         ) override {
-            std::unordered_map<uint32_t, Tile::Position> result;
+            std::unordered_map<uint32_t, Maps::TilePosition> result;
             auto items = _scene->items({position.x(), position.y()});
             for (auto* item : items)
                 if (auto* tile = dynamic_cast<QtTile*>(item))

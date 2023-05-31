@@ -25,7 +25,6 @@
 #include "QtTileGridTilesAndHexagonsRenderer.h"
 #include "QtView.h"
 
-
 namespace Simp1e::UI::Qt {
 
     class QtTileGrid : public UITileGrid {
@@ -36,11 +35,11 @@ namespace Simp1e::UI::Qt {
         QtView*            _view;
         QtScene*           _scene;
         std::unique_ptr<QtTileGridRenderer> _renderer;
-        std::unordered_map<uint32_t, std::vector<std::function<void(const Tile::Position&)>>>
+        std::unordered_map<uint32_t, std::vector<std::function<void(const Maps::TilePosition&)>>>
             _tileLeftClickHandlers;
-        std::unordered_map<uint32_t, std::vector<std::function<void(const Tile::Position&)>>>
+        std::unordered_map<uint32_t, std::vector<std::function<void(const Maps::TilePosition&)>>>
             _tileRightClickHandlers;
-        std::unordered_map<uint32_t, std::vector<std::function<void(const Tile::Position&)>>>
+        std::unordered_map<uint32_t, std::vector<std::function<void(const Maps::TilePosition&)>>>
                                                _tileMiddleClickHandlers;
         std::unordered_set<UITileGridElement*> _elements;
 
@@ -129,21 +128,21 @@ namespace Simp1e::UI::Qt {
 
         RenderingStyle GetRenderingStyle() override { return _config.renderingStyle; }
 
-        UITile* GetTile(const Tile::Position& position) override {
+        UITile* GetTile(const Maps::TilePosition& position) override {
             qDebug() << "GetTile()" << position.x << position.y << position.z;
             qDebug() << "WARNING not recommended due to support for multiple layers";
             return _renderer->GetTile(position);
         }
 
-        TileGrid* GetGrid(uint32_t layer = 0) override { return _renderer->GetGrid(layer); }
+        Maps::TileGrid* GetGrid(uint32_t layer = 0) override { return _renderer->GetGrid(layer); }
 
         UITileGrid* GetGridForRenderingStyle(RenderingStyle renderingStyle) override {
             if (_config.renderingStyle == renderingStyle) return this;
             return nullptr;
         }
 
-        std::vector<Tile::Position> GetPath(
-            const Tile::Position& startPosition, const Tile::Position& endPosition,
+        std::vector<Maps::TilePosition> GetPath(
+            const Maps::TilePosition& startPosition, const Maps::TilePosition& endPosition,
             bool hexgrid = false, bool allowDiagonalMovement = true
         ) override {
             qDebug() << "GetPath()" << startPosition.x << startPosition.y << startPosition.z
@@ -170,7 +169,7 @@ namespace Simp1e::UI::Qt {
                          << endPosition.y << endPosition.z;
                 return {};
             }
-            auto tiles = AStar::GetShortestPath(
+            auto tiles = Maps::AStar::GetShortestPath(
                 *grid, start, end, isHexGrid, true
             );  // TODO Read diagonal movement from _config
             if (tiles.empty()) return {};
@@ -178,13 +177,13 @@ namespace Simp1e::UI::Qt {
             for (auto& tile : tiles)
                 qDebug() << tile.tile->GetPosition().x << tile.tile->GetPosition().y
                          << tile.tile->GetPosition().z;
-            std::vector<Tile::Position> positions;
+            std::vector<Maps::TilePosition> positions;
             for (auto& tile : tiles) positions.push_back(tile.tile->GetPosition());
             return positions;
             return {};
         }
 
-        bool SetTileObstacle(const Tile::Position& position, bool isObstacle = true) override {
+        bool SetTileObstacle(const Maps::TilePosition& position, bool isObstacle = true) override {
             auto* tile = _renderer->GetTile(position);
             if (!tile) {
                 qDebug() << "SetObstacle() failed, tile not found at position" << position.x
@@ -207,7 +206,7 @@ namespace Simp1e::UI::Qt {
         bool SetMoveModeEnabled(UITileGridElement* element, bool enabled = true) override {
             try {
                 if (!element) return false;
-                auto* qtElement = std::any_cast<Simp1eQtGraphicsItem*>(element->GetElement());
+                auto* qtElement = std::any_cast<QtGraphicsItem*>(element->GetElement());
                 if (!qtElement) return false;
                 //
                 // qtElement
@@ -225,17 +224,17 @@ namespace Simp1e::UI::Qt {
             return true;
         }
 
-        bool OnLeftClick(std::function<void(const Tile::Position&)> handler, uint32_t layer)
+        bool OnLeftClick(std::function<void(const Maps::TilePosition&)> handler, uint32_t layer)
             override {
             _tileLeftClickHandlers[layer].push_back(handler);
             return true;
         }
-        bool OnRightClick(std::function<void(const Tile::Position&)> handler, uint32_t layer)
+        bool OnRightClick(std::function<void(const Maps::TilePosition&)> handler, uint32_t layer)
             override {
             _tileRightClickHandlers[layer].push_back(handler);
             return true;
         }
-        bool OnMiddleClick(std::function<void(const Tile::Position&)> handler, uint32_t layer)
+        bool OnMiddleClick(std::function<void(const Maps::TilePosition&)> handler, uint32_t layer)
             override {
             _tileMiddleClickHandlers[layer].push_back(handler);
             return true;
@@ -245,7 +244,7 @@ namespace Simp1e::UI::Qt {
             try {
                 if (!element) return false;
                 qDebug() << "RemoveElement()";
-                auto* qtElement = std::any_cast<Simp1eQtGraphicsItem*>(element->GetElement());
+                auto* qtElement = std::any_cast<QtGraphicsItem*>(element->GetElement());
                 if (!qtElement) return false;
                 _scene->removeItem(qtElement);
                 delete qtElement;
@@ -256,11 +255,11 @@ namespace Simp1e::UI::Qt {
             }
         }
 
-        bool MoveElement(UITileGridElement* element, const Tile::Position& position) override {
+        bool MoveElement(UITileGridElement* element, const Maps::TilePosition& position) override {
             try {
                 if (!element) return false;
                 qDebug() << "MoveElement()" << position.x << position.y << position.z;
-                auto* qtElement = std::any_cast<Simp1eQtGraphicsItem*>(element->GetElement());
+                auto* qtElement = std::any_cast<QtGraphicsItem*>(element->GetElement());
                 if (!qtElement) return false;
                 auto center = _renderer->GetTileCenter(position);
                 qtElement->setPos(
@@ -276,7 +275,7 @@ namespace Simp1e::UI::Qt {
         }
 
         bool AnimatedMoveElement(
-            UITileGridElement* element, const Tile::Position& position, double duration = 500,
+            UITileGridElement* element, const Maps::TilePosition& position, double duration = 500,
             double delay = 0
         ) override {
             if (!element) return false;
@@ -314,7 +313,7 @@ namespace Simp1e::UI::Qt {
         }
 
         UITileGridElement* AddCircle(
-            const Tile::Position& position, const UIColor& color, uint32_t diameter
+            const Maps::TilePosition& position, const UIColor& color, uint32_t diameter
         ) override {
             auto center = _renderer->GetTileCenter(position);
             if (!UIPosition::IsValid(center)) return nullptr;
@@ -325,14 +324,14 @@ namespace Simp1e::UI::Qt {
             );
             _scene->addItem(circle);
 
-            QGraphicsItem* elementPtr = circle;
-            auto*          element    = new UITileGridElement(position, elementPtr);
+            QtGraphicsItem* elementPtr = circle;
+            auto*           element    = new UITileGridElement(position, elementPtr);
             _elements.insert(element);
             return element;
         }
 
         UITileGridElement* AddImage(
-            const Tile::Position& position, const std::filesystem::path& imagePath,
+            const Maps::TilePosition& position, const std::filesystem::path& imagePath,
             bool angleTile = false
         ) override {
             auto center = _renderer->GetTileCenter(position);
@@ -354,8 +353,8 @@ namespace Simp1e::UI::Qt {
             _scene->addItem(image);
             _scene->update();
 
-            Simp1eQtGraphicsItem* elementPtr = image;
-            auto*                 element    = new UITileGridElement(position, elementPtr);
+            QtGraphicsItem* elementPtr = image;
+            auto*           element    = new UITileGridElement(position, elementPtr);
             _elements.insert(element);
             return element;
         }

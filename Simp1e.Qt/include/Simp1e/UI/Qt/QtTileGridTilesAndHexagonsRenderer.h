@@ -11,10 +11,10 @@
 namespace Simp1e::UI::Qt {
 
     class QtTileGridTilesAndHexagonsRenderer : public QtTileGridRenderer {
-        UITileGrid::Config&                         _config;
-        QtScene*                                    _scene;
-        TileGrid                                    _hexGrid{0, 0, 1};
-        std::unordered_map<Tile::Position, QtTile*> _tiles;
+        UITileGrid::Config&                             _config;
+        QtScene*                                        _scene;
+        Maps::TileGrid                                  _hexGrid{0, 0, 1};
+        std::unordered_map<Maps::TilePosition, QtTile*> _tiles;
 
         int HEX_WIDTH      = 60;
         int HEX_HEIGHT     = 60;
@@ -24,7 +24,7 @@ namespace Simp1e::UI::Qt {
         int HEX_OFFSET_Y   = 0;
 
         QGraphicsPolygonItem* createDiamondTile(
-            int x, int y, int width, int height, bool isGray = false
+            double x, double y, int width, int height, bool isGray = false
         ) {
             QPointF topPoint(x, y);
             QPointF rightPoint(x + width / 2.0, y + height / 2.0);
@@ -42,7 +42,7 @@ namespace Simp1e::UI::Qt {
             return diamondTile;
         }
 
-        QGraphicsPolygonItem* createHexagon(int x, int y, int width, int height) {
+        QGraphicsPolygonItem* createHexagon(double x, double y, double width, double height) {
             qreal sideLength = width / 2;  // The horizontal side length of the hexagon
 
             QPointF top(x + sideLength, y);
@@ -66,13 +66,13 @@ namespace Simp1e::UI::Qt {
         QtTileGridTilesAndHexagonsRenderer(UITileGrid::Config& config, QtScene* scene)
             : _config(config), _scene(scene) {}
 
-        UITile* GetTile(const Tile::Position& position) override {
+        UITile* GetTile(const Maps::TilePosition& position) override {
             auto it = _tiles.find(position);
             if (it != _tiles.end()) return it->second;
             return nullptr;
         }
 
-        TileGrid* GetGrid(uint32_t layer = 0) override {
+        Maps::TileGrid* GetGrid(uint32_t layer = 0) override {
             if (layer == 0) return _config.grid;
             else if (layer == 1) return &_hexGrid;
             else return nullptr;
@@ -163,7 +163,7 @@ namespace Simp1e::UI::Qt {
             return UISize{uiWidth, uiHeight};
         }
 
-        UIPosition GetHexTileCenter(const Tile::Position& position) {
+        UIPosition GetHexTileCenter(const Maps::TilePosition& position) {
             int DIAMOND_ROWS     = _config.grid->GetRows();
             int DIAMOND_OFFSET_Y = -1 * DIAMOND_ROWS * DIAMOND_HEIGHT / 2.0;
 
@@ -176,7 +176,7 @@ namespace Simp1e::UI::Qt {
             return UIPosition{center.x(), center.y()};
         }
 
-        UIPosition GetDiamondTileCenter(const Tile::Position& position) {
+        UIPosition GetDiamondTileCenter(const Maps::TilePosition& position) {
             int  DIAMOND_ROWS     = _config.grid->GetRows();
             int  DIAMOND_OFFSET_Y = -1 * DIAMOND_ROWS * DIAMOND_HEIGHT / 2.0;
             int  x    = position.y * DIAMOND_WIDTH + (position.x % 2 == 0 ? 0 : DIAMOND_WIDTH / 2);
@@ -186,13 +186,13 @@ namespace Simp1e::UI::Qt {
             return UIPosition{center.x(), center.y()};
         }
 
-        UIPosition GetTileCenter(const Tile::Position& position) override {
+        UIPosition GetTileCenter(const Maps::TilePosition& position) override {
             if (position.z == 0) return GetDiamondTileCenter(position);
             else if (position.z == 1) return GetHexTileCenter(position);
             else return UIPosition::Invalid();
         }
 
-        QPolygonF GetHexTileBounds(const Tile::Position& position) {
+        QPolygonF GetHexTileBounds(const Maps::TilePosition& position) {
             int DIAMOND_ROWS     = _config.grid->GetRows();
             int DIAMOND_OFFSET_Y = -1 * DIAMOND_ROWS * DIAMOND_HEIGHT / 2.0;
 
@@ -204,7 +204,7 @@ namespace Simp1e::UI::Qt {
             return item->polygon();
         }
 
-        QPolygonF GetDiamondTileBounds(const Tile::Position& position) {
+        QPolygonF GetDiamondTileBounds(const Maps::TilePosition& position) {
             int  DIAMOND_ROWS     = _config.grid->GetRows();
             int  DIAMOND_OFFSET_Y = -1 * DIAMOND_ROWS * DIAMOND_HEIGHT / 2.0;
             int  x    = position.y * DIAMOND_WIDTH + (position.x % 2 == 0 ? 0 : DIAMOND_WIDTH / 2);
@@ -213,16 +213,16 @@ namespace Simp1e::UI::Qt {
             return item->polygon();
         }
 
-        QPolygonF GetTileBounds(const Tile::Position& position) override {
+        QPolygonF GetTileBounds(const Maps::TilePosition& position) override {
             if (position.z == 0) return GetDiamondTileBounds(position);
             else if (position.z == 1) return GetHexTileBounds(position);
             else return QPolygonF();
         }
 
-        std::unordered_map<uint32_t, Tile::Position> ScenePositionToTilePositions(
+        std::unordered_map<uint32_t, Maps::TilePosition> ScenePositionToTilePositions(
             const UIPosition& position, uint32_t layer = 0
         ) override {
-            std::unordered_map<uint32_t, Tile::Position> result;
+            std::unordered_map<uint32_t, Maps::TilePosition> result;
             auto items = _scene->items({position.x(), position.y()});
             for (auto* item : items)
                 if (auto* tile = dynamic_cast<QtTile*>(item))

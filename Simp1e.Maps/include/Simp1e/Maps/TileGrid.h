@@ -19,7 +19,7 @@ namespace Simp1e::Maps {
             for (uint32_t row = 0; row < _rows; ++row)
                 for (uint32_t column = 0; column < _columns; ++column)
                     _tiles.at(row).at(column) =
-                        std::make_unique<Tile>(Tile::Position{row, column, _layer});
+                        std::make_unique<Tile>(TilePosition{row, column, _layer});
         }
 
     public:

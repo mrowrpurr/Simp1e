@@ -25,22 +25,22 @@ namespace Simp1e::UI {
         };
 
         struct Config {
-            TileGrid*      grid               = nullptr;
-            RenderingStyle renderingStyle     = RenderingStyle::Grid;
-            uint32_t       tileWidth          = 64;
-            uint32_t       tileHeight         = 48;
-            uint32_t       padding            = 4;
-            bool           showGrid           = true;
-            bool           displayCoordinates = true;
+            Maps::TileGrid* grid               = nullptr;
+            RenderingStyle  renderingStyle     = RenderingStyle::Grid;
+            uint32_t        tileWidth          = 64;
+            uint32_t        tileHeight         = 48;
+            uint32_t        padding            = 4;
+            bool            showGrid           = true;
+            bool            displayCoordinates = true;
         };
 
         virtual ~UITileGrid() = default;
-        virtual RenderingStyle  GetRenderingStyle() { return RenderingStyle::None; }
-        virtual bool            ShowAsWindow() { return false; }
-        virtual QWidget*        GetWidget() { return nullptr; }
-        virtual Maps::TileGrid* GetGrid(uint32_t layer = 0) { return nullptr; }
-        virtual std::vector<Maps::Tile::Position> GetPath(
-            const Maps::Tile::Position& startPosition, const Maps::Tile::Position& endPosition,
+        virtual RenderingStyle                  GetRenderingStyle() { return RenderingStyle::None; }
+        virtual bool                            ShowAsWindow() { return false; }
+        virtual QWidget*                        GetWidget() { return nullptr; }
+        virtual Maps::TileGrid*                 GetGrid(uint32_t layer = 0) { return nullptr; }
+        virtual std::vector<Maps::TilePosition> GetPath(
+            const Maps::TilePosition& startPosition, const Maps::TilePosition& endPosition,
             bool hexgrid = false, bool allowDiagonalMovement = true
         ) {
             return {};
@@ -51,18 +51,18 @@ namespace Simp1e::UI {
             return nullptr;
         }
 
-        virtual UITile* GetTile(const Tile::Position& position) { return nullptr; }
-        virtual bool    SetTileObstacle(const Tile::Position& position, bool isObstacle = true) {
+        virtual UITile* GetTile(const Maps::TilePosition& position) { return nullptr; }
+        virtual bool SetTileObstacle(const Maps::TilePosition& position, bool isObstacle = true) {
             return false;
         }
         virtual bool SetBackgroundColor(const UIColor& color) { return false; }
         virtual bool AddBackgroundImage(const UIImage& image) { return false; }
         virtual bool RemoveBackgroundImage(const UIImage& image) { return false; }
-        virtual bool MoveElement(UITileGridElement* element, const Tile::Position& position) {
+        virtual bool MoveElement(UITileGridElement* element, const Maps::TilePosition& position) {
             return false;
         }
         virtual bool AnimatedMoveElement(
-            UITileGridElement* element, const Tile::Position& position, double duration = 500,
+            UITileGridElement* element, const Maps::TilePosition& position, double duration = 500,
             double delay = 0
         ) {
             return false;
@@ -78,28 +78,35 @@ namespace Simp1e::UI {
             return false;
         }
         virtual UITileGridElement* AddCircle(
-            const Tile::Position& position, const UIColor& color, uint32_t diameter
+            const Maps::TilePosition& position, const UIColor& color, uint32_t diameter
         ) {
             return nullptr;
         }
         virtual UITileGridElement* AddRectangle(
-            const Tile::Position& position, const UIColor& color, uint32_t width, uint32_t height
+            const Maps::TilePosition& position, const UIColor& color, uint32_t width,
+            uint32_t height
         ) {
             return nullptr;
         }
         virtual UITileGridElement* AddImage(
-            const Tile::Position& position, const std::filesystem::path& imagePath,
+            const Maps::TilePosition& position, const std::filesystem::path& imagePath,
             bool angleTile = false
         ) {
             return nullptr;
         }
-        virtual bool OnLeftClick(std::function<void(const Tile::Position&)>, uint32_t layer = 0) {
+        virtual bool OnLeftClick(
+            std::function<void(const Maps::TilePosition&)>, uint32_t layer = 0
+        ) {
             return false;
         }
-        virtual bool OnRightClick(std::function<void(const Tile::Position&)>, uint32_t layer = 0) {
+        virtual bool OnRightClick(
+            std::function<void(const Maps::TilePosition&)>, uint32_t layer = 0
+        ) {
             return false;
         }
-        virtual bool OnMiddleClick(std::function<void(const Tile::Position&)>, uint32_t layer = 0) {
+        virtual bool OnMiddleClick(
+            std::function<void(const Maps::TilePosition&)>, uint32_t layer = 0
+        ) {
             return false;
         }
     };

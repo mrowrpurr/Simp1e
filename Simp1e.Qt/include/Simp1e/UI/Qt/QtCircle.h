@@ -5,8 +5,10 @@
 #include <QGraphicsObject>
 #include <QPainter>
 
+#include "QtGraphicsItem.h"
+
 namespace Simp1e::UI::Qt {
-    class QtCircle : public QGraphicsObject {
+    class QtCircle : public QtGraphicsItem {
         QRectF  _rect;
         UIColor _color;
 

@@ -9,7 +9,7 @@
 
 #include "AStarTile.h"
 
-namespace Simp1e::AStar {
+namespace Simp1e::Maps::AStar {
 
     namespace Utility {
 

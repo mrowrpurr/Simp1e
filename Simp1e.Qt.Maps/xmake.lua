@@ -1,4 +1,5 @@
-target("Simp1e.QT.Maps")
+target("Simp1e.Qt.Maps")
     set_kind("headeronly")
     add_includedirs("include", {public = true})
     add_headerfiles("include/(**.h)")
+    add_deps("Simp1e.UI", "Simp1e.Maps", "Simp1e.Qt")
