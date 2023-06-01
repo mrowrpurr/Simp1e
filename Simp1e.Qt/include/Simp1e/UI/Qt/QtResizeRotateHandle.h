@@ -93,10 +93,16 @@ namespace Simp1e::UI::Qt {
         }
 
         void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override {
+            qDebug() << "hoverEnterEvent";
             setCursor(QCursor(GetCursorShape()));
         }
-        void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override { unsetCursor(); }
+        void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override {
+            qDebug() << "hoverLeaveEvent";
+            unsetCursor();
+        }
         void mousePressEvent(QGraphicsSceneMouseEvent* event) override {
+            qDebug() << "mousePressEvent";
+
             if (event->buttons() != ::Qt::MouseButton::LeftButton)
                 return QGraphicsItem::mousePressEvent(event);
 
@@ -106,9 +112,12 @@ namespace Simp1e::UI::Qt {
             event->accept();
         }
 
+        // TODO name me
         int i = 0;
 
         void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override {
+            qDebug() << "mouseMoveEvent";
+
             if (event->buttons() != ::Qt::MouseButton::LeftButton)
                 return QGraphicsItem::mouseMoveEvent(event);
 
@@ -124,6 +133,8 @@ namespace Simp1e::UI::Qt {
             qreal   dy          = dragPos.y() - _resizeInitialMousePos.y();
             QRectF  newRect     = _resizeInitialBoundingBox;
             qreal   newRotation = _resizeInitialRotation;
+
+            qDebug() << "mouseMoveEvent" << i << dx << dy;
 
             switch (_position) {
                 case HandlePosition::TopLeft:

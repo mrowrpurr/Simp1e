@@ -50,9 +50,8 @@ namespace Simp1e::UI::Qt {
             if (event->button() == ::Qt::RightButton) {
                 _mousePressed = true;
                 _lastMousePos = event->globalPosition();
-            } else {
-                QGraphicsView::mousePressEvent(event);
             }
+            QGraphicsView::mousePressEvent(event);
         }
 
         void mouseMoveEvent(QMouseEvent* event) override {
@@ -63,13 +62,12 @@ namespace Simp1e::UI::Qt {
                 QScrollBar* vBar = verticalScrollBar();
                 hBar->setValue(hBar->value() - delta.x());
                 vBar->setValue(vBar->value() - delta.y());
-            }
+            } else QGraphicsView::mouseMoveEvent(event);
         }
 
         void mouseReleaseEvent(QMouseEvent* event) override {
-            if (event->button() == ::Qt::RightButton) {
-                _mousePressed = false;
-            }
+            if (event->button() == ::Qt::RightButton) _mousePressed = false;
+            QGraphicsView::mouseReleaseEvent(event);
         }
 
         QElapsedTimer _touchTimer;
