@@ -1,6 +1,9 @@
 #pragma once
 
+#include <Simp1e/Maps/TileGrid.h>
 #include <Simp1e/UI/Qt.h>
+#include <Simp1e/UI/Qt/QtTileGrid.h>
+#include <Simp1e/UI/UITileGrid.h>
 
 #include <QAction>
 #include <QApplication>
@@ -20,8 +23,24 @@
 #include <QToolBar>
 #include <QWidget>
 #include <filesystem>
+#include <memory>
 
 namespace MiniMapEditor {
+
+    namespace Clipart {
+        std::filesystem::path GetClipartPath(const std::string& filename) {
+            return std::filesystem::path(std::getenv("Openclipart")) / filename;
+        }
+        std::filesystem::path farm() { return GetClipartPath("11443.png"); }
+        std::filesystem::path player() { return GetClipartPath("293915.png"); }
+        std::filesystem::path grass() { return GetClipartPath("267082.png"); }
+        std::filesystem::path crackedGround() { return GetClipartPath("267062.png"); }
+        std::filesystem::path water() { return GetClipartPath("219395.png"); }
+        std::filesystem::path funnyMonster() { return GetClipartPath("216127.png"); }
+        std::filesystem::path smith() { return GetClipartPath("11410.png"); }
+        std::filesystem::path fort() { return GetClipartPath("11449.png"); }
+        // std::filesystem::path x() { return GetClipartPath(""); }
+    }
 
     struct IEditor {};
 
@@ -89,8 +108,10 @@ namespace MiniMapEditor {
     };
 
     class Editor : public QMainWindow {
-        EditorPreferences     _preferences;
-        std::filesystem::path _logoPath;
+        EditorPreferences                       _preferences;
+        std::filesystem::path                   _logoPath;
+        Simp1e::Maps::TileGrid                  _tileGrid{15, 20};
+        std::unique_ptr<Simp1e::UI::UITileGrid> _uiTileGrid;
 
     public:
         Editor() {
@@ -98,6 +119,7 @@ namespace MiniMapEditor {
             setWindowTitle("Mini Map Editor");
             SetupMenu();
             SetupToolbar();
+            SetupMap();
         }
 
         static int Run() {
@@ -109,7 +131,7 @@ namespace MiniMapEditor {
     private:
         void OnMapNew() { QMessageBox::information(this, "New Map", "New Map"); }
         void OnMapLoad() { QMessageBox::information(this, "Load Map", "Load Map"); }
-        void OnMapSave() { QMessageBox::information(this, "Save Map", "Save Map"); }
+        void OnMapSave() { _uiTileGrid->AddImage({5, 5}, Clipart::farm()); }
         void OnMapPreferences() { _preferences.show(); }
         void OnQuit() { QMessageBox::information(this, "Quit", "Quit"); }
         void OnAbout() {
@@ -177,6 +199,18 @@ namespace MiniMapEditor {
             filePreferences->setShortcut(QKeySequence::Preferences);
             fileQuit->setShortcut(QKeySequence::Quit);
             helpAbout->setShortcut(QKeySequence::HelpContents);
+        }
+
+        void SetupMap() {
+            auto* qtTileGrid = new Simp1e::UI::Qt::QtTileGrid(Simp1e::UI::UITileGrid::Config{
+                .grid           = &_tileGrid,
+                .renderingStyle = Simp1e::UI::UITileGrid::RenderingStyle::Isometric,
+                .tileWidth      = 69,
+                .tileHeight     = 48,
+                .showGrid       = true,
+            });
+            _uiTileGrid.reset(qtTileGrid);
+            setCentralWidget(qtTileGrid->GetWidget());
         }
     };
 }

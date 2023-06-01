@@ -113,7 +113,7 @@ namespace Simp1e::UI::Qt {
         }
 
     public:
-        QtTileGrid(const Config& config) : _config(config) {
+        explicit QtTileGrid(const Config& config) : _config(config) {
             _scene = new QtScene();
             SetupRenderer();
             auto gridSize = _renderer->InitializeGrid();
