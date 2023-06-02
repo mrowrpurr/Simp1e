@@ -3,6 +3,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QPainterPath>
+#include <QPen>
 #include <QTabletEvent>
 
 
@@ -16,18 +17,26 @@ public:
 
     void tabletEvent(QTabletEvent* event) override {
         static QPainterPath path;
+        static QPen         pen;
+        pen.setColor(Qt::black);
         switch (event->type()) {
             case QEvent::TabletPress:
+                pen.setWidthF(
+                    event->pressure() * 10
+                );  // Adjust the multiplication factor for pen width as per requirement.
                 path.moveTo(event->pos());
                 break;
             case QEvent::TabletMove:
+                pen.setWidthF(
+                    event->pressure() * 10
+                );  // Adjust the multiplication factor for pen width as per requirement.
                 path.lineTo(event->pos());
-                scene()->addPath(path);
+                scene()->addPath(path, pen);
                 path = QPainterPath();
                 path.moveTo(event->pos());
                 break;
             case QEvent::TabletRelease:
-                scene()->addPath(path);
+                scene()->addPath(path, pen);
                 path = QPainterPath();
                 break;
         }
