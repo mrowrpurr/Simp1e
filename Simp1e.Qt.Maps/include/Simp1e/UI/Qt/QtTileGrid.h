@@ -9,6 +9,7 @@
 #include <Simp1e/UI/UIPosition.h>
 #include <Simp1e/UI/UISize.h>
 #include <Simp1e/UI/UITileGrid.h>
+#include <clip/clip.h>
 
 #include <QClipboard>
 #include <QPixmap>
@@ -115,12 +116,30 @@ namespace Simp1e::UI::Qt {
 
             // TODO - this is just hardcoded testing...
             _scene->OnPaste([this](QPointF position) {
-                auto clipboard = QApplication::clipboard();
-                auto pixmap    = clipboard->pixmap();
-                if (pixmap.isNull()) return;
+                if (!clip::has(clip::image_format())) {
+                    qDebug() << "Clipboard doesn't contain an image\n";
+                    return;
+                }
 
-                auto* tempFile = new QTemporaryFile();
-                if (tempFile->open()) pixmap.save(tempFile->fileName(), "PNG");
+                clip::image image;
+                if (!clip::get_image(image)) {
+                    qDebug() << "Failed to get image from clipboard\n";
+                    return;
+                }
+
+                // Extract the image data
+                const clip::image_spec spec = image.spec();
+                QImage                 qtImage(
+                    (const uchar*)image.data(), spec.width, spec.height, QImage::Format_ARGB32
+                );
+
+                // auto clipboard = QApplication::clipboard();
+                // auto pixmap    = clipboard->pixmap();
+                // if (pixmap.isNull()) return;
+
+                auto* tempFile = new QTemporaryFile("XXXXXX.png");
+                // if (tempFile->open()) pixmap.save(tempFile->fileName(), "PNG");
+                if (tempFile->open()) qtImage.save(tempFile->fileName(), "PNG");
                 else return;
                 tempFile->close();
 
