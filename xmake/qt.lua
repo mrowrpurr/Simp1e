@@ -1,3 +1,20 @@
+-- requires add_qt_libs
+function add_3d_qt_libs()
+    local qt_root = os.getenv("QTROOT")
+
+    if is_host("windows") then
+        local qt_platform_folder = path.join(qt_root, "msvc2019_64")
+        local qt_lib = path.join(qt_platform_folder, "lib")
+        local qt_include = path.join(qt_platform_folder, "include")
+
+        add_includedirs(path.join(qt_include, "Qt3DCore"))
+        add_includedirs(path.join(qt_include, "Qt3DRender"))
+        add_includedirs(path.join(qt_include, "Qt3DExtras"))
+
+        add_links("Qt63DCore", "Qt63DRender", "Qt63DExtras")
+    end
+end
+
 function add_qt_libs()
     -- Path to your Qt installation folder, including the version
     -- e.g. C:\Qt\5.12.0\msvc2017_64 or /usr/local/Qt-5.12.0
@@ -14,14 +31,9 @@ function add_qt_libs()
         add_includedirs(path.join(qt_include, "QtGui"))
         add_includedirs(path.join(qt_include, "QtWidgets"))
 
-        -- TODO: update add_qt_libs() to accept a list of modules to link
-        add_includedirs(path.join(qt_include, "Qt3DCore"))
-        add_includedirs(path.join(qt_include, "Qt3DRender"))
-        add_includedirs(path.join(qt_include, "Qt3DExtras"))
-
         -- link
         add_linkdirs(qt_lib)
-        add_links("Qt6Core", "Qt6Gui", "Qt6Widgets", "Qt63DCore", "Qt63DRender", "Qt63DExtras")
+        add_links("Qt6Core", "Qt6Gui", "Qt6Widgets") -- , "Qt63DCore", "Qt63DRender", "Qt63DExtras")
 
         -- compiler flag
         add_cxflags("/Zc:__cplusplus")
