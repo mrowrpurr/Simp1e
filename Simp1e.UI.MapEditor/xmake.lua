@@ -1,5 +1,5 @@
-target("Simp1e.Qt")
+target("Simp1e.UI.MapEditor")
     set_kind("headeronly")
     add_includedirs("include", {public = true})
     add_headerfiles("include/(**.h)")
-    add_packages("clip", {public = true})
+    add_deps("Simp1e.UI", "Simp1e.Maps")

@@ -36,8 +36,10 @@ namespace Simp1e::UI {
         };
 
         virtual ~UITileGrid() = default;
-        virtual RenderingStyle                  GetRenderingStyle() { return RenderingStyle::None; }
-        virtual bool                            ShowAsWindow() { return false; }
+        virtual RenderingStyle GetRenderingStyle() { return RenderingStyle::None; }
+        virtual bool           ShowAsWindow() { return false; }
+
+        // TODO omg what is Qt doing in here????
         virtual QWidget*                        GetWidget() { return nullptr; }
         virtual Maps::TileGrid*                 GetGrid(uint32_t layer = 0) { return nullptr; }
         virtual std::vector<Maps::TilePosition> GetPath(

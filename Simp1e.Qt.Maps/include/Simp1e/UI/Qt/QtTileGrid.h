@@ -9,8 +9,12 @@
 #include <Simp1e/UI/UIPosition.h>
 #include <Simp1e/UI/UISize.h>
 #include <Simp1e/UI/UITileGrid.h>
+#include <clip/clip.h>
 
+#include <QClipboard>
+#include <QPixmap>
 #include <QPropertyAnimation>
+#include <QTemporaryFile>
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -19,6 +23,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "QtTileGridRenderer.h"
 #include "TileGridRenderers/QtTileGridHexagonRenderer.h"
 #include "TileGridRenderers/QtTileGridIsometricRenderer.h"
 #include "TileGridRenderers/QtTileGridRectangleRenderer.h"
@@ -41,6 +46,7 @@ namespace Simp1e::UI::Qt {
         std::unordered_map<uint32_t, std::vector<std::function<void(const Maps::TilePosition&)>>>
                                                _tileMiddleClickHandlers;
         std::unordered_set<UITileGridElement*> _elements;
+        std::vector<QTemporaryFile*>           _tempFiles;
 
         void SetupRenderer() {
             switch (_config.renderingStyle) {
@@ -61,6 +67,9 @@ namespace Simp1e::UI::Qt {
             }
         }
 
+        bool               toggleTheThings = false;
+        UITileGridElement* pastedElement   = nullptr;
+
         void ListenForSceneEvents() {
             _scene->OnLeftClick([this](const QPointF& position) {
                 auto tilePositions =
@@ -75,6 +84,12 @@ namespace Simp1e::UI::Qt {
                 }
             });
             _scene->OnRightClick([this](const QPointF& position) {
+                if (pastedElement) {
+                    toggleTheThings = !toggleTheThings;
+                    SetMoveModeEnabled(pastedElement, toggleTheThings);
+                    SetResizeModeEnabled(pastedElement, toggleTheThings);
+                    SetRotateModeEnabled(pastedElement, toggleTheThings);
+                }
                 auto tilePositions =
                     _renderer->ScenePositionToTilePositions({position.x(), position.y()});
                 if (tilePositions.empty()) return;
@@ -98,6 +113,51 @@ namespace Simp1e::UI::Qt {
                     for (auto& handler : foundClickHandlersForLayer->second) handler(tilePosition);
                 }
             });
+
+            // TODO - this is just hardcoded testing...
+            _scene->OnPaste([this](QPointF position) {
+                if (!clip::has(clip::image_format())) {
+                    qDebug() << "Clipboard doesn't contain an image\n";
+                    return;
+                }
+
+                clip::image image;
+                if (!clip::get_image(image)) {
+                    qDebug() << "Failed to get image from clipboard\n";
+                    return;
+                }
+
+                // Extract the image data
+                const clip::image_spec spec = image.spec();
+                QImage                 qtImage(
+                    (const uchar*)image.data(), spec.width, spec.height, QImage::Format_ARGB32
+                );
+
+                // auto clipboard = QApplication::clipboard();
+                // auto pixmap    = clipboard->pixmap();
+                // if (pixmap.isNull()) return;
+
+                auto* tempFile = new QTemporaryFile("XXXXXX.png");
+                // if (tempFile->open()) pixmap.save(tempFile->fileName(), "PNG");
+                if (tempFile->open()) qtImage.save(tempFile->fileName(), "PNG");
+                else return;
+                tempFile->close();
+
+                _tempFiles.push_back(tempFile);
+
+                auto path = tempFile->fileName();
+                qDebug() << "path" << path;
+
+                auto tilePositions =
+                    _renderer->ScenePositionToTilePositions({position.x(), position.y()});
+                if (tilePositions.empty()) return;
+                if (!tilePositions.contains(0)) return;
+
+                pastedElement = AddImage(tilePositions[0], path.toStdString().c_str());
+                SetMoveModeEnabled(pastedElement, true);
+                SetResizeModeEnabled(pastedElement, true);
+                SetRotateModeEnabled(pastedElement, true);
+            });
         }
 
         IQtGraphicsItem* GraphicsItemFromElement(UITileGridElement* element) {
@@ -113,7 +173,7 @@ namespace Simp1e::UI::Qt {
         }
 
     public:
-        QtTileGrid(const Config& config) : _config(config) {
+        explicit QtTileGrid(const Config& config) : _config(config) {
             _scene = new QtScene();
             SetupRenderer();
             auto gridSize = _renderer->InitializeGrid();
@@ -128,6 +188,7 @@ namespace Simp1e::UI::Qt {
 
         ~QtTileGrid() override {
             for (auto elementPtr : _elements) delete elementPtr;
+            for (auto tempFile : _tempFiles) delete tempFile;
         }
 
         QWidget* GetWidget() override { return &_window; }
@@ -346,8 +407,9 @@ namespace Simp1e::UI::Qt {
             if (!UIPosition::IsValid(center)) return nullptr;
             auto bounds = _renderer->GetTileBounds(position);
             auto image  = new QtImage(imagePath.string().c_str());
-            image->SetPolygon(bounds);
-            image->SetResize(true);
+            // image->SetPolygon(bounds);
+            // image->SetResize(true);
+            image->SetSize(256, 256);
             if (angleTile) {
                 if (_config.renderingStyle == RenderingStyle::Isometric) image->SetRotate(-45);
                 else if (_config.renderingStyle == RenderingStyle::IsometricWithHexagons && position.z == 0)

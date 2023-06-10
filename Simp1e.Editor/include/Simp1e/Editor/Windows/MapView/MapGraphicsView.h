@@ -6,11 +6,11 @@
 #include <QTimer>
 #include <QTouchEvent>
 
-#include "MapCellGraphicsRectItem.h"
+// #include "MapCellGraphicsRectItem.h"
 
 namespace Simp1e::Editor::Windows::MapView {
 
-    class MapGraphicsView : public QGraphicsView {
+    class QtView : public QGraphicsView {
         qreal   _totalScaleFactor = 1;
         qreal   _lastScaleFactor  = 1;
         bool    _mousePressed     = false;
@@ -22,7 +22,7 @@ namespace Simp1e::Editor::Windows::MapView {
         QPointF               _currentTouchPos;
 
     public:
-        MapGraphicsView() {
+        QtView(QGraphicsScene* scene) : QGraphicsView(scene) {
             setRenderHint(QPainter::Antialiasing);
             setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
             setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -90,10 +90,10 @@ namespace Simp1e::Editor::Windows::MapView {
                         if (_touchTimer.elapsed() > 1 && _touchTimer.elapsed() < 250) {
                             QPointF        pos  = touchEvent->points().first().position();
                             QGraphicsItem* item = this->itemAt(pos.toPoint());
-                            if (MapCellGraphicsRectItem* rectItem =
-                                    qgraphicsitem_cast<MapCellGraphicsRectItem*>(item)) {
-                                rectItem->Click();
-                            }
+                            // if (MapCellGraphicsRectItem* rectItem =
+                            //         qgraphicsitem_cast<MapCellGraphicsRectItem*>(item)) {
+                            //     rectItem->Click();
+                            // }
                         }
                     }
                 }
