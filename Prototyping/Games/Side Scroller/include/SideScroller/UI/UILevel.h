@@ -5,44 +5,39 @@
 
 #include "IUIGame.h"
 #include "IUILevel.h"
+#include "UIPlayerCharacter.h"
 
 namespace SideScroller {
 
     class UILevel : public IUILevel {
+        UIPlayerCharacter*     _player;
         IUIGame*               _game;
         std::unique_ptr<Level> _level;
 
     public:
         UILevel(IUIGame* game, QObject* parent = nullptr) : IUILevel(parent), _game(game) {}
 
-        void LoadLevel(const Level& level) override {
-            _level = std::make_unique<Level>(level);
+        std::unique_ptr<Level>& GetLevel() override { return _level; }
+        IUIPlayerCharacter*     GetPlayer() override { return _player; }
 
-            // // Make full size background rect
-            // auto backgroundRect = new QGraphicsRectItem(0, 0, level.width, level.height);
-            // backgroundRect->setBrush(QBrush(Qt::white));
-            // addItem(backgroundRect);
+    private:
+        void AddItem(const LevelItem& item) { addItem(new UILevelItem(item, this)); }
 
-            // // Hmm make a small item all the way at the right
-            auto rect = new QGraphicsRectItem(0, 0, 5, 5);
-            rect->setPos(level.width - 5, level.height - 5);
-            rect->setBrush(QBrush(Qt::red));
-            addItem(rect);
-
-            // for (const auto& item : level.items) {
-            // HERE!
-
-            // auto rect = new QGraphicsRectItem(0, 0, 100, 100);
-            // rect->setBrush(QBrush(Qt::red));
-            // addItem(rect);
-
-            auto anotherRect = new QGraphicsRectItem(100, 100, 100, 100);
-            anotherRect->setBrush(QBrush(Qt::blue));
-            addItem(anotherRect);
-
-            // setSceneRect(0, 0, level.width + 10, level.height + 10);
+        void AddItems(const std::vector<LevelItem>& items) {
+            for (const auto& item : items) AddItem(item);
         }
 
-        std::unique_ptr<Level>& GetLevel() override { return _level; }
+        void AddPlayer(const PlayerCharacter& player) {
+            _player = new UIPlayerCharacter(player, this);
+            addItem(_player);
+        }
+
+    public:
+        void LoadLevel(const Level& level) override {
+            _level = std::make_unique<Level>(level);
+            setSceneRect(0, 0, _level->width, _level->height);
+            AddPlayer(_level->player);
+            AddItems(_level->items);
+        }
     };
 }

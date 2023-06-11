@@ -11,7 +11,7 @@ int main(int argc, char** argv) {
         .player = {{.position = {400, 0}, .size = {10, 50}, .backgroundColor = {255, 0, 255}}},
         .items  = {{
              .type            = LevelItemType::Platform,
-             .position        = {10, 10},
+             .position        = {10, 100},
              .size            = {100, 10},
              .backgroundColor = {255, 0, 0},
         }}};

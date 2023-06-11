@@ -19,7 +19,8 @@ namespace SideScroller {
             setScene(levelUI);
             auto& level = levelUI->GetLevel();
             SetSize({level->width, level->height});
-            MoveTo({0, 0});
+            // MoveTo({0, 0});
+            // centerOn() ...
         }
 
         void MoveTo(Simp1e::UI::UIPoint point) override {
