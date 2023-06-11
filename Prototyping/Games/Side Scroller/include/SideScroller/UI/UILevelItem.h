@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Simp1e/UI/Qt/QtUI.h>
+
 #include <QPainter>
 
 #include "IUILevel.h"
@@ -31,7 +33,7 @@ namespace SideScroller {
 
         void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
             override {
-            painter->setBrush(QBrush(Qt::green));
+            painter->setBrush(QBrush(Simp1e::UI::Qt::ToQColor(_levelItem.backgroundColor)));
             painter->setPen(QPen(Qt::white));
             painter->drawRect(
                 _levelItem.position.x(), GetItemY(), _levelItem.size.width(),

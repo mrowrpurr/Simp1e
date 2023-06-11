@@ -7,6 +7,8 @@
 namespace SideScroller {
 
     class UIViewport : public IUIViewport {
+        IUILevel* _levelUI;
+
     public:
         UIViewport(QWidget* parent = nullptr) : IUIViewport(parent) {
             // setDragMode(QGraphicsView::NoDrag);
@@ -16,18 +18,24 @@ namespace SideScroller {
         }
 
         void SetLevelUI(IUILevel* levelUI) override {
+            _levelUI = levelUI;
             setScene(levelUI);
             auto& level = levelUI->GetLevel();
             SetSize({level->width, level->height});
-            // MoveTo({0, 0});
-            // centerOn() ...
+            CenterOnPlayer();
         }
 
+        void MoveToX(qreal x) { centerOn(x, y()); }
         void MoveTo(Simp1e::UI::UIPoint point) override {
             centerOn(
                 point.x() + static_cast<double>(width()) / 2,
                 point.y() + static_cast<double>(height()) / 2
             );
+        }
+
+        void CenterOnPlayer() {
+            auto player = _levelUI->GetPlayer()->GetPlayer();
+            MoveToX(player.position.x());
         }
 
         void SetZoom(double zoom) override { setTransform(QTransform::fromScale(zoom, zoom)); }
