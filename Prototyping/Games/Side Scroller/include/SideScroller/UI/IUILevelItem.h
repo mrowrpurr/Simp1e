@@ -20,7 +20,7 @@ namespace SideScroller {
         QRectF boundingRect() const override { return QRectF(); }
         void   paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override {}
 
-        bool IsAboutToCollide(Simp1e::UI::UIDirection direction, double speed) {
+        bool IsAboutToCollide(Simp1e::UI::UIDirection direction, double speed = 1) {
             // Ignore the diagonals and just look at Up(North), Down(South), Left(West), Right(East)
             QRectF nextBoundingRect = boundingRect();
 

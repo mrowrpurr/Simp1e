@@ -17,13 +17,16 @@ namespace SideScroller {
         IUILevel*       _level;
         PlayerCharacter _player;
 
+        QTimer _gravityTimer;
+        int    _gravityFallSpeed = 10;  // Pixels per frame
+
         QTimer _leftRightTimer;
         bool   _isMovingLeft  = false;
         bool   _isMovingRight = false;
 
         QTimer jumpTimer;
-        int    jumpHeight        = 200;  // the height of the jump in pixels
-        int    jumpSpeed         = 3;    // the speed of the jump in pixels per frame
+        int    jumpHeight        = 100;  // the height of the jump in pixels
+        int    jumpSpeed         = 5;    // the speed of the jump in pixels per frame
         int    currentJumpHeight = 0;    // the current height of the jump
 
     public:
@@ -33,23 +36,24 @@ namespace SideScroller {
             jumpTimer.setInterval(20);  // <--- changing this doens't seem to do anything
             QObject::connect(&jumpTimer, &QTimer::timeout, [this]() { jumpFrame(); });
             //
-            _leftRightTimer.setInterval(20);
             QObject::connect(&_leftRightTimer, &QTimer::timeout, [this]() {
                 DoLeftRightMovement();
             });
             _leftRightTimer.start(50);
+            //
+            QObject::connect(&_gravityTimer, &QTimer::timeout, [this]() {
+                DoGravityPlayerFalling();
+            });
+            _gravityTimer.start(50);
         }
 
         LevelItem& GetLevelItem() override { return _player; }
 
     private:
         void jumpFrame() {
-            if (currentJumpHeight < jumpHeight / 2 &&
+            if (currentJumpHeight < jumpHeight &&
                 !IsAboutToCollide(Simp1e::UI::UIDirection::North, jumpSpeed)) {
                 _player.position = {_player.position.x(), _player.position.y() + jumpSpeed};
-                currentJumpHeight += jumpSpeed;
-            } else if (currentJumpHeight < jumpHeight && !IsAboutToCollide(Simp1e::UI::UIDirection::South, jumpSpeed)) {
-                _player.position = {_player.position.x(), _player.position.y() - jumpSpeed};
                 currentJumpHeight += jumpSpeed;
             } else {
                 jumpTimer.stop();
@@ -62,11 +66,26 @@ namespace SideScroller {
 
         void DoLeftRightMovement() {
             if (_isMovingLeft && !IsAboutToCollide(Simp1e::UI::UIDirection::West, _playerSpeed)) {
+                qDebug() << "Moving left";
                 _player.position = {_player.position.x() - _playerSpeed, _player.position.y()};
                 prepareGeometryChange();
                 update();
             } else if (_isMovingRight && !IsAboutToCollide(Simp1e::UI::UIDirection::East, _playerSpeed)) {
+                qDebug() << "Moving right";
                 _player.position = {_player.position.x() + _playerSpeed, _player.position.y()};
+                prepareGeometryChange();
+                update();
+            }
+        }
+
+        bool IsOnPlatformOrGround() {
+            return _player.position.y() == 0 || IsAboutToCollide(Simp1e::UI::UIDirection::South, 1);
+        }
+
+        void DoGravityPlayerFalling() {
+            if (!IsOnPlatformOrGround()) {
+                _player.position = {_player.position.x(), _player.position.y() - _gravityFallSpeed};
+                if (_player.position.y() < 0) _player.position = {_player.position.x(), 0.0};
                 prepareGeometryChange();
                 update();
             }
