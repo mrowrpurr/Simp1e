@@ -65,13 +65,11 @@ namespace SideScroller {
 
         void keyPressEvent(QKeyEvent* event) override {
             if (event->isAutoRepeat()) return;
-            qDebug() << "Key pressed: " << event->key();
             for (auto& callback : _keyPressCallbacks) callback(event);
         }
 
         void keyReleaseEvent(QKeyEvent* event) override {
             if (event->isAutoRepeat()) return;
-            qDebug() << "Key released: " << event->key();
             for (auto& callback : _keyReleaseCallbacks) callback(event);
         }
     };
