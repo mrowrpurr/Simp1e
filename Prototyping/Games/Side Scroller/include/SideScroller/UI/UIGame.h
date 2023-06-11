@@ -18,6 +18,7 @@ namespace SideScroller {
     public:
         UIGame(int& argc, char** argv) : IUIGame(argc, argv) {
             _frame.GetViewport()->OnKeyPress([this](QKeyEvent* event) { OnKeyPress(event); });
+            _frame.GetViewport()->OnKeyRelease([this](QKeyEvent* event) { OnKeyRelease(event); });
         }
 
     private:
@@ -27,13 +28,26 @@ namespace SideScroller {
                     _frame.close();
                     break;
                 case Qt::Key_A:
-                    _levelUI->GetPlayer()->MoveLeft();
+                    _levelUI->GetPlayer()->StartMovingLeft();
                     break;
                 case Qt::Key_D:
-                    _levelUI->GetPlayer()->MoveRight();
+                    _levelUI->GetPlayer()->StartMovingRight();
                     break;
                 case Qt::Key_Space:
                     _levelUI->GetPlayer()->Jump();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        void OnKeyRelease(QKeyEvent* event) {
+            switch (event->key()) {
+                case Qt::Key_A:
+                    _levelUI->GetPlayer()->StopMovingLeft();
+                    break;
+                case Qt::Key_D:
+                    _levelUI->GetPlayer()->StopMovingRight();
                     break;
                 default:
                     break;

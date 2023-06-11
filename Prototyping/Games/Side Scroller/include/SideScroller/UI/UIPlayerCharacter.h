@@ -17,6 +17,10 @@ namespace SideScroller {
         IUILevel*       _level;
         PlayerCharacter _player;
 
+        QTimer _leftRightTimer;
+        bool   _isMovingLeft  = false;
+        bool   _isMovingRight = false;
+
         QTimer jumpTimer;
         int    jumpHeight        = 200;  // the height of the jump in pixels
         int    jumpSpeed         = 3;    // the speed of the jump in pixels per frame
@@ -25,8 +29,15 @@ namespace SideScroller {
     public:
         UIPlayerCharacter(PlayerCharacter player, IUILevel* level, QGraphicsItem* parent = nullptr)
             : IUIPlayerCharacter(parent), _player(player), _level(level) {
+            //
             jumpTimer.setInterval(20);  // <--- changing this doens't seem to do anything
             QObject::connect(&jumpTimer, &QTimer::timeout, [this]() { jumpFrame(); });
+            //
+            _leftRightTimer.setInterval(20);
+            QObject::connect(&_leftRightTimer, &QTimer::timeout, [this]() {
+                DoLeftRightMovement();
+            });
+            _leftRightTimer.start(50);
         }
 
     private:
@@ -51,6 +62,18 @@ namespace SideScroller {
             update();
         }
 
+        void DoLeftRightMovement() {
+            if (_isMovingLeft) {
+                _player.position = {_player.position.x() - _playerSpeed, _player.position.y()};
+                prepareGeometryChange();
+                update();
+            } else if (_isMovingRight) {
+                _player.position = {_player.position.x() + _playerSpeed, _player.position.y()};
+                prepareGeometryChange();
+                update();
+            }
+        }
+
     public:
         IUILevel*        GetLevel() override { return _level; }
         PlayerCharacter& GetPlayer() override { return _player; }
@@ -59,18 +82,24 @@ namespace SideScroller {
             return _level->GetLevel()->height - _player.position.y() - _player.size.height();
         }
 
-        void MoveLeft() override {
-            qDebug() << "Move left";
-            prepareGeometryChange();
-            _player.position = {_player.position.x() - _playerSpeed, _player.position.y()};
-            update();
+        void StartMovingLeft() override {
+            _isMovingLeft = true;
+            qDebug() << "Start moving left";
         }
 
-        void MoveRight() override {
-            qDebug() << "Move right";
-            prepareGeometryChange();
-            _player.position = {_player.position.x() + _playerSpeed, _player.position.y()};
-            update();
+        void StopMovingLeft() override {
+            _isMovingLeft = false;
+            qDebug() << "Stop moving left";
+        }
+
+        void StartMovingRight() override {
+            _isMovingRight = true;
+            qDebug() << "Start moving right";
+        }
+
+        void StopMovingRight() override {
+            _isMovingRight = false;
+            qDebug() << "Stop moving right";
         }
 
         void Jump() override {
@@ -85,7 +114,6 @@ namespace SideScroller {
         }
 
         void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
-
             override {
             qDebug() << "Painting player";
             painter->setBrush(QBrush(Simp1e::UI::Qt::ToQColor(_player.backgroundColor)));

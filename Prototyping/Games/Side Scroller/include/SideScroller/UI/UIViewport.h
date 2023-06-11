@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QDebug>
+#include <QKeyEvent>
 #include <QScrollBar>
 #include <functional>
 #include <vector>
@@ -11,6 +13,7 @@ namespace SideScroller {
     class UIViewport : public IUIViewport {
         IUILevel*                                    _levelUI;
         std::vector<std::function<void(QKeyEvent*)>> _keyPressCallbacks;
+        std::vector<std::function<void(QKeyEvent*)>> _keyReleaseCallbacks;
 
     public:
         UIViewport(QWidget* parent = nullptr) : IUIViewport(parent) {
@@ -52,12 +55,24 @@ namespace SideScroller {
             _keyPressCallbacks.push_back(callback);
         }
 
+        void OnKeyRelease(std::function<void(QKeyEvent*)> callback) override {
+            _keyReleaseCallbacks.push_back(callback);
+        }
+
     protected:
         // Don't scroll the scene with the wheel
         // void wheelEvent(QWheelEvent* event) override {}
 
         void keyPressEvent(QKeyEvent* event) override {
+            if (event->isAutoRepeat()) return;
+            qDebug() << "Key pressed: " << event->key();
             for (auto& callback : _keyPressCallbacks) callback(event);
+        }
+
+        void keyReleaseEvent(QKeyEvent* event) override {
+            if (event->isAutoRepeat()) return;
+            qDebug() << "Key released: " << event->key();
+            for (auto& callback : _keyReleaseCallbacks) callback(event);
         }
     };
 }
