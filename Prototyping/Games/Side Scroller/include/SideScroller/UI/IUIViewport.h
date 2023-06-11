@@ -12,10 +12,11 @@ namespace SideScroller {
     class IUIViewport : public QGraphicsView {
     public:
         IUIViewport(QWidget* parent = nullptr) : QGraphicsView(parent) {}
-        virtual ~IUIViewport()                         = default;
-        virtual void MoveTo(Simp1e::UI::UIPoint point) = 0;
-        virtual void SetZoom(double zoom)              = 0;
-        virtual void SetSize(Simp1e::UI::UISize size)  = 0;
-        virtual void SetLevelUI(IUILevel* levelUI)     = 0;
+        virtual ~IUIViewport()                                            = default;
+        virtual void MoveTo(Simp1e::UI::UIPoint point)                    = 0;
+        virtual void SetZoom(double zoom)                                 = 0;
+        virtual void SetSize(Simp1e::UI::UISize size)                     = 0;
+        virtual void SetLevelUI(IUILevel* levelUI)                        = 0;
+        virtual void OnKeyPress(std::function<void(QKeyEvent*)> callback) = 0;
     };
 }

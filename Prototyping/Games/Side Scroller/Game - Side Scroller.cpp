@@ -1,6 +1,7 @@
 #include "SideScroller/Game/Level.h"
 #include "SideScroller/UI/UIGame.h"
 
+// More specifically: Platformer
 using namespace SideScroller;
 
 int main(int argc, char** argv) {

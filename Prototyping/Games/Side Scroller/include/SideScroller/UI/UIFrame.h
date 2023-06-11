@@ -16,6 +16,8 @@ namespace SideScroller {
     public:
         UIFrame(IUIGame* game) : IUIFrame(), _game(game) {}
 
+        IUIViewport* GetViewport() override { return &_viewport; }
+
         void SetLevelUI(IUILevel* levelUI) override { _viewport.SetLevelUI(levelUI); }
 
         void SetViewportWidth(double width) override {

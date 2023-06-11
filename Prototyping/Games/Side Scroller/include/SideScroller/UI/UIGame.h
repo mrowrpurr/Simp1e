@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QDebug>
+#include <QKeyEvent>
 #include <memory>
 
 #include "IUIGame.h"
@@ -15,8 +16,31 @@ namespace SideScroller {
         double                   _viewportWidth = 500;
 
     public:
-        UIGame(int& argc, char** argv) : IUIGame(argc, argv) {}
+        UIGame(int& argc, char** argv) : IUIGame(argc, argv) {
+            _frame.GetViewport()->OnKeyPress([this](QKeyEvent* event) { OnKeyPress(event); });
+        }
 
+    private:
+        void OnKeyPress(QKeyEvent* event) {
+            switch (event->key()) {
+                case Qt::Key_Escape:
+                    _frame.close();
+                    break;
+                case Qt::Key_A:
+                    _levelUI->GetPlayer()->MoveLeft();
+                    break;
+                case Qt::Key_D:
+                    _levelUI->GetPlayer()->MoveRight();
+                    break;
+                case Qt::Key_Space:
+                    _levelUI->GetPlayer()->Jump();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+    public:
         void LoadLevel(const Level& level) override {
             _levelUI = std::make_unique<UILevel>(this);
             _levelUI->LoadLevel(level);

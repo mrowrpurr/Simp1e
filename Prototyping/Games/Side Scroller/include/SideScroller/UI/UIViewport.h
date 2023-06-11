@@ -1,13 +1,16 @@
 #pragma once
 
 #include <QScrollBar>
+#include <functional>
+#include <vector>
 
 #include "IUIViewport.h"
 
 namespace SideScroller {
 
     class UIViewport : public IUIViewport {
-        IUILevel* _levelUI;
+        IUILevel*                                    _levelUI;
+        std::vector<std::function<void(QKeyEvent*)>> _keyPressCallbacks;
 
     public:
         UIViewport(QWidget* parent = nullptr) : IUIViewport(parent) {
@@ -45,8 +48,16 @@ namespace SideScroller {
             setFixedSize(size.width(), size.height());
         }
 
+        void OnKeyPress(std::function<void(QKeyEvent*)> callback) override {
+            _keyPressCallbacks.push_back(callback);
+        }
+
     protected:
         // Don't scroll the scene with the wheel
         // void wheelEvent(QWheelEvent* event) override {}
+
+        void keyPressEvent(QKeyEvent* event) override {
+            for (auto& callback : _keyPressCallbacks) callback(event);
+        }
     };
 }
