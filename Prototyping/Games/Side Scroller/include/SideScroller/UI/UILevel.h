@@ -18,24 +18,29 @@ namespace SideScroller {
         void LoadLevel(const Level& level) override {
             _level = std::make_unique<Level>(level);
 
-            // Create 1 rectangle for the entire background for the entire level scene
-            auto background = new QGraphicsRectItem{0, 0, level.width, level.height};
-            qDebug() << "UILevel LoadLevel Level size: " << level.width << "x" << level.height;
-            background->setBrush(QBrush{
-                QColor{0, 255, 255}
-            });
-            addItem(background);
+            // // Make full size background rect
+            // auto backgroundRect = new QGraphicsRectItem(0, 0, level.width, level.height);
+            // backgroundRect->setBrush(QBrush(Qt::white));
+            // addItem(backgroundRect);
 
-            auto rect = new QGraphicsRectItem{0, 0, 300, 400};
-            rect->setPos(300, 600);
-            qDebug() << "Pink rect x y width height: " << rect->x() << " " << rect->y() << " "
-                     << rect->rect().width() << " " << rect->rect().height();
-            rect->setBrush(QBrush{
-                QColor{255, 0, 255}
-            });
+            // // Hmm make a small item all the way at the right
+            auto rect = new QGraphicsRectItem(0, 0, 5, 5);
+            rect->setPos(level.width - 5, level.height - 5);
+            rect->setBrush(QBrush(Qt::red));
             addItem(rect);
 
             // for (const auto& item : level.items) {
+            // HERE!
+
+            // auto rect = new QGraphicsRectItem(0, 0, 100, 100);
+            // rect->setBrush(QBrush(Qt::red));
+            // addItem(rect);
+
+            auto anotherRect = new QGraphicsRectItem(100, 100, 100, 100);
+            anotherRect->setBrush(QBrush(Qt::blue));
+            addItem(anotherRect);
+
+            // setSceneRect(0, 0, level.width + 10, level.height + 10);
         }
 
         std::unique_ptr<Level>& GetLevel() override { return _level; }

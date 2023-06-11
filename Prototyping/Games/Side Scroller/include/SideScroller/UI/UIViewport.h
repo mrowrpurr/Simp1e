@@ -9,9 +9,10 @@ namespace SideScroller {
     class UIViewport : public IUIViewport {
     public:
         UIViewport(QWidget* parent = nullptr) : IUIViewport(parent) {
-            setDragMode(QGraphicsView::NoDrag);
-            setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-            setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+            // setDragMode(QGraphicsView::NoDrag);
+            // setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+            setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+            // setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         }
 
         void SetLevelUI(IUILevel* levelUI) override {
@@ -31,12 +32,12 @@ namespace SideScroller {
         void SetZoom(double zoom) override { setTransform(QTransform::fromScale(zoom, zoom)); }
 
         void SetSize(Simp1e::UI::UISize size) override {
+            qDebug() << "Set Viewport size: " << size.width() << "x" << size.height();
             setFixedSize(size.width(), size.height());
         }
 
     protected:
-        void wheelEvent(QWheelEvent* event) override {
-            // Don't scroll the scene with the wheel
-        }
+        // Don't scroll the scene with the wheel
+        // void wheelEvent(QWheelEvent* event) override {}
     };
 }

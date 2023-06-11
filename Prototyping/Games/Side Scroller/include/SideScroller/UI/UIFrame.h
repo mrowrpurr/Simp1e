@@ -19,7 +19,8 @@ namespace SideScroller {
         void SetLevelUI(IUILevel* levelUI) override { _viewport.SetLevelUI(levelUI); }
 
         void SetViewportWidth(double width) override {
-            _viewport.setFixedSize(width + viewportPadding, _viewport.height());
+            qDebug() << "Set Frame Viewport size: " << width << "x" << _viewport.height();
+            _viewport.SetSize({width + viewportPadding, static_cast<double>(_viewport.height())});
         }
     };
 }

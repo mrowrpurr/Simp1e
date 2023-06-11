@@ -6,13 +6,14 @@ using namespace SideScroller;
 int main(int argc, char** argv) {
     Level level{
         .name   = "My first level",
-        .width  = 8000,
+        .width  = 2000,
         .height = 500,
+        .player = {{.position = {400, 0}, .size = {10, 50}, .backgroundColor = {255, 0, 255}}},
         .items  = {{
-             .type            = LevelItemType::Player,
-             .position        = {10, 30},
-             .size            = {10, 50},
-             .backgroundColor = {255, 0, 255},
+             .type            = LevelItemType::Platform,
+             .position        = {10, 10},
+             .size            = {100, 10},
+             .backgroundColor = {255, 0, 0},
         }}};
 
     UIGame game{argc, argv};
