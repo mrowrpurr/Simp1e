@@ -6,8 +6,8 @@ using namespace SideScroller;
 int main(int argc, char** argv) {
     Level level{
         .name   = "My first level",
-        .width  = 1000,
-        .height = 100,
+        .width  = 8000,
+        .height = 500,
         .items  = {{
              .type            = LevelItemType::Player,
              .position        = {10, 30},
