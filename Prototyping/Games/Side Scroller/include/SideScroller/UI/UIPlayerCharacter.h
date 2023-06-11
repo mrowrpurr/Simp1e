@@ -40,20 +40,18 @@ namespace SideScroller {
             _leftRightTimer.start(50);
         }
 
+        LevelItem& GetLevelItem() override { return _player; }
+
     private:
         void jumpFrame() {
-            if (currentJumpHeight < jumpHeight / 2) {
-                // We're still going up
-                // _player.position.y() -= jumpSpeed;
+            if (currentJumpHeight < jumpHeight / 2 &&
+                !IsAboutToCollide(Simp1e::UI::UIDirection::North, jumpSpeed)) {
                 _player.position = {_player.position.x(), _player.position.y() + jumpSpeed};
                 currentJumpHeight += jumpSpeed;
-            } else if (currentJumpHeight < jumpHeight) {
-                // We're coming down
-                // _player.position.y() += jumpSpeed;
+            } else if (currentJumpHeight < jumpHeight && !IsAboutToCollide(Simp1e::UI::UIDirection::South, jumpSpeed)) {
                 _player.position = {_player.position.x(), _player.position.y() - jumpSpeed};
                 currentJumpHeight += jumpSpeed;
             } else {
-                // We've finished the jump
                 jumpTimer.stop();
                 currentJumpHeight = 0;
             }
@@ -63,11 +61,11 @@ namespace SideScroller {
         }
 
         void DoLeftRightMovement() {
-            if (_isMovingLeft) {
+            if (_isMovingLeft && !IsAboutToCollide(Simp1e::UI::UIDirection::West, _playerSpeed)) {
                 _player.position = {_player.position.x() - _playerSpeed, _player.position.y()};
                 prepareGeometryChange();
                 update();
-            } else if (_isMovingRight) {
+            } else if (_isMovingRight && !IsAboutToCollide(Simp1e::UI::UIDirection::East, _playerSpeed)) {
                 _player.position = {_player.position.x() + _playerSpeed, _player.position.y()};
                 prepareGeometryChange();
                 update();

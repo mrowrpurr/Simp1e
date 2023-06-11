@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
                  .backgroundColor = {255, 0, 0},
             }, {
                  .type            = LevelItemType::Platform,
-                 .position        = {600, 50},
+                 .position        = {600, 40},
                  .size            = {100, 10},
                  .backgroundColor = {0, 255, 255},
             }, {

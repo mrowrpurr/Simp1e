@@ -17,7 +17,8 @@ namespace SideScroller {
         UILevelItem(const LevelItem& levelItem, IUILevel* level, QGraphicsItem* parent = nullptr)
             : IUILevelItem(parent), _level(level), _levelItem(levelItem) {}
 
-        IUILevel* GetLevel() override { return _level; }
+        IUILevel*  GetLevel() override { return _level; }
+        LevelItem& GetLevelItem() override { return _levelItem; }
 
         qreal GetItemY() const {
             return _level->GetLevel()->height - _levelItem.position.y() - _levelItem.size.height();
