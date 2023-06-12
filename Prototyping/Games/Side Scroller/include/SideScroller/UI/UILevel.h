@@ -32,10 +32,17 @@ namespace SideScroller {
             addItem(_player);
         }
 
+        void AddBackground() {
+            auto background = new QGraphicsRectItem(0, 0, _level->width, _level->height);
+            background->setBrush(QBrush(Qt::white));
+            addItem(background);
+        }
+
     public:
         void LoadLevel(const Level& level) override {
             _level = std::make_unique<Level>(level);
             setSceneRect(0, 0, _level->width, _level->height);
+            AddBackground();
             AddPlayer(_level->player);
             AddItems(_level->items);
         }

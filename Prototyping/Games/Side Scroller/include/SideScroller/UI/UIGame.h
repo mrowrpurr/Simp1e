@@ -13,7 +13,7 @@ namespace SideScroller {
     class UIGame : public IUIGame {
         UIFrame                  _frame{this};
         std::unique_ptr<UILevel> _levelUI;
-        double                   _viewportWidth = 500;
+        double                   _viewportWidth = 1200;
 
     public:
         UIGame(int& argc, char** argv) : IUIGame(argc, argv) {
@@ -58,6 +58,7 @@ namespace SideScroller {
         void LoadLevel(const Level& level) override {
             _levelUI = std::make_unique<UILevel>(this);
             _levelUI->LoadLevel(level);
+            _levelUI->GetPlayer()->OnMove([this]() { _frame.GetViewport()->CenterOnPlayer(); });
 
             _frame.SetLevelUI(_levelUI.get());
             _frame.SetViewportWidth(_viewportWidth);

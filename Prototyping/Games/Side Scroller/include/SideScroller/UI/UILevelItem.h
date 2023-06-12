@@ -10,9 +10,10 @@
 namespace SideScroller {
 
     class UILevelItem : public IUILevelItem {
-        LevelItem  _ownedLevelItem;
-        LevelItem* _levelItem;
-        IUILevel*  _level;
+        LevelItem                          _ownedLevelItem;
+        LevelItem*                         _levelItem;
+        IUILevel*                          _level;
+        std::vector<std::function<void()>> _onMoveCallbacks;
 
     public:
         UILevelItem(const LevelItem& levelItem, IUILevel* level, QGraphicsItem* parent = nullptr)
@@ -29,6 +30,10 @@ namespace SideScroller {
                    _levelItem->size.height();
         }
 
+        void OnMove(std::function<void()> callback) override {
+            _onMoveCallbacks.push_back(callback);
+        }
+
         // TODO
         void StartMovingLeft() override {}
         void StopMovingLeft() override {}
@@ -37,6 +42,10 @@ namespace SideScroller {
         void Jump() override {}
 
     protected:
+        void TriggerMoveCallbacks() {
+            for (auto& callback : _onMoveCallbacks) callback();
+        }
+
         QRectF boundingRect() const override {
             return QRectF(
                 _levelItem->position.x(), GetItemY(), _levelItem->size.width(),

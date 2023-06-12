@@ -7,24 +7,24 @@ using namespace SideScroller;
 int main(int argc, char** argv) {
     Level level{
         .name   = "My first level",
-        .width  = 2000,
-        .height = 500,
-        .player = {{.position = {400, 0}, .size = {10, 50}, .backgroundColor = {255, 0, 255}}},
+        .width  = 8000,
+        .height = 1000,
+        .player = {{.position = {600, 0}, .size = {200, 200}, .backgroundColor = {255, 0, 255}}},
         .items  = {
                    {
                  .type            = LevelItemType::Platform,
                  .position        = {10, 100},
-                 .size            = {100, 10},
+                 .size            = {400, 30},
                  .backgroundColor = {255, 0, 0},
             }, {
                  .type            = LevelItemType::Platform,
-                 .position        = {600, 40},
-                 .size            = {100, 10},
+                 .position        = {1200, 200},
+                 .size            = {400, 30},
                  .backgroundColor = {0, 255, 255},
             }, {
                  .type            = LevelItemType::Platform,
-                 .position        = {800, 100},
-                 .size            = {100, 10},
+                 .position        = {1800, 300},
+                 .size            = {400, 30},
                  .backgroundColor = {255, 255, 0},
             }}
     };

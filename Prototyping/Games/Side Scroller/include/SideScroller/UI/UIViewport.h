@@ -39,9 +39,14 @@ namespace SideScroller {
             );
         }
 
-        void CenterOnPlayer() {
+        void CenterOnPlayer() override {
             auto* player = _levelUI->GetPlayer();
-            MoveToX(player->pos().x());
+            if (player == nullptr) {
+                qDebug() << "No player to center on";
+                return;
+            }
+            qDebug() << "Centering on player at: " << player->GetX();
+            MoveToX(player->GetX());
         }
 
         void SetZoom(double zoom) override { setTransform(QTransform::fromScale(zoom, zoom)); }

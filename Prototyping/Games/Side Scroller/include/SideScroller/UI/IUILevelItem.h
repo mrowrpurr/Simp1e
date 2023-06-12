@@ -4,6 +4,7 @@
 
 #include <QGraphicsItem>
 #include <QGraphicsScene>
+#include <functional>
 
 #include "../Game/LevelItem.h"
 
@@ -13,14 +14,18 @@ namespace SideScroller {
 
     struct IUILevelItem : public QGraphicsItem {
         IUILevelItem(QGraphicsItem* parent = nullptr) : QGraphicsItem(parent) {}
-        virtual ~IUILevelItem()                 = default;
-        virtual IUILevel*  GetLevel() const     = 0;
-        virtual LevelItem* GetLevelItem() const = 0;
-        virtual void       StartMovingRight()   = 0;
-        virtual void       StartMovingLeft()    = 0;
-        virtual void       StopMovingRight()    = 0;
-        virtual void       StopMovingLeft()     = 0;
-        virtual void       Jump()               = 0;
+        virtual ~IUILevelItem()                                   = default;
+        virtual IUILevel*  GetLevel() const                       = 0;
+        virtual LevelItem* GetLevelItem() const                   = 0;
+        virtual void       StartMovingRight()                     = 0;
+        virtual void       StartMovingLeft()                      = 0;
+        virtual void       StopMovingRight()                      = 0;
+        virtual void       StopMovingLeft()                       = 0;
+        virtual void       Jump()                                 = 0;
+        virtual void       OnMove(std::function<void()> callback) = 0;
+        virtual QRectF     GetBoundingRect() const { return boundingRect(); }
+        virtual double     GetX() const { return boundingRect().x(); }
+        virtual double     GetY() const { return boundingRect().y(); }
 
     protected:
         QRectF boundingRect() const override { return QRectF(); }

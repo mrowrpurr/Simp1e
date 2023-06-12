@@ -6,6 +6,7 @@ add_requires_for_logging()
 add_requires_for_string_formatting()
 -- add_requires_for_specs()
 includes("Simp1e*/xmake.lua")
+includes("Misc/**/xmake.lua")
 includes("Prototyping/**/xmake.lua")
 
 -- TODO : bring back testing

@@ -19,5 +19,6 @@ namespace SideScroller {
         virtual void SetLevelUI(IUILevel* levelUI)                          = 0;
         virtual void OnKeyPress(std::function<void(QKeyEvent*)> callback)   = 0;
         virtual void OnKeyRelease(std::function<void(QKeyEvent*)> callback) = 0;
+        virtual void CenterOnPlayer()                                       = 0;
     };
 }
