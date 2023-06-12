@@ -17,5 +17,7 @@ namespace Animations {
         constexpr auto STAND_RIGHT = "Running 1/Right.png";
         constexpr auto JUMP_RIGHT  = "Bounce 1/Bounce Right.gif";
         constexpr auto JUMP_LEFT   = "Bounce 1/Bounce Left.gif";
+        constexpr auto FALL_RIGHT  = "Bounce 1/Right.gif";
+        constexpr auto FALL_LEFT   = "Bounce 1/Left.gif";
     }
 }
