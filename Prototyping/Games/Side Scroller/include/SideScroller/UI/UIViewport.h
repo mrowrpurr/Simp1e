@@ -40,8 +40,8 @@ namespace SideScroller {
         }
 
         void CenterOnPlayer() {
-            auto player = _levelUI->GetPlayer()->GetPlayer();
-            MoveToX(player.position.x());
+            auto* player = _levelUI->GetPlayer();
+            MoveToX(player->pos().x());
         }
 
         void SetZoom(double zoom) override { setTransform(QTransform::fromScale(zoom, zoom)); }

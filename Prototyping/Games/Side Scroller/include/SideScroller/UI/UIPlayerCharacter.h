@@ -7,15 +7,14 @@
 #include <QTimer>
 
 #include "IUILevel.h"
-#include "IUIPlayerCharacter.h"
 #include "UILevelItem.h"
 
 namespace SideScroller {
 
-    class UIPlayerCharacter : public IUIPlayerCharacter {
-        double          _playerSpeed = 10;  // Pixels per press
-        IUILevel*       _level;
-        PlayerCharacter _player;
+    class UIPlayerCharacter : public UILevelItem {
+        double     _playerSpeed = 10;  // Pixels per press
+        LevelItem  _player;
+        LevelItem* _playerPtr = &_player;
 
         QTimer _gravityTimer;
         int    _gravityFallSpeed = 10;  // Pixels per frame
@@ -30,23 +29,24 @@ namespace SideScroller {
         int    _currentJumpHeight = 0;    // the current height of the jump
 
     public:
-        UIPlayerCharacter(PlayerCharacter player, IUILevel* level, QGraphicsItem* parent = nullptr)
-            : IUIPlayerCharacter(parent), _player(player), _level(level) {
-            //
+        UIPlayerCharacter(const LevelItem& player, IUILevel* level, QGraphicsItem* parent = nullptr)
+            : UILevelItem(&_player, level, parent), _player(player) {
+            // Connect the jump timer
             QObject::connect(&_jumpTimer, &QTimer::timeout, [this]() { jumpFrame(); });
-            //
+            // Connect the left/right timer
             QObject::connect(&_leftRightTimer, &QTimer::timeout, [this]() {
                 DoLeftRightMovement();
             });
             _leftRightTimer.start(50);
-            //
+            // Connect the gravity timer
             QObject::connect(&_gravityTimer, &QTimer::timeout, [this]() {
                 DoGravityPlayerFalling();
             });
             _gravityTimer.start(50);
         }
 
-        LevelItem& GetLevelItem() override { return _player; }
+        IUILevel*  GetLevel() const override { return UILevelItem::GetLevel(); }
+        LevelItem* GetLevelItem() const override { return _playerPtr; }
 
     private:
         void jumpFrame() {
@@ -91,13 +91,6 @@ namespace SideScroller {
         }
 
     public:
-        IUILevel*        GetLevel() override { return _level; }
-        PlayerCharacter& GetPlayer() override { return _player; }
-
-        qreal GetPlayerY() const {
-            return _level->GetLevel()->height - _player.position.y() - _player.size.height();
-        }
-
         void StartMovingLeft() override {
             _isMovingLeft = true;
             qDebug() << "Start moving left";
@@ -121,22 +114,6 @@ namespace SideScroller {
         void Jump() override {
             if (!IsOnPlatformOrGround()) return;
             if (!_jumpTimer.isActive()) _jumpTimer.start(10);
-        }
-
-    protected:
-        QRectF boundingRect() const override {
-            return QRectF(
-                _player.position.x(), GetPlayerY(), _player.size.width(), _player.size.height()
-            );
-        }
-
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
-            override {
-            painter->setBrush(QBrush(Simp1e::UI::Qt::ToQColor(_player.backgroundColor)));
-            painter->setPen(QPen(Qt::white));
-            painter->drawRect(
-                _player.position.x(), GetPlayerY(), _player.size.width(), _player.size.height()
-            );
         }
     };
 }

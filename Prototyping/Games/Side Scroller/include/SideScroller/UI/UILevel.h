@@ -18,7 +18,7 @@ namespace SideScroller {
         UILevel(IUIGame* game, QObject* parent = nullptr) : IUILevel(parent), _game(game) {}
 
         std::unique_ptr<Level>& GetLevel() override { return _level; }
-        IUIPlayerCharacter*     GetPlayer() override { return _player; }
+        IUILevelItem*           GetPlayer() override { return _player; }
 
     private:
         void AddItem(const LevelItem& item) { addItem(new UILevelItem(item, this)); }

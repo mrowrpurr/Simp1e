@@ -3,6 +3,7 @@
 #include <Simp1e/UI/UIDirection.h>
 
 #include <QGraphicsItem>
+#include <QGraphicsScene>
 
 #include "../Game/LevelItem.h"
 
@@ -12,9 +13,14 @@ namespace SideScroller {
 
     struct IUILevelItem : public QGraphicsItem {
         IUILevelItem(QGraphicsItem* parent = nullptr) : QGraphicsItem(parent) {}
-        virtual ~IUILevelItem()           = default;
-        virtual IUILevel*  GetLevel()     = 0;
-        virtual LevelItem& GetLevelItem() = 0;
+        virtual ~IUILevelItem()                 = default;
+        virtual IUILevel*  GetLevel() const     = 0;
+        virtual LevelItem* GetLevelItem() const = 0;
+        virtual void       StartMovingRight()   = 0;
+        virtual void       StartMovingLeft()    = 0;
+        virtual void       StopMovingRight()    = 0;
+        virtual void       StopMovingLeft()     = 0;
+        virtual void       Jump()               = 0;
 
     protected:
         QRectF boundingRect() const override { return QRectF(); }
@@ -44,7 +50,7 @@ namespace SideScroller {
             for (auto& item : scene()->items(nextBoundingRect)) {
                 if (item == this) continue;
                 if (auto* levelItem = dynamic_cast<IUILevelItem*>(item))
-                    if (levelItem->GetLevelItem().type == LevelItemType::Platform) return true;
+                    if (levelItem->GetLevelItem()->type == LevelItemType::Platform) return true;
             }
 
             return false;
