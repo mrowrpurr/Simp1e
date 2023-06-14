@@ -8,3 +8,4 @@ build
 *.xcf
 .DS_Store
 .vscode
+*.jks

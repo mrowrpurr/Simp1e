@@ -6,3 +6,4 @@ find_package(Qt6 COMPONENTS Core Widgets REQUIRED)
 
 file(REMOVE_RECURSE ${CMAKE_SOURCE_DIR}/android-build)
 
+add_subdirectory("Prototyping/Games/Side Scroller - Simpler")
