@@ -7,7 +7,7 @@ int main(int argc, char* argv[]) {
     QWidget window;
 
     window.resize(250, 150);
-    window.setWindowTitle("Simple example");
+    window.setWindowTitle("Hello Qt from CMake");
     window.show();
 
     return app.exec();
