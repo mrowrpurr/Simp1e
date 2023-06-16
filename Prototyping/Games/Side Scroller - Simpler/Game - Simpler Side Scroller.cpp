@@ -1,5 +1,6 @@
 #include <Simp1e/Color.h>
 #include <Simp1e/ECS.h>
+#include <Simp1e/ECS/Game.h>
 #include <Simp1e/ECS/PositionComponent.h>
 #include <Simp1e/ECS/RectangleComponent.h>
 
@@ -8,6 +9,7 @@
 #include <QGraphicsRectItem>
 #include <QGraphicsScene>
 #include <QGraphicsView>
+
 
 using namespace Simp1e;
 using namespace Simp1e::ECS;
@@ -24,7 +26,7 @@ class QtRectangleComponent : public RectangleComponent {
     QtRectangleComponent(const QtRectangleComponent&) = delete;
 
 public:
-    SIMP1E_ECS_COMPONENT(69)
+    SIMP1E_ECS_COMPONENT("QtRectangleComponent")
 
     QtRectangleComponent(const Rectangle& rectangle)
         : RectangleComponent(rectangle),

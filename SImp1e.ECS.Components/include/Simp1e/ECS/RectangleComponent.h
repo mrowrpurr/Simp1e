@@ -2,6 +2,7 @@
 
 #include <Simp1e/Color.h>
 #include <Simp1e/ECS/ComponentType.h>
+#include <Simp1e/ECS/ComponentTypeMacro.h>
 #include <Simp1e/Rectangle.h>
 
 #include <optional>

@@ -13,7 +13,12 @@ namespace Simp1e::ECS {
             : _entityManager(entityManager), _entity(entity) {}
 
         template <typename T>
-        void AddComponent(ComponentType componentType, T&& component) {
+        void AddComponent(const ComponentType& componentType) {
+            _entityManager.AddComponent<T>(_entity, componentType);
+        }
+
+        template <typename T>
+        void AddComponent(const ComponentType& componentType, T&& component) {
             _entityManager.AddComponent(_entity, componentType, std::forward<T>(component));
         }
 
@@ -23,7 +28,7 @@ namespace Simp1e::ECS {
         }
 
         template <typename T>
-        void AddComponent(ComponentType componentType, T* component) {
+        void AddComponent(const ComponentType& componentType, T* component) {
             _entityManager.AddComponent(_entity, componentType, component);
         }
 
@@ -33,17 +38,17 @@ namespace Simp1e::ECS {
         }
 
         template <typename T>
-        T* GetComponent(ComponentType componentType) {
+        T* GetComponent(const ComponentType& componentType) {
             return _entityManager.GetComponent<T>(_entity, componentType);
         }
 
         template <typename T>
-        T GetComponent() {
+        T* GetComponent() {
             return _entityManager.GetComponent<T>(_entity, T::GetComponentType());
         }
 
         template <typename T>
-        bool HasComponent(ComponentType componentType) {
+        bool HasComponent(const ComponentType& componentType) {
             return _entityManager.HasComponent(_entity, componentType);
         }
 
@@ -53,7 +58,7 @@ namespace Simp1e::ECS {
         }
 
         template <typename T>
-        void RemoveComponent(ComponentType componentType) {
+        void RemoveComponent(const ComponentType& componentType) {
             _entityManager.RemoveComponent(_entity, componentType);
         }
 

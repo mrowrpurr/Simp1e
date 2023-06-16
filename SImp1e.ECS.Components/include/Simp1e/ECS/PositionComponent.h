@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Simp1e/ECS/ComponentType.h>
+#include <Simp1e/ECS/ComponentTypeMacro.h>
 #include <Simp1e/Position.h>
 
 #include "ComponentTypes.h"

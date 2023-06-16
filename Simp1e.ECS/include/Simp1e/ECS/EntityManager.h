@@ -3,14 +3,14 @@
 #include <memory>
 #include <unordered_map>
 
-#include "ComponentPtr.h"
+#include "ComponentPointer.h"
 #include "ComponentType.h"
 #include "Entity.h"
 
 namespace Simp1e::ECS {
 
     class EntityManager {
-        std::unordered_map<ComponentType, std::unordered_map<Entity, ComponentPtr>> _components;
+        std::unordered_map<ComponentType, std::unordered_map<Entity, ComponentPointer>> _components;
 
     public:
         Entity CreateEntity() {
@@ -19,9 +19,14 @@ namespace Simp1e::ECS {
         }
 
         template <typename T>
-        void AddComponent(Entity entity, ComponentType componentType, T&& component) {
+        void AddComponent(Entity entity, const ComponentType& componentType) {
+            _components[componentType][entity] = MakeComponentPointer(new T());
+        }
+
+        template <typename T>
+        void AddComponent(Entity entity, const ComponentType& componentType, T&& component) {
             _components[componentType][entity] =
-                MakeComponentPtr(new T(std::forward<T>(component)));
+                MakeComponentPointer(new T(std::forward<T>(component)));
         }
 
         template <typename T>
@@ -30,8 +35,8 @@ namespace Simp1e::ECS {
         }
 
         template <typename T>
-        void AddComponent(Entity entity, ComponentType componentType, T* component) {
-            _components[componentType][entity] = MakeComponentPtr(component);
+        void AddComponent(Entity entity, const ComponentType& componentType, T* component) {
+            _components[componentType][entity] = MakeComponentPointer(component);
         }
 
         template <typename T>
@@ -40,20 +45,22 @@ namespace Simp1e::ECS {
         }
 
         template <typename T>
-        T* GetComponent(Entity entity, ComponentType componentType) {
+        T* GetComponent(Entity entity, const ComponentType& componentType) {
             return static_cast<T*>(_components[componentType][entity].get());
         }
 
-        std::unordered_map<Entity, ComponentPtr>& GetComponents(ComponentType componentType) {
+        std::unordered_map<Entity, ComponentPointer>& GetComponents(
+            const ComponentType& componentType
+        ) {
             return _components[componentType];
         }
 
         template <typename T>
-        std::unordered_map<Entity, ComponentPtr>& GetComponents() {
+        std::unordered_map<Entity, ComponentPointer>& GetComponents() {
             return _components[T::GetComponentType()];
         }
 
-        bool HasComponent(Entity entity, ComponentType componentType) {
+        bool HasComponent(Entity entity, const ComponentType& componentType) {
             return _components[componentType].find(entity) != _components[componentType].end();
         }
 
@@ -62,7 +69,7 @@ namespace Simp1e::ECS {
             return HasComponent(entity, T::GetComponentType());
         }
 
-        void RemoveComponent(Entity entity, ComponentType componentType) {
+        void RemoveComponent(Entity entity, const ComponentType& componentType) {
             _components[componentType].erase(entity);
         }
 
