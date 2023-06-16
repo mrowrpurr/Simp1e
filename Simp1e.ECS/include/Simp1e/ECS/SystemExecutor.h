@@ -18,13 +18,13 @@ namespace Simp1e::ECS {
     public:
         template <typename T>
         SystemExecutor(
-            const SystemType& systemType, T* system, std::function<void(SystemPointer)> update
+            const SystemType& systemType, T* system, std::function<void(SystemPointer&)> update
         )
             : _systemType(systemType), _systemPointer(MakeSystemPointer(system)), _update(update) {}
 
         template <typename T>
         SystemExecutor(
-            const SystemType& systemType, T&& system, std::function<void(SystemPointer)> update
+            const SystemType& systemType, T&& system, std::function<void(SystemPointer&)> update
         )
             : _systemType(systemType), _systemPointer(MakeSystemPointer(system)), _update(update) {}
 

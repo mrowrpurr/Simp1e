@@ -10,9 +10,10 @@ namespace Simp1e::ECS {
     public:
         template <typename T>
         void AddSystem(const SystemType& systemType, T* system) {
-            _systems[systemType] = std::make_unique<SystemExecutor>(
-                systemType, system, [](SystemPointer system) { static_cast<T*>(system)->Update(); }
-            );
+            _systems[systemType] =
+                std::make_unique<SystemExecutor>(systemType, system, [](SystemPointer& system) {
+                    static_cast<T*>(system.get())->Update();
+                });
         }
 
         template <typename T>
@@ -33,6 +34,16 @@ namespace Simp1e::ECS {
         template <typename T>
         void AddSystem(T&& system) {
             AddSystem(T::GetSystemType(), std::forward<T>(system));
+        }
+
+        template <typename T>
+        void AddSystem() {
+            AddSystem(T::GetSystemType(), new T());
+        }
+
+        template <typename T>
+        void RemoveSystem(T* system) {
+            RemoveSystem(T::GetSystemType());
         }
 
         template <typename T>
