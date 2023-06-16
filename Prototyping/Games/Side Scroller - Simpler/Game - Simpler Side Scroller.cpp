@@ -70,24 +70,11 @@ public:
 
     void Update(ManagedEntityManager& entityManager) {
         // Draw all rectangles
-        // for (auto& [entity, component] :
-        //      entityManager.GetComponents(QtRectangleComponent::GetComponentType())) {
-        //     auto rectangleComponent = std::any_cast<QtRectangleComponent>(&component);
-        //     rectangleComponent->Initialize(_scene);
-        // }
-
-        // for (auto entity : entityManager.GetEntities()) {
-        //     if (entityManager.HasComponent<PositionComponent>(entity) &&
-        //         entityManager.HasComponent<RectangleComponent>(entity)) {
-        //         auto position  = entityManager.GetComponent<PositionComponent>(entity);
-        //         auto rectangle = entityManager.GetComponent<RectangleComponent>(entity);
-
-        //         _scene.addRect(
-        //             rectangle.rect.x, rectangle.rect.y, rectangle.rect.width,
-        //             rectangle.rect.height, QPen(rectangle.color.ToQColor())
-        //         );
-        //     }
-        // }
+        for (auto& [entity, component] :
+             entityManager.GetComponents(QtRectangleComponent::GetComponentType())) {
+            auto rectangleComponent = std::any_cast<QtRectangleComponent>(&component);
+            rectangleComponent->Initialize(_scene);
+        }
     }
 };
 
@@ -106,7 +93,7 @@ int main(int argc, char* argv[]) {
     entity.AddComponent<PositionComponent>({100, 100});
     entity.AddComponent<QtRectangleComponent>({
         {
-         0, 0,
+         300, 400,
          50, 200,
          },
         Color::Magenta()
