@@ -21,7 +21,7 @@ class QtRectangleComponent : public RectangleComponent {
     QGraphicsRectItem _rectItem;
 
     // Delete copy constructor - not possible with std::any
-    // QtRectangleComponent(const QtRectangleComponent&) = delete;
+    QtRectangleComponent(const QtRectangleComponent&) = delete;
 
 public:
     SIMP1E_ECS_COMPONENT(69)
@@ -37,10 +37,6 @@ public:
         : QtRectangleComponent(rectangle) {
         if (fillColor.has_value()) SetFillColor(fillColor.value());
     }
-
-    // Copy constructor for std::any
-    QtRectangleComponent(const QtRectangleComponent& other)
-        : QtRectangleComponent(other.GetRectangle(), other.GetFillColor()) {}
 
     QGraphicsRectItem& GetRectItem() { return _rectItem; }
 
@@ -69,9 +65,7 @@ public:
     DrawSomethingSystem(QGraphicsScene& scene) : _scene(scene) {}
 
     void Update(ManagedEntityManager& entityManager) {
-        // Draw all rectangles
-        for (auto& [entity, component] :
-             entityManager.GetComponents(QtRectangleComponent::GetComponentType())) {
+        for (auto& [entity, component] : entityManager.GetComponents<QtRectangleComponent>()) {
             auto rectangleComponent = static_cast<QtRectangleComponent*>(component.get());
             rectangleComponent->Initialize(_scene);
         }
@@ -91,13 +85,9 @@ int main(int argc, char* argv[]) {
     // Add one rectangle entity with a position and a fill color
     auto entity = entityManager.CreateEntity();
     entity.AddComponent<PositionComponent>({100, 100});
-    entity.AddComponent<QtRectangleComponent>({
-        {
-         300, 400,
-         50, 200,
-         },
-        Color::Magenta()
-    });
+
+    auto rectComponent = new QtRectangleComponent({300, 400, 50, 200}, Color::Magenta());
+    entity.AddComponent(rectComponent);
 
     // Systems...
     DrawSomethingSystem drawSomethingSystem(scene);

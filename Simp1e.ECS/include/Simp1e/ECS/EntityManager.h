@@ -26,8 +26,17 @@ namespace Simp1e::ECS {
 
         template <typename T>
         void AddComponent(Entity entity, T&& component) {
-            _components[component.GetComponentType()][entity] =
-                MakeComponentPtr(new T(std::forward<T>(component)));
+            AddComponent(entity, T::GetComponentType(), std::forward<T>(component));
+        }
+
+        template <typename T>
+        void AddComponent(Entity entity, ComponentType componentType, T* component) {
+            _components[componentType][entity] = MakeComponentPtr(component);
+        }
+
+        template <typename T>
+        void AddComponent(Entity entity, T* component) {
+            AddComponent(entity, T::GetComponentType(), component);
         }
 
         template <typename T>
@@ -37,6 +46,11 @@ namespace Simp1e::ECS {
 
         std::unordered_map<Entity, ComponentPtr>& GetComponents(ComponentType componentType) {
             return _components[componentType];
+        }
+
+        template <typename T>
+        std::unordered_map<Entity, ComponentPtr>& GetComponents() {
+            return _components[T::GetComponentType()];
         }
 
         bool HasComponent(Entity entity, ComponentType componentType) {

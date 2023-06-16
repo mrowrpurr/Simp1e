@@ -24,6 +24,16 @@ namespace Simp1e::ECS {
         }
 
         template <typename T>
+        void AddComponent(Entity entity, ComponentType componentType, T* component) {
+            _entityManager.AddComponent(entity, componentType, component);
+        }
+
+        template <typename T>
+        void AddComponent(Entity entity, T* component) {
+            _entityManager.AddComponent(entity, component);
+        }
+
+        template <typename T>
         T* GetComponent(Entity entity, ComponentType componentType) {
             return _entityManager.GetComponent<T>(entity, componentType);
         }
@@ -35,6 +45,11 @@ namespace Simp1e::ECS {
 
         std::unordered_map<Entity, ComponentPtr>& GetComponents(ComponentType componentType) {
             return _entityManager.GetComponents(componentType);
+        }
+
+        template <typename T>
+        std::unordered_map<Entity, ComponentPtr>& GetComponents() {
+            return _entityManager.GetComponents<T>();
         }
 
         template <typename T>

@@ -19,7 +19,17 @@ namespace Simp1e::ECS {
 
         template <typename T>
         void AddComponent(T&& component) {
-            _entityManager.AddComponent(_entity, std::forward<T>(component));
+            AddComponent(T::GetComponentType(), std::forward<T>(component));
+        }
+
+        template <typename T>
+        void AddComponent(ComponentType componentType, T* component) {
+            _entityManager.AddComponent(_entity, componentType, component);
+        }
+
+        template <typename T>
+        void AddComponent(T* component) {
+            AddComponent(T::GetComponentType(), component);
         }
 
         template <typename T>
