@@ -72,7 +72,7 @@ public:
         // Draw all rectangles
         for (auto& [entity, component] :
              entityManager.GetComponents(QtRectangleComponent::GetComponentType())) {
-            auto rectangleComponent = std::any_cast<QtRectangleComponent>(&component);
+            auto rectangleComponent = static_cast<QtRectangleComponent*>(component.get());
             rectangleComponent->Initialize(_scene);
         }
     }

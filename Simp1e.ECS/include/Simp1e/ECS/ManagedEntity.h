@@ -23,7 +23,7 @@ namespace Simp1e::ECS {
         }
 
         template <typename T>
-        T GetComponent(ComponentType componentType) {
+        T* GetComponent(ComponentType componentType) {
             return _entityManager.GetComponent<T>(_entity, componentType);
         }
 
