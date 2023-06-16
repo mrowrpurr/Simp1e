@@ -107,6 +107,8 @@ namespace Simp1e::ECS {
             }
         }
 
+        size_t GetSystemCount() const { return _systems.size(); }
+
         void operator()() { Update(); }
     };
 }

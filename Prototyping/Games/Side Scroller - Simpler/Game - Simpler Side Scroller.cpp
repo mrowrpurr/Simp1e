@@ -20,9 +20,15 @@ using namespace Simp1e::ECS;
 // };
 
 class SystemOne {
+    Game& _game;
+
 public:
+    SystemOne(Game& game) : _game(game) {}
     static SystemType GetSystemType() { return "SystemOne"; }
-    void              Update() { qDebug() << "SystemOne::Update()"; }
+    void              Update() {
+        qDebug() << "SystemOne::Update()";
+        qDebug() << "The game has " << _game.Systems().GetSystemCount() << " systems.";
+    }
 };
 
 class SystemTwo {
@@ -42,7 +48,7 @@ public:
 
 int main(int argc, char* argv[]) {
     Game game;
-    game.Systems().AddSystem<SystemOne>();
+    game.Systems().AddSystem<SystemOne>(game);
     game.Systems().AddSystem<SystemTwo>();
     game.Events().AddListener<OnClickEvent>([](OnClickEvent* event) {
         qDebug() << "OnClickEvent data: " << event->someData.c_str();
