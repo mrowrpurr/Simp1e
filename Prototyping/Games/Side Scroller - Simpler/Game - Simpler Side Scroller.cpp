@@ -19,6 +19,12 @@ using namespace Simp1e::ECS;
 //     void              Update() { qDebug() << "InputSystem::Update()"; }
 // };
 
+class OnClickEvent {
+public:
+    std::string      someData;
+    static EventType GetEventType() { return "OnClickEvent"; }
+};
+
 class SystemOne {
     Game& _game;
 
@@ -28,6 +34,7 @@ public:
     void              Update() {
         qDebug() << "SystemOne::Update()";
         qDebug() << "The game has " << _game.Systems().GetSystemCount() << " systems.";
+        _game.Events().SendEvent<OnClickEvent>({"EVENT FROM SYSTEM ONE"});
     }
 };
 
@@ -38,12 +45,6 @@ public:
         qDebug() << "SystemTwo::Update()";
         // How can I emit an event here?
     }
-};
-
-class OnClickEvent {
-public:
-    std::string      someData;
-    static EventType GetEventType() { return "OnClickEvent"; }
 };
 
 int main(int argc, char* argv[]) {
