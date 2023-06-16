@@ -13,6 +13,12 @@
 using namespace Simp1e;
 using namespace Simp1e::ECS;
 
+// class InputSystem {
+// public:
+//     static SystemType GetSystemType() { return "InputSystem"; }
+//     void              Update() { qDebug() << "InputSystem::Update()"; }
+// };
+
 class SystemOne {
 public:
     static SystemType GetSystemType() { return "SystemOne"; }
@@ -22,13 +28,25 @@ public:
 class SystemTwo {
 public:
     static SystemType GetSystemType() { return "SystemTwo"; }
-    void              Update() { qDebug() << "SystemTwo::Update()"; }
+    void              Update() {
+        qDebug() << "SystemTwo::Update()";
+        // How can I emit an event here?
+    }
+};
+
+class OnClickEvent {
+public:
+    std::string      someData;
+    static EventType GetEventType() { return "OnClickEvent"; }
 };
 
 int main(int argc, char* argv[]) {
     Game game;
     game.Systems().AddSystem<SystemOne>();
     game.Systems().AddSystem<SystemTwo>();
+    game.Events().AddListener<OnClickEvent>([](OnClickEvent* event) {
+        qDebug() << "OnClickEvent data: " << event->someData.c_str();
+    });
 
     QApplication   app(argc, argv);
     QGraphicsView  window;
@@ -39,6 +57,12 @@ int main(int argc, char* argv[]) {
 
     //
     game.Update();
+
+    game.Systems().DisableSystem<SystemOne>();
+
+    game.Update();
+
+    game.Events().SendEvent<OnClickEvent>({"Some data"});
 
     window.setWindowTitle("Side Scroller");
     window.show();

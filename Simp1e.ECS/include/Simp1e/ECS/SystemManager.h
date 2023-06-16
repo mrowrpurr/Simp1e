@@ -1,19 +1,23 @@
 #pragma once
 
+#include <vector>
+
 #include "SystemExecutor.h"
 
 namespace Simp1e::ECS {
 
     class SystemManager {
-        std::unordered_map<SystemType, std::unique_ptr<SystemExecutor>> _systems;
+        std::vector<std::unique_ptr<SystemExecutor>> _systems;
+        std::unordered_map<SystemType, size_t>       _systemIndices;
 
     public:
         template <typename T>
         void AddSystem(const SystemType& systemType, T* system) {
-            _systems[systemType] =
-                std::make_unique<SystemExecutor>(systemType, system, [](SystemPointer& system) {
-                    static_cast<T*>(system.get())->Update();
-                });
+            _systems.emplace_back(std::make_unique<SystemExecutor>(
+                systemType, system,
+                [](SystemPointer& system) { static_cast<T*>(system.get())->Update(); }
+            ));
+            _systemIndices[systemType] = _systems.size() - 1;
         }
 
         template <typename T>
@@ -46,17 +50,61 @@ namespace Simp1e::ECS {
             RemoveSystem(T::GetSystemType());
         }
 
-        template <typename T>
         void RemoveSystem(const SystemType& systemType) {
-            _systems.erase(systemType);
+            auto it = _systemIndices.find(systemType);
+            if (it != _systemIndices.end()) {
+                _systems.erase(_systems.begin() + it->second);
+                _systemIndices.erase(it);
+            }
         }
 
-        void RemoveSystem(const SystemType& systemType) { _systems.erase(systemType); }
+        template <typename T>
+        void RemoveSystem() {
+            RemoveSystem(T::GetSystemType());
+        }
+
+        void EnableSystem(const SystemType& systemType) {
+            auto it = _systemIndices.find(systemType);
+            if (it != _systemIndices.end()) {
+                _systems[it->second]->Enable();
+            }
+        }
+
+        template <typename T>
+        void EnableSystem() {
+            EnableSystem(T::GetSystemType());
+        }
+
+        void DisableSystem(const SystemType& systemType) {
+            auto it = _systemIndices.find(systemType);
+            if (it != _systemIndices.end()) {
+                _systems[it->second]->Disable();
+            }
+        }
+
+        template <typename T>
+        void DisableSystem() {
+            DisableSystem(T::GetSystemType());
+        }
+
+        void ToggleSystem(const SystemType& systemType) {
+            auto it = _systemIndices.find(systemType);
+            if (it != _systemIndices.end()) {
+                _systems[it->second]->Toggle();
+            }
+        }
+
+        template <typename T>
+        void ToggleSystem() {
+            ToggleSystem(T::GetSystemType());
+        }
 
         void Clear() { _systems.clear(); }
 
         void Update() {
-            for (auto& system : _systems) system.second->Update();
+            for (auto& system : _systems) {
+                system->Update();
+            }
         }
 
         void operator()() { Update(); }

@@ -8,6 +8,7 @@
 namespace Simp1e::ECS {
 
     class SystemExecutor {
+        bool                                _isEnabled = true;
         SystemType                          _systemType;
         SystemPointer                       _systemPointer;
         std::function<void(SystemPointer&)> _update;
@@ -28,7 +29,16 @@ namespace Simp1e::ECS {
         )
             : _systemType(systemType), _systemPointer(MakeSystemPointer(system)), _update(update) {}
 
-        void Update() { _update(_systemPointer); }
+        bool IsEnabled() const { return _isEnabled; }
+
+        void Enable() { _isEnabled = true; }
+        void Disable() { _isEnabled = false; }
+        void Toggle() { _isEnabled = !_isEnabled; }
+        void SetEnabled(bool isEnabled) { _isEnabled = isEnabled; }
+
+        void Update() {
+            if (_isEnabled) _update(_systemPointer);
+        }
 
         void operator()() { Update(); }
     };

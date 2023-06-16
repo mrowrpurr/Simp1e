@@ -10,14 +10,14 @@
 namespace Simp1e::ECS {
 
     class EventManager {
-        std::unordered_map<EventType, std::vector<std::function<void(EventPointer)>>>
+        std::unordered_map<EventType, std::vector<std::function<void(EventPointer&)>>>
             _eventHandlers;
 
     public:
         template <typename T>
         void AddListener(const EventType& eventType, std::function<void(T*)> handler) {
-            _eventHandlers[eventType].push_back([handler](EventPointer ptr) {
-                handler(static_cast<T*>(ptr));
+            _eventHandlers[eventType].push_back([handler](EventPointer& ptr) {
+                handler(static_cast<T*>(ptr.get()));
             });
         }
 
@@ -46,16 +46,12 @@ namespace Simp1e::ECS {
         }
 
         template <typename T>
-        void SendEvent(T* event) {
+        void SendEvent(T&& event) {
             auto& handlers = _eventHandlers[T::GetEventType()];
             for (auto& handler : handlers) {
-                handler(MakeEventPointer(event));
+                auto ptr = MakeEventPointer(new T(std::forward<T>(event)));
+                handler(ptr);
             }
-        }
-
-        template <typename T>
-        void SendEvent(T&& event) {
-            SendEvent(&event);
         }
 
         template <typename T>
