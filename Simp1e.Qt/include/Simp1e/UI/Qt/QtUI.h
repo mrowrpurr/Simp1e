@@ -6,6 +6,8 @@
 #include <QColor>
 #include <QPen>
 
+// TODO remove the ::UI and make it just ::Qt ir ::QT
+
 namespace Simp1e::UI::Qt {
     QColor ToQColor(const UIColor& color) {
         return QColor(color.red, color.green, color.blue, color.alpha);

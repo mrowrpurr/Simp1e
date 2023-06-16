@@ -1,14 +1,131 @@
+#include <Simp1e/Color.h>
+#include <Simp1e/ECS.h>
+#include <Simp1e/ECS/PositionComponent.h>
+#include <Simp1e/ECS/RectangleComponent.h>
+
 #include <QApplication>
-#include <QWidget>
+#include <QDebug>
+#include <QGraphicsRectItem>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+
+using namespace Simp1e;
+using namespace Simp1e::ECS;
+
+QColor ToQColor(const Color& color) {
+    return QColor(color.red(), color.green(), color.blue(), color.alpha());
+}
+
+class QtRectangleComponent : public RectangleComponent {
+    bool              _initialized = false;
+    QGraphicsRectItem _rectItem;
+
+    // Delete copy constructor - not possible with std::any
+    // QtRectangleComponent(const QtRectangleComponent&) = delete;
+
+public:
+    SIMP1E_ECS_COMPONENT(69)
+
+    QtRectangleComponent(const Rectangle& rectangle)
+        : RectangleComponent(rectangle),
+          _rectItem(rectangle.x(), rectangle.y(), rectangle.width(), rectangle.height()) {}
+    QtRectangleComponent(const Rectangle& rectangle, const Color& fillColor)
+        : QtRectangleComponent(rectangle) {
+        SetFillColor(fillColor);
+    }
+    QtRectangleComponent(const Rectangle& rectangle, const std::optional<Color>& fillColor)
+        : QtRectangleComponent(rectangle) {
+        if (fillColor.has_value()) SetFillColor(fillColor.value());
+    }
+
+    // Copy constructor for std::any
+    QtRectangleComponent(const QtRectangleComponent& other)
+        : QtRectangleComponent(other.GetRectangle(), other.GetFillColor()) {}
+
+    QGraphicsRectItem& GetRectItem() { return _rectItem; }
+
+    void SetRectangle(const Rectangle& rectangle) override {
+        RectangleComponent::SetRectangle(rectangle);
+        _rectItem.setRect(rectangle.x(), rectangle.y(), rectangle.width(), rectangle.height());
+    }
+
+    void SetFillColor(const Color& fillColor) override {
+        RectangleComponent::SetFillColor(fillColor);
+        _rectItem.setBrush(ToQColor(fillColor));
+    }
+
+    void Initialize(QGraphicsScene& scene) {
+        if (!_initialized) {
+            scene.addItem(&_rectItem);
+            _initialized = true;
+        }
+    }
+};
+
+class DrawSomethingSystem {
+    QGraphicsScene& _scene;
+
+public:
+    DrawSomethingSystem(QGraphicsScene& scene) : _scene(scene) {}
+
+    void Update(ManagedEntityManager& entityManager) {
+        // Draw all rectangles
+        // for (auto& [entity, component] :
+        //      entityManager.GetComponents(QtRectangleComponent::GetComponentType())) {
+        //     auto rectangleComponent = std::any_cast<QtRectangleComponent>(&component);
+        //     rectangleComponent->Initialize(_scene);
+        // }
+
+        // for (auto entity : entityManager.GetEntities()) {
+        //     if (entityManager.HasComponent<PositionComponent>(entity) &&
+        //         entityManager.HasComponent<RectangleComponent>(entity)) {
+        //         auto position  = entityManager.GetComponent<PositionComponent>(entity);
+        //         auto rectangle = entityManager.GetComponent<RectangleComponent>(entity);
+
+        //         _scene.addRect(
+        //             rectangle.rect.x, rectangle.rect.y, rectangle.rect.width,
+        //             rectangle.rect.height, QPen(rectangle.color.ToQColor())
+        //         );
+        //     }
+        // }
+    }
+};
 
 int main(int argc, char* argv[]) {
-    QApplication app(argc, argv);
+    QApplication   app(argc, argv);
+    QGraphicsView  window;
+    QGraphicsScene scene(0, 0, 800, 600);
+    window.setScene(&scene);
 
-    QWidget window;
+    qDebug() << "Run app";
 
-    window.resize(250, 150);
-    window.setWindowTitle("Hello Qt from CMake");
+    ManagedEntityManager entityManager;
+
+    // Add one rectangle entity with a position and a fill color
+    auto entity = entityManager.CreateEntity();
+    entity.AddComponent<PositionComponent>({100, 100});
+    entity.AddComponent<QtRectangleComponent>({
+        {
+         0, 0,
+         50, 200,
+         },
+        Color::Magenta()
+    });
+
+    // Systems...
+    DrawSomethingSystem drawSomethingSystem(scene);
+
+    // Main loop
+    // while (true) {
+    // Update systems
+    drawSomethingSystem.Update(entityManager);
+
+    // Update window
+    // window.update();
+    // app.processEvents();
+    // }
+
+    window.setWindowTitle("Side Scroller");
     window.show();
-
     return app.exec();
 }
