@@ -9,7 +9,6 @@ namespace Simp1e::ECS {
 
     struct QtTextComponentUpdateHandler : public QtComponentUpdateHandler {
         void Update(Game& game, Entity entity, ComponentPointer& component) override {
-            _Log_("QtTextComponentUpdateHandler::Update");
             auto* textComponent = component_cast<TextComponent>(component);
             if (!textComponent) return;
             auto* graphicsItemComponent =

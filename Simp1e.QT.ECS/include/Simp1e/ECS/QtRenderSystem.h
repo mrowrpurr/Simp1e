@@ -1,10 +1,10 @@
 #pragma once
 
+#include <Simp1e/ECS/ComponentBase.h>
 #include <Simp1e/ECS/ComponentType.h>
 #include <Simp1e/ECS/Game.h>
 #include <Simp1e/ECS/QTGraphicsItemComponent.h>
 #include <Simp1e/ECS/SystemTypeMacro.h>
-#include <_Log_.h>
 
 #include <QGraphicsScene>
 #include <QPainter>
@@ -34,9 +34,7 @@ namespace Simp1e::ECS {
         SIMP1E_ECS_SYSTEM("QtRender")
 
         QtRenderSystem(Game& game, QGraphicsScene& scene) : _game(game), _scene(scene) {
-            _Log_("QtRenderSystem::QtRenderSystem");
             _game.Entities().Events().OnComponentAdded([this](auto entity, auto& componentType) {
-                _Log_("QtRenderSystem::OnComponentAdded");
                 if (!this->_visualComponentTypes.count(componentType)) return;
                 if (_game.Entities().HasComponent<QTGraphicsItemComponent>(entity)) return;
                 auto* graphicsItemComponent = new QTGraphicsItemComponent(
@@ -50,7 +48,6 @@ namespace Simp1e::ECS {
                 );
             });
             _game.Entities().Events().OnComponentAdded([this](auto entity, auto& componentType) {
-                _Log_("QtRenderSystem::OnComponentAdded");
                 if (!this->_visualComponentTypes.count(componentType)) return;
                 auto* graphicsItemComponent =
                     _game.Entities().GetComponent<QTGraphicsItemComponent>(entity);
@@ -61,6 +58,17 @@ namespace Simp1e::ECS {
                 auto* graphicsItemComponent =
                     _game.Entities().GetComponent<QTGraphicsItemComponent>(entity);
                 if (graphicsItemComponent) graphicsItemComponent->update();
+
+                // If there are no more visual components on this entity, remove the graphics item
+                auto entityComponents   = _game.Entities().GetComponents(entity);
+                bool hasVisualComponent = false;
+                for (auto& [componentType, component] : entityComponents)
+                    if (_visualComponentTypes.count(componentType)) {
+                        hasVisualComponent = true;
+                        break;
+                    }
+                if (!hasVisualComponent)
+                    _game.Entities().RemoveComponent<QTGraphicsItemComponent>(entity);
             });
         }
 
@@ -108,7 +116,6 @@ namespace Simp1e::ECS {
 
         void Update() {
             bool somethingChanged = false;
-            _Log_("QtRenderSystem::Update");
             for (auto& [componentType, componentUpdateHandler] : _componentUpdateHandlers)
                 for (auto& [entityId, componentPtr] : _game.Entities().GetComponents(componentType))
                     if (auto* component = static_cast<ComponentBase*>(componentPtr.get()))
@@ -124,17 +131,10 @@ namespace Simp1e::ECS {
             Entity entityId, QPainter* painter, const QStyleOptionGraphicsItem* option,
             QWidget* widget
         ) {
-            _Log_("QtRenderSystem::PaintEntity {}", entityId);
-            auto entity = _game.Entities().Get(entityId);
-
+            auto entity     = _game.Entities().Get(entityId);
             auto components = entity.GetComponents();
-            _Log_("Entity {} has {} components", entityId, components.size());
-
-            // TODO have some kind of way to check the VisibleComponent and not do this if it's not
-            // visible
 
             for (auto& [componentType, component] : components) {
-                _Log_("QtRenderSystem::PaintEntity::Component {}", componentType.c_str());
                 if (!_visualComponentTypes.count(componentType)) continue;
                 auto foundRenderer = _componentRenderers.find(componentType);
                 if (foundRenderer == _componentRenderers.end()) continue;

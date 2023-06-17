@@ -14,81 +14,107 @@
 #include <Simp1e/ECS/VisibleComponent.h>
 
 #include <QApplication>
+#include <QElapsedTimer>
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QLabel>
 #include <QPushButton>
+#include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
 
 using namespace Simp1e;
 using namespace Simp1e::ECS;
 
-int main(int argc, char* argv[]) {
-    QApplication app(argc, argv);
-    app.setStyle("fusion");
+class GraphicsViewWithFPS : public QGraphicsView {
+    QLabel        fpsLabel;
+    QElapsedTimer fpsTimer;
+    int           frames = 0;
 
-    QWidget window;
-    window.setWindowTitle("Side Scroller");
+public:
+    GraphicsViewWithFPS() { fpsTimer.start(); }
 
-    auto* layout = new QVBoxLayout();
+    QLabel& FPSLabel() { return fpsLabel; }
 
-    QGraphicsView  view;
-    QGraphicsScene scene(0, 0, 800, 600);
-    view.setScene(&scene);
-    layout->addWidget(&view);
+protected:
+    void drawBackground(QPainter* painter, const QRectF& rect) override {
+        QGraphicsView::drawBackground(painter, rect);
+        ++frames;
+        if (fpsTimer.elapsed() > 1000) {
+            fpsTimer.restart();
+            fpsLabel.setText(QString("FPS: %1").arg(frames));
+            frames = 0;
+        }
+    }
+};
 
-    window.show();
-    ///////////////////////
-
-    Game game;
-    game.Systems().AddSystem<CommandSystem>();
-
+void SetupQtRenderSystem(Game& game, QGraphicsScene& scene) {
     auto* qtRenderSystem = new QtRenderSystem(game, scene);
+    qtRenderSystem->AddVisualComponentType<VisibleComponent>();
     qtRenderSystem->AddComponentUpdateHandler<PositionComponent, QtPositionComponentUpdateHandler>(
     );
     qtRenderSystem->AddComponentRenderer<TextComponent, QtTextComponentRenderer>();
     qtRenderSystem->AddComponentUpdateHandler<TextComponent, QtTextComponentUpdateHandler>();
     game.Systems().AddSystem(qtRenderSystem);
+}
 
+void AddTextLabel(Game& game) {
     auto label = game.Entities().CreateEntity();
-    label.AddComponent<VisibleComponent>();
+    label.AddComponent<PositionComponent>({100, 100});
     label.AddComponent<RectangleComponent>({
         {100, 100}
     });
     label.AddComponent<TextComponent>({"Hello from the entity."});
-    label.AddComponent<PositionComponent>({100, 100});
+}
 
-    qDebug() << "Run app";
-
-    game.Update();
-
-    _Log_("Changing position");
-    // label.GetComponent<PositionComponent>()->SetPosition({200, 200});
-
-    _Log_("Updating");
-    game.Update();
-
-    auto        labelEntityId = label.GetEntity();
-    QPushButton button("Change text");
-    QObject::connect(&button, &QPushButton::clicked, [&game, labelEntityId]() {
-        _Log_("Changing text");
-        game.Entities()
-            .GetComponent<TextComponent>(labelEntityId)
-            ->SetText("Hello from the entity. Updated.");
-        _Log_("Updating");
-        game.Update();
+// We'll add a click handler component to this one or figure out how to use Qt input event --->
+// CommandSystem
+void AddGraphicsRectButton(Game& game) {
+    auto button = game.Entities().CreateEntity();
+    button.AddComponent<RectangleComponent>({
+        {100, 100}
     });
-    layout->addWidget(&button);
+    button.AddComponent<TextComponent>({"Click me!"});
+}
 
+Game    game;
+QTimer  mainLoopTimer;
+QLabel* loopIterationLabel;
+
+int  loopIteration = 0;
+void GameLoop() {
+    loopIteration++;
+    loopIterationLabel->setText(QString("Loop Iteration: %1").arg(loopIteration));
+
+    game.Update();
+}
+
+int main(int argc, char* argv[]) {
+    QApplication app(argc, argv);
+    app.setStyle("fusion");
+    QWidget window;
+    window.setWindowTitle("Side Scroller");
+    auto* layout = new QVBoxLayout();
     window.setLayout(layout);
-
-    // _Log_("Changing text");
-    // label.GetComponent<TextComponent>()->SetText("Hello from the entity. Updated.");
-
-    // _Log_("Updating");
-    // game.Update();
-
+    GraphicsViewWithFPS view;
+    QGraphicsScene      scene(0, 0, 800, 600);
+    view.setScene(&scene);
+    layout->addWidget(&view.FPSLabel());
+    loopIterationLabel = new QLabel();
+    layout->addWidget(loopIterationLabel);
+    layout->addWidget(&view);
+    window.show();
     ///////////////////////
 
+    SetupQtRenderSystem(game, scene);
+    game.Systems().AddSystem<CommandSystem>();
+
+    AddTextLabel(game);
+    AddGraphicsRectButton(game);
+
+    QObject::connect(&mainLoopTimer, &QTimer::timeout, &app, GameLoop);
+    mainLoopTimer.start(16);
+
+    ///////////////////////
     return app.exec();
 }
