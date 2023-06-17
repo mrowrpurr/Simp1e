@@ -22,5 +22,7 @@ namespace Simp1e::ECS {
         }
 
         void update() { _graphicsItem->update(); }
+
+        QTGraphicsItem* GetGraphicsItem() { return _graphicsItem; }
     };
 }

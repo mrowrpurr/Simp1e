@@ -27,6 +27,33 @@
 using namespace Simp1e;
 using namespace Simp1e::ECS;
 
+struct QtComponentUpdateHandler {
+    virtual void Update(Game& game, Entity entity, ComponentPointer& component) = 0;
+};
+
+struct PositionComponentUpdateHandler : public QtComponentUpdateHandler {
+    void Update(Game& game, Entity entity, ComponentPointer& component) override {
+        _Log_("PositionComponentUpdateHandler::Update");
+        auto* positionComponent = component_cast<PositionComponent>(component);
+        _Log_("A");
+        if (!positionComponent) return;
+        _Log_("B");
+        if (!positionComponent->IsDirty()) return;
+        _Log_("C");
+        positionComponent->SetDirty(false);
+        auto* graphicsItemComponent = game.Entities().GetComponent<QTGraphicsItemComponent>(entity);
+
+        if (!graphicsItemComponent) return;
+        _Log_("D");
+        auto* graphicsItem = graphicsItemComponent->GetGraphicsItem();
+        if (!graphicsItem) return;
+        _Log_("E");
+        graphicsItem->setPos(ToQPointF(positionComponent->GetPosition()));
+        graphicsItem->update();
+        _Log_("PositionComponentUpdateHandler::Update - done");
+    }
+};
+
 struct QtComponentRenderer {
     virtual void Render(
         Game& game, Entity entity, ComponentPointer* component,
@@ -55,11 +82,14 @@ struct TextComponentRenderer : public QtComponentRenderer {
     }
 };
 
+// TODO - make this a Manager, not a System.
 class QtRenderSystem {
     Game&                                                                   _game;
     QGraphicsScene&                                                         _scene;
     std::unordered_set<ComponentType>                                       _visualComponentTypes;
     std::unordered_map<ComponentType, std::unique_ptr<QtComponentRenderer>> _componentRenderers;
+    std::unordered_map<ComponentType, std::unique_ptr<QtComponentUpdateHandler>>
+        _componentUpdateHandlers;
 
     // Delete copy constructor
     QtRenderSystem(const QtRenderSystem&) = delete;
@@ -76,6 +106,7 @@ public:
                     QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget
                 ) { PaintEntity(entity, painter, option, widget); }
             );
+            _game.Entities().AddComponent<QTGraphicsItemComponent>(entity, graphicsItemComponent);
         });
         _game.Entities().Events().OnComponentAdded([this](auto entity, auto& componentType) {
             _Log_("QtRenderSystem::OnComponentAdded");
@@ -106,6 +137,7 @@ public:
 
     void AddComponentRenderer(ComponentType componentType, QtComponentRenderer* renderer) {
         _componentRenderers[componentType] = std::unique_ptr<QtComponentRenderer>(renderer);
+        AddVisualComponentType(componentType);
     }
 
     template <typename T>
@@ -118,8 +150,31 @@ public:
         AddComponentRenderer(T::GetComponentType(), new R());
     }
 
+    void AddComponentUpdateHandler(
+        ComponentType componentType, QtComponentUpdateHandler* updateHandler
+    ) {
+        _componentUpdateHandlers[componentType] =
+            std::unique_ptr<QtComponentUpdateHandler>(updateHandler);
+        AddVisualComponentType(componentType);
+    }
+
+    template <typename T>
+    void AddComponentUpdateHandler(QtComponentUpdateHandler* updateHandler) {
+        AddComponentUpdateHandler(T::GetComponentType(), updateHandler);
+    }
+
+    template <typename T, typename U>
+    void AddComponentUpdateHandler() {
+        AddComponentUpdateHandler(T::GetComponentType(), new U());
+    }
+
     void Update() {
-        // TODO nothing? If nothing, why a 'System'?
+        _Log_("QtRenderSystem::Update");
+        for (auto& [componentType, componentUpdateHandler] : _componentUpdateHandlers)
+            for (auto& [entityId, componentPtr] : _game.Entities().GetComponents(componentType))
+                if (auto* component = static_cast<ComponentBase*>(componentPtr.get()))
+                    if (component->IsDirty())
+                        componentUpdateHandler->Update(_game, entityId, componentPtr);
     }
 
     void PaintEntity(
@@ -152,15 +207,16 @@ int main(int argc, char* argv[]) {
     QGraphicsView  window;
     QGraphicsScene scene(0, 0, 800, 600);
     window.setScene(&scene);
+    window.setWindowTitle("Side Scroller");
+    window.show();
     ///////////////////////
 
     Game game;
     game.Systems().AddSystem<CommandSystem>();
 
     auto* qtRenderSystem = new QtRenderSystem(game, scene);
-    qtRenderSystem->AddVisualComponentType<VisibleComponent>();
+    qtRenderSystem->AddComponentUpdateHandler<PositionComponent, PositionComponentUpdateHandler>();
     qtRenderSystem->AddVisualComponentType<RectangleComponent>();
-    qtRenderSystem->AddVisualComponentType<TextComponent>();
     qtRenderSystem->AddComponentRenderer<TextComponent, TextComponentRenderer>();
     game.Systems().AddSystem(qtRenderSystem);
 
@@ -176,9 +232,20 @@ int main(int argc, char* argv[]) {
 
     game.Update();
 
+    _Log_("Changing position");
+    // label.GetComponent<PositionComponent>()->SetPosition({200, 200});
+
+    _Log_("Updating");
+    game.Update();
+
+    _Log_("Changing text");
+    label.GetComponent<TextComponent>()->SetText("Hello from the entity. Updated.");
+
+    // _Log_("Updating");
+    // game.Update();
+
     ///////////////////////
-    window.setWindowTitle("Side Scroller");
-    window.show();
+
     return app.exec();
 }
 
