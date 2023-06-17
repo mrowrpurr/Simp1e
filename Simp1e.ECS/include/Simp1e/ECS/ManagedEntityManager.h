@@ -81,7 +81,7 @@ namespace Simp1e::ECS {
 
         template <typename T>
         bool HasComponent(Entity entity) {
-            return _entityManager.HasComponent<T>(entity, T::GetComponentType());
+            return _entityManager.HasComponent<T>(entity);
         }
 
         template <typename T>
