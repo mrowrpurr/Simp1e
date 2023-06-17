@@ -21,6 +21,9 @@
 #include <QGraphicsRectItem>
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QWidget>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -35,22 +38,29 @@ struct PositionComponentUpdateHandler : public QtComponentUpdateHandler {
     void Update(Game& game, Entity entity, ComponentPointer& component) override {
         _Log_("PositionComponentUpdateHandler::Update");
         auto* positionComponent = component_cast<PositionComponent>(component);
-        _Log_("A");
         if (!positionComponent) return;
-        _Log_("B");
         if (!positionComponent->IsDirty()) return;
-        _Log_("C");
         positionComponent->SetDirty(false);
         auto* graphicsItemComponent = game.Entities().GetComponent<QTGraphicsItemComponent>(entity);
-
         if (!graphicsItemComponent) return;
-        _Log_("D");
         auto* graphicsItem = graphicsItemComponent->GetGraphicsItem();
         if (!graphicsItem) return;
-        _Log_("E");
         graphicsItem->setPos(ToQPointF(positionComponent->GetPosition()));
         graphicsItem->update();
-        _Log_("PositionComponentUpdateHandler::Update - done");
+    }
+};
+
+struct TextComponentUpdateHandler : public QtComponentUpdateHandler {
+    void Update(Game& game, Entity entity, ComponentPointer& component) override {
+        _Log_("TextComponentUpdateHandler::Update");
+        auto* textComponent = component_cast<TextComponent>(component);
+        if (!textComponent) return;
+        auto* graphicsItemComponent = game.Entities().GetComponent<QTGraphicsItemComponent>(entity);
+        if (!graphicsItemComponent) return;
+        auto* graphicsItem = graphicsItemComponent->GetGraphicsItem();
+        if (!graphicsItem) return;
+        graphicsItem->SetText(textComponent->GetText());
+        graphicsItem->update();
     }
 };
 
@@ -76,6 +86,7 @@ struct TextComponentRenderer : public QtComponentRenderer {
         auto* textComponent = component_cast<TextComponent>(component);
         if (!textComponent) return;
 
+        _Log_("The text is {}", textComponent->GetText());
         painter->drawText(
             ToQRectF(rectangleComponent->GetRectangle()), ToQString(textComponent->GetText())
         );
@@ -169,12 +180,17 @@ public:
     }
 
     void Update() {
+        bool somethingChanged = false;
         _Log_("QtRenderSystem::Update");
         for (auto& [componentType, componentUpdateHandler] : _componentUpdateHandlers)
             for (auto& [entityId, componentPtr] : _game.Entities().GetComponents(componentType))
                 if (auto* component = static_cast<ComponentBase*>(componentPtr.get()))
-                    if (component->IsDirty())
+                    if (component->IsDirty()) {
+                        somethingChanged = true;
                         componentUpdateHandler->Update(_game, entityId, componentPtr);
+                    }
+
+        if (somethingChanged) _scene.update();
     }
 
     void PaintEntity(
@@ -204,10 +220,17 @@ public:
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
     app.setStyle("fusion");
-    QGraphicsView  window;
-    QGraphicsScene scene(0, 0, 800, 600);
-    window.setScene(&scene);
+
+    QWidget window;
     window.setWindowTitle("Side Scroller");
+
+    auto* layout = new QVBoxLayout();
+
+    QGraphicsView  view;
+    QGraphicsScene scene(0, 0, 800, 600);
+    view.setScene(&scene);
+    layout->addWidget(&view);
+
     window.show();
     ///////////////////////
 
@@ -216,8 +239,8 @@ int main(int argc, char* argv[]) {
 
     auto* qtRenderSystem = new QtRenderSystem(game, scene);
     qtRenderSystem->AddComponentUpdateHandler<PositionComponent, PositionComponentUpdateHandler>();
-    qtRenderSystem->AddVisualComponentType<RectangleComponent>();
     qtRenderSystem->AddComponentRenderer<TextComponent, TextComponentRenderer>();
+    qtRenderSystem->AddComponentUpdateHandler<TextComponent, TextComponentUpdateHandler>();
     game.Systems().AddSystem(qtRenderSystem);
 
     auto label = game.Entities().CreateEntity();
@@ -238,8 +261,22 @@ int main(int argc, char* argv[]) {
     _Log_("Updating");
     game.Update();
 
-    _Log_("Changing text");
-    label.GetComponent<TextComponent>()->SetText("Hello from the entity. Updated.");
+    auto        labelEntityId = label.GetEntity();
+    QPushButton button("Change text");
+    QObject::connect(&button, &QPushButton::clicked, [&game, labelEntityId]() {
+        _Log_("Changing text");
+        game.Entities()
+            .GetComponent<TextComponent>(labelEntityId)
+            ->SetText("Hello from the entity. Updated.");
+        _Log_("Updating");
+        game.Update();
+    });
+    layout->addWidget(&button);
+
+    window.setLayout(layout);
+
+    // _Log_("Changing text");
+    // label.GetComponent<TextComponent>()->SetText("Hello from the entity. Updated.");
 
     // _Log_("Updating");
     // game.Update();
@@ -248,98 +285,3 @@ int main(int argc, char* argv[]) {
 
     return app.exec();
 }
-
-// class QtRenderSystem {
-//     // TODO we need to know when entities are destroyed so we can remove the graphics item
-//     std::unordered_map<Entity, QTGraphicsItem*> _graphicItems;
-
-//     Game&           _game;
-//     QGraphicsScene& _scene;
-
-// public:
-//     SIMP1E_ECS_SYSTEM("QtRender")
-
-//     QtRenderSystem(Game& game, QGraphicsScene& scene) : _game(game), _scene(scene) {}
-
-//     QTGraphicsItem* FindGraphicsItem(Entity entity) {
-//         auto it = _graphicItems.find(entity);
-//         if (it != _graphicItems.end()) return it->second;
-//         return nullptr;
-//     }
-
-//     QTGraphicsItem* FindOrCreateGraphicsItem(Entity entity) {
-//         auto it = _graphicItems.find(entity);
-//         if (it != _graphicItems.end()) return it->second;
-//         auto* graphicsItem =
-//             new QTGraphicsItem([this, entity](auto* painter, auto* option, auto* widget) {
-//                 PaintEntity(entity, painter, option, widget);
-//             });
-//         _scene.addItem(graphicsItem);
-//         _graphicItems[entity] = graphicsItem;
-//         return graphicsItem;
-//     }
-
-//     void UpdateText(Entity entity, TextComponent* textComponent, QTGraphicsItem* graphicsItem) {
-//         if (!textComponent) return;
-//         if (textComponent->IsDirty()) {
-//             textComponent->SetDirty(false);
-//             graphicsItem->SetText(textComponent->GetText());
-//         }
-//     }
-
-//     void UpdateRectangle(
-//         Entity entity, RectangleComponent* rectangleComponent, QTGraphicsItem* graphicsItem
-//     ) {
-//         if (!rectangleComponent) return;
-//         if (rectangleComponent->IsDirty()) {
-//             rectangleComponent->SetDirty(false);
-//             qDebug() << "UpdateRectangle";
-//             graphicsItem->SetSize(ToQSizeF(rectangleComponent->GetRectangle().size()));
-//         }
-//     }
-
-//     void UpdateVisible(Entity entity, VisibleComponent* visibleComponent) {
-//         if (!visibleComponent) return;
-//         if (visibleComponent->IsDirty()) {
-//             visibleComponent->SetDirty(false);
-//             auto* graphicsItem = FindOrCreateGraphicsItem(entity);
-//             if (visibleComponent->IsVisible()) graphicsItem->show();
-//             else graphicsItem->hide();
-
-//             UpdateRectangle(
-//                 entity, _game.Entities().GetComponent<RectangleComponent>(entity), graphicsItem
-//             );
-//             UpdateText(entity, _game.Entities().GetComponent<TextComponent>(entity),
-//             graphicsItem);
-//         }
-//     }
-
-//     void PaintEntity(Entity entity, QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
-//     {
-//         qDebug() << "PaintEntity" << entity;
-//         auto* graphicsItem = FindGraphicsItem(entity);
-//         if (!graphicsItem) return;
-
-//         auto components = _game.Entities().GetComponents(entity);
-
-//         auto visible = components.GetComponent<VisibleComponent>();
-//         if (!visible || !visible->IsVisible()) return;
-
-//         auto rectangle = components.GetComponent<RectangleComponent>();
-//         if (rectangle) {
-//             painter->setBrush(QBrush(Qt::red));
-//             painter->drawRect(graphicsItem->GetBoundingRect());
-//         }
-
-//         auto text = components.GetComponent<TextComponent>();
-//         if (text) {
-//             painter->setPen(QPen(Qt::blue));
-//             painter->drawText(graphicsItem->GetBoundingRect(), ToQString(text->GetText()));
-//         }
-//     }
-
-//     void Update() {
-//         for (auto& [entity, component] : _game.Entities().GetComponents<VisibleComponent>())
-//             UpdateVisible(entity, component_cast<VisibleComponent>(component));
-//     }
-// };
