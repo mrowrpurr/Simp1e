@@ -19,6 +19,8 @@ namespace Simp1e {
         Rectangle(sreal x, sreal y, sreal width, sreal height)
             : _origin(x, y), _size(width, height) {}
         Rectangle(const Params& params) : _origin(params.origin), _size(params.size) {}
+        Rectangle(const Size& size) : _origin(0, 0), _size(size) {}
+        Rectangle(sreal width, sreal height) : _origin(0, 0), _size(width, height) {}
 
         Point& origin() { return _origin; }
         Size&  size() { return _size; }

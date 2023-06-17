@@ -3,8 +3,10 @@
 #include <Simp1e/ECS/ComponentType.h>
 #include <Simp1e/ECS/ComponentTypeMacro.h>
 
+#include "ComponentBase.h"
+
 namespace Simp1e::ECS {
-    class VisibleComponent {
+    class VisibleComponent : public ComponentBase {
         bool _isVisible = true;
 
     public:
@@ -13,13 +15,26 @@ namespace Simp1e::ECS {
         VisibleComponent() = default;
         VisibleComponent(bool isVisible) : _isVisible(isVisible) {}
 
-        bool IsVisible() { return _isVisible; }
+        virtual bool IsVisible() { return _isVisible; }
 
-        void SetVisible(bool isVisible) { _isVisible = isVisible; }
+        virtual void SetVisible(bool isVisible) {
+            _isVisible = isVisible;
+            SetDirty();
+        }
 
-        void Show() { _isVisible = true; }
-        void Hide() { _isVisible = false; }
+        virtual void Show() {
+            _isVisible = true;
+            SetDirty();
+        }
 
-        void ToggleVisible() { _isVisible = !_isVisible; }
+        virtual void Hide() {
+            _isVisible = false;
+            SetDirty();
+        }
+
+        virtual void ToggleVisible() {
+            _isVisible = !_isVisible;
+            SetDirty();
+        }
     };
 }

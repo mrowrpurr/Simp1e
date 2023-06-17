@@ -18,20 +18,27 @@ namespace Simp1e {
 
     public:
         QTGraphicsItem(
-            std::function<void(QPainter*, const QStyleOptionGraphicsItem*, QWidget*)> painter,
-            QGraphicsScene*                                                           scene
+            std::function<void(QPainter*, const QStyleOptionGraphicsItem*, QWidget*)> painter
         )
-            : _painter(painter) {
-            scene->addItem(this);
-        }
+            : _painter(painter) {}
 
-        void   SetBoundingRect(const QRectF& boundingRect) { _boundingRect = boundingRect; }
+        void SetBoundingRect(const QRectF& boundingRect) {
+            _boundingRect = boundingRect;
+            prepareGeometryChange();
+            update();
+        }
         QRectF GetBoundingRect() const { return _boundingRect; }
 
-        void                       SetText(const std::string& text) { _text = text; }
+        void SetText(const std::string& text) {
+            _text = text;
+            update();
+        }
         std::optional<std::string> GetText() const { return _text; }
 
-        void   SetSize(const QSizeF& size) { _boundingRect.setSize(size); }
+        void SetSize(const QSizeF& size) {
+            _boundingRect.setSize(size);
+            update();
+        }
         QSizeF GetSize() const { return _boundingRect.size(); }
 
     protected:

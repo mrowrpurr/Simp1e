@@ -5,8 +5,10 @@
 
 #include <string>
 
+#include "ComponentBase.h"
+
 namespace Simp1e::ECS {
-    class TextComponent {
+    class TextComponent : public ComponentBase {
         std::string _text;
 
     public:
@@ -15,8 +17,11 @@ namespace Simp1e::ECS {
         TextComponent() = default;
         TextComponent(const std::string& text) : _text(text) {}
 
-        std::string& GetText() { return _text; }
+        virtual std::string GetText() const { return _text; }
 
-        void SetText(const std::string& text) { _text = text; }
+        virtual void SetText(const std::string& text) {
+            _text = text;
+            SetDirty();
+        }
     };
 }

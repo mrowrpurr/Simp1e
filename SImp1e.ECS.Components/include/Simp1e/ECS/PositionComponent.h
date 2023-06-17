@@ -4,8 +4,10 @@
 #include <Simp1e/ECS/ComponentTypeMacro.h>
 #include <Simp1e/Position.h>
 
+#include "ComponentBase.h"
+
 namespace Simp1e::ECS {
-    class PositionComponent {
+    class PositionComponent : public ComponentBase {
         Position _position;
 
     public:
@@ -15,7 +17,11 @@ namespace Simp1e::ECS {
         PositionComponent(sreal x, sreal y) : _position(x, y) {}
         PositionComponent(const Position& position) : _position(position) {}
 
-        Position& GetPosition() { return _position; }
-        void      SetPosition(const Position& position) { _position = position; }
+        virtual Position const GetPosition() { return _position; }
+
+        virtual void SetPosition(const Position& position) {
+            _position = position;
+            SetDirty();
+        }
     };
 }

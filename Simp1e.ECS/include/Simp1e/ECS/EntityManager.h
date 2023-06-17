@@ -60,6 +60,17 @@ namespace Simp1e::ECS {
             return static_cast<T*>(_components[componentType][entity].get());
         }
 
+        std::unordered_map<Entity, ComponentPointer>& GetComponents(
+            const ComponentType& componentType
+        ) {
+            return _components[componentType];
+        }
+
+        template <typename T>
+        std::unordered_map<Entity, ComponentPointer>& GetComponents() {
+            return _components[T::GetComponentType()];
+        }
+
         bool HasComponent(Entity entity, const ComponentType& componentType) {
             return _components[componentType].find(entity) != _components[componentType].end();
         }

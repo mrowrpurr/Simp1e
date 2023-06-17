@@ -7,4 +7,4 @@
 #include "Conversions/ToQRectF.h"
 #include "Conversions/ToQSize.h"
 #include "Conversions/ToQSizeF.h"
-
+#include "Conversions/ToQString.h"

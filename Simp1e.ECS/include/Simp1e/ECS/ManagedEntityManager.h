@@ -56,6 +56,17 @@ namespace Simp1e::ECS {
             return _entityManager.GetComponent<T>(entity, T::GetComponentType());
         }
 
+        std::unordered_map<Entity, ComponentPointer>& GetComponents(
+            const ComponentType& componentType
+        ) {
+            return _entityManager.GetComponents(componentType);
+        }
+
+        template <typename T>
+        std::unordered_map<Entity, ComponentPointer>& GetComponents() {
+            return _entityManager.GetComponents<T>();
+        }
+
         template <typename T>
         bool HasComponent(Entity entity, const ComponentType& componentType) {
             return _entityManager.HasComponent<T>(entity, componentType);
