@@ -9,13 +9,13 @@
 namespace Simp1e::ECS {
 
     class EntityManagerEvents {
-        std::vector<std::function<void(Entity)>>                _onEntityCreated;
-        std::vector<std::function<void(Entity)>>                _onEntityRemoving;
-        std::vector<std::function<void(Entity)>>                _onEntityRemoved;
-        std::vector<std::function<void(Entity, ComponentType)>> _onComponentAdding;
-        std::vector<std::function<void(Entity, ComponentType)>> _onComponentAdded;
-        std::vector<std::function<void(Entity, ComponentType)>> _onComponentRemoving;
-        std::vector<std::function<void(Entity, ComponentType)>> _onComponentRemoved;
+        std::vector<std::function<void(Entity)>>                       _onEntityCreated;
+        std::vector<std::function<void(Entity)>>                       _onEntityRemoving;
+        std::vector<std::function<void(Entity)>>                       _onEntityRemoved;
+        std::vector<std::function<void(Entity, const ComponentType&)>> _onComponentAdding;
+        std::vector<std::function<void(Entity, const ComponentType&)>> _onComponentAdded;
+        std::vector<std::function<void(Entity, const ComponentType&)>> _onComponentRemoving;
+        std::vector<std::function<void(Entity, const ComponentType&)>> _onComponentRemoved;
         std::unordered_map<ComponentType, std::vector<std::function<void(Entity)>>>
             _onComponentAddingByType;
         std::unordered_map<ComponentType, std::vector<std::function<void(Entity)>>>
@@ -38,12 +38,12 @@ namespace Simp1e::ECS {
             _onEntityRemoved.push_back(callback);
         }
 
-        void OnComponentAdding(std::function<void(Entity, ComponentType)> callback) {
+        void OnComponentAdding(std::function<void(Entity, const ComponentType&)> callback) {
             _onComponentAdding.push_back(callback);
         }
 
         void OnComponentAdding(
-            const ComponentType& componentType, std::function<void(Entity)> callback
+            const ComponentType&& componentType, std::function<void(Entity)> callback
         ) {
             _onComponentAddingByType[componentType].push_back(callback);
         }
@@ -53,12 +53,12 @@ namespace Simp1e::ECS {
             OnComponentAdding(T::GetComponentType(), callback);
         }
 
-        void OnComponentAdded(std::function<void(Entity, ComponentType)> callback) {
+        void OnComponentAdded(std::function<void(Entity, const ComponentType&)> callback) {
             _onComponentAdded.push_back(callback);
         }
 
         void OnComponentAdded(
-            const ComponentType& componentType, std::function<void(Entity)> callback
+            const ComponentType&& componentType, std::function<void(Entity)> callback
         ) {
             _onComponentAddedByType[componentType].push_back(callback);
         }
@@ -68,12 +68,12 @@ namespace Simp1e::ECS {
             OnComponentAdded(T::GetComponentType(), callback);
         }
 
-        void OnComponentRemoving(std::function<void(Entity, ComponentType)> callback) {
+        void OnComponentRemoving(std::function<void(Entity, const ComponentType&)> callback) {
             _onComponentRemoving.push_back(callback);
         }
 
         void OnComponentRemoving(
-            const ComponentType& componentType, std::function<void(Entity)> callback
+            const ComponentType&& componentType, std::function<void(Entity)> callback
         ) {
             _onComponentRemovingByType[componentType].push_back(callback);
         }
@@ -83,12 +83,12 @@ namespace Simp1e::ECS {
             OnComponentRemoving(T::GetComponentType(), callback);
         }
 
-        void OnComponentRemoved(std::function<void(Entity, ComponentType)> callback) {
+        void OnComponentRemoved(std::function<void(Entity, const ComponentType&)> callback) {
             _onComponentRemoved.push_back(callback);
         }
 
         void OnComponentRemoved(
-            const ComponentType& componentType, std::function<void(Entity)> callback
+            const ComponentType&& componentType, std::function<void(Entity)> callback
         ) {
             _onComponentRemovedByType[componentType].push_back(callback);
         }
@@ -110,7 +110,7 @@ namespace Simp1e::ECS {
             for (auto& callback : _onEntityRemoved) callback(entity);
         }
 
-        void AddingComponent(Entity entity, ComponentType componentType) {
+        void AddingComponent(Entity entity, const ComponentType& componentType) {
             for (auto& callback : _onComponentAdding) callback(entity, componentType);
             auto found = _onComponentAddingByType.find(componentType);
             if (found != _onComponentAddingByType.end())
@@ -122,7 +122,7 @@ namespace Simp1e::ECS {
             AddingComponent(entity, T::GetComponentType());
         }
 
-        void AddedComponent(Entity entity, ComponentType componentType) {
+        void AddedComponent(Entity entity, const ComponentType& componentType) {
             for (auto& callback : _onComponentAdded) callback(entity, componentType);
             auto found = _onComponentAddedByType.find(componentType);
             if (found != _onComponentAddedByType.end())
@@ -134,7 +134,7 @@ namespace Simp1e::ECS {
             AddedComponent(entity, T::GetComponentType());
         }
 
-        void RemovingComponent(Entity entity, ComponentType componentType) {
+        void RemovingComponent(Entity entity, const ComponentType& componentType) {
             for (auto& callback : _onComponentRemoving) callback(entity, componentType);
             auto found = _onComponentRemovingByType.find(componentType);
             if (found != _onComponentRemovingByType.end())
@@ -146,7 +146,7 @@ namespace Simp1e::ECS {
             RemovingComponent(entity, T::GetComponentType());
         }
 
-        void RemovedComponent(Entity entity, ComponentType componentType) {
+        void RemovedComponent(Entity entity, const ComponentType& componentType) {
             for (auto& callback : _onComponentRemoved) callback(entity, componentType);
             auto found = _onComponentRemovedByType.find(componentType);
             if (found != _onComponentRemovedByType.end())

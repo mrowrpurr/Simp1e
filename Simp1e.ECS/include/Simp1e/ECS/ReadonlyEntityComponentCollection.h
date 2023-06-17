@@ -36,5 +36,10 @@ namespace Simp1e::ECS {
         bool HasComponent() {
             return HasComponent(T::GetComponentType());
         }
+
+        size_t size() { return _components.size(); }
+
+        auto begin() { return _components.begin(); }
+        auto end() { return _components.end(); }
     };
 }

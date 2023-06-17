@@ -17,6 +17,10 @@ namespace Simp1e::ECS {
     public:
         SIMP1E_ECS_SYSTEM("CommandSystem")
 
+        CommandSystem() { _Log_("CommandSystem::CommandSystem() - Constructed"); }
+
+        ~CommandSystem() { _Log_("CommandSystem::~CommandSystem() - Destructed"); }
+
         template <typename T>
         void AddCommand(const CommandType& commandType, T* command) {
             _commands.emplace(std::make_unique<CommandExecutor>(

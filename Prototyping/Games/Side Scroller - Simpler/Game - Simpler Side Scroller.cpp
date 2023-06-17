@@ -1,5 +1,8 @@
+#include <string_format.h>
+
 #include <QDebug>
-#define _Log_(...) qDebug(__VA_ARGS__)
+
+#define _Log_(...) qDebug(string_format(__VA_ARGS__).c_str())
 //
 
 #include <Simp1e/ECS.h>
@@ -19,13 +22,47 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <unordered_map>
+#include <unordered_set>
 
 using namespace Simp1e;
 using namespace Simp1e::ECS;
 
+struct QtComponentRenderer {
+    virtual void Render(
+        Game& game, Entity entity, ComponentPointer* component,
+        ReadonlyEntityComponentCollection& components, QPainter* painter,
+        const QStyleOptionGraphicsItem* option, QWidget* widget
+    ) = 0;
+};
+
+struct TextComponentRenderer : public QtComponentRenderer {
+    void Render(
+        Game& game, Entity entity, ComponentPointer* component,
+        ReadonlyEntityComponentCollection& components, QPainter* painter,
+        const QStyleOptionGraphicsItem* option, QWidget* widget
+    ) override {
+        _Log_("TextComponentRenderer::Render");
+
+        auto* rectangleComponent = components.GetComponent<RectangleComponent>();
+        if (!rectangleComponent) return;
+
+        auto* textComponent = component_cast<TextComponent>(component);
+        if (!textComponent) return;
+
+        painter->drawText(
+            ToQRectF(rectangleComponent->GetRectangle()), ToQString(textComponent->GetText())
+        );
+    }
+};
+
 class QtRenderSystem {
-    Game&           _game;
-    QGraphicsScene& _scene;
+    Game&                                                                   _game;
+    QGraphicsScene&                                                         _scene;
+    std::unordered_set<ComponentType>                                       _visualComponentTypes;
+    std::unordered_map<ComponentType, std::unique_ptr<QtComponentRenderer>> _componentRenderers;
+
+    // Delete copy constructor
+    QtRenderSystem(const QtRenderSystem&) = delete;
 
 public:
     SIMP1E_ECS_SYSTEM("QtRender")
@@ -40,7 +77,15 @@ public:
                 ) { PaintEntity(entity, painter, option, widget); }
             );
         });
-        _game.Entities().Events().OnComponentAdded([this](auto entity, auto componentType) {
+        _game.Entities().Events().OnComponentAdded([this](auto entity, auto& componentType) {
+            _Log_("QtRenderSystem::OnComponentAdded");
+            if (!this->_visualComponentTypes.count(componentType)) return;
+            auto* graphicsItemComponent =
+                _game.Entities().GetComponent<QTGraphicsItemComponent>(entity);
+            if (graphicsItemComponent) graphicsItemComponent->update();
+        });
+        _game.Entities().Events().OnComponentRemoved([this](auto entity, auto& componentType) {
+            if (!this->_visualComponentTypes.count(componentType)) return;
             auto* graphicsItemComponent =
                 _game.Entities().GetComponent<QTGraphicsItemComponent>(entity);
             if (graphicsItemComponent) graphicsItemComponent->update();
@@ -50,17 +95,54 @@ public:
         });
     }
 
+    void AddVisualComponentType(ComponentType componentType) {
+        _visualComponentTypes.insert(componentType);
+    }
+
+    template <typename T>
+    void AddVisualComponentType() {
+        AddVisualComponentType(T::GetComponentType());
+    }
+
+    void AddComponentRenderer(ComponentType componentType, QtComponentRenderer* renderer) {
+        _componentRenderers[componentType] = std::unique_ptr<QtComponentRenderer>(renderer);
+    }
+
+    template <typename T>
+    void AddComponentRenderer(QtComponentRenderer* renderer) {
+        AddComponentRenderer(T::GetComponentType(), renderer);
+    }
+
+    template <typename T, typename R>
+    void AddComponentRenderer() {
+        AddComponentRenderer(T::GetComponentType(), new R());
+    }
+
     void Update() {
         // TODO nothing? If nothing, why a 'System'?
     }
 
-    void PaintEntity(Entity entity, QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) {
-        _Log_("QtRenderSystem::PaintEntity");
-        // TODO have the painters do their painting...
+    void PaintEntity(
+        Entity entityId, QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget
+    ) {
+        _Log_("QtRenderSystem::PaintEntity {}", entityId);
+        auto entity = _game.Entities().Get(entityId);
 
-        // For not, just render a magenta rectangle
-        painter->setBrush(Qt::magenta);
-        painter->drawRect(0, 0, 100, 100);
+        auto components = entity.GetComponents();
+        _Log_("Entity {} has {} components", entityId, components.size());
+
+        // TODO have some kind of way to check the VisibleComponent and not do this if it's not
+        // visible
+
+        for (auto& [componentType, component] : components) {
+            _Log_("QtRenderSystem::PaintEntity::Component {}", componentType.c_str());
+            if (!_visualComponentTypes.count(componentType)) continue;
+            auto foundRenderer = _componentRenderers.find(componentType);
+            if (foundRenderer == _componentRenderers.end()) continue;
+            foundRenderer->second->Render(
+                _game, entityId, component, components, painter, option, widget
+            );
+        }
     }
 };
 
@@ -74,7 +156,13 @@ int main(int argc, char* argv[]) {
 
     Game game;
     game.Systems().AddSystem<CommandSystem>();
-    game.Systems().AddSystem<QtRenderSystem>({game, scene});
+
+    auto* qtRenderSystem = new QtRenderSystem(game, scene);
+    qtRenderSystem->AddVisualComponentType<VisibleComponent>();
+    qtRenderSystem->AddVisualComponentType<RectangleComponent>();
+    qtRenderSystem->AddVisualComponentType<TextComponent>();
+    qtRenderSystem->AddComponentRenderer<TextComponent, TextComponentRenderer>();
+    game.Systems().AddSystem(qtRenderSystem);
 
     auto label = game.Entities().CreateEntity();
     label.AddComponent<VisibleComponent>();
