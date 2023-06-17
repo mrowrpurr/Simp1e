@@ -4,14 +4,12 @@
 #include <Simp1e/ECS/ComponentTypeMacro.h>
 #include <Simp1e/Position.h>
 
-#include "ComponentTypes.h"
-
 namespace Simp1e::ECS {
     class PositionComponent {
         Position _position;
 
     public:
-        SIMP1E_ECS_COMPONENT(ComponentTypes::Position)
+        SIMP1E_ECS_COMPONENT("Position")
 
         PositionComponent() = default;
         PositionComponent(sreal x, sreal y) : _position(x, y) {}

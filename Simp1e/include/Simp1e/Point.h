@@ -17,10 +17,10 @@ namespace Simp1e {
         Point(sreal x, sreal y) : _x(x), _y(y) {}
         Point(const Params& params) : _x(params.x), _y(params.y) {}
 
-        sreal& x() { return _x; }
-        sreal& y() { return _y; }
+        virtual sreal& x() { return _x; }
+        virtual sreal& y() { return _y; }
 
-        const sreal& x() const { return _x; }
-        const sreal& y() const { return _y; }
+        virtual const sreal& x() const { return _x; }
+        virtual const sreal& y() const { return _y; }
     };
 }

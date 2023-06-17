@@ -1,0 +1,7 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+<qresource>
+    <file alias="player/images/look/right.png">D:\Dropbox\Parker\GameAssets\Running 1\Right.png</file>
+    <file alias="player/images/look/left.png">D:\Dropbox\Parker\GameAssets\Running 1\Left.png</file>
+</qresource>
+</RCC>
