@@ -34,9 +34,9 @@ struct QtComponentUpdateHandler {
     virtual void Update(Game& game, Entity entity, ComponentPointer& component) = 0;
 };
 
-struct PositionComponentUpdateHandler : public QtComponentUpdateHandler {
+struct QtPositionComponentUpdateHandler : public QtComponentUpdateHandler {
     void Update(Game& game, Entity entity, ComponentPointer& component) override {
-        _Log_("PositionComponentUpdateHandler::Update");
+        _Log_("QtPositionComponentUpdateHandler::Update");
         auto* positionComponent = component_cast<PositionComponent>(component);
         if (!positionComponent) return;
         if (!positionComponent->IsDirty()) return;
@@ -50,9 +50,9 @@ struct PositionComponentUpdateHandler : public QtComponentUpdateHandler {
     }
 };
 
-struct TextComponentUpdateHandler : public QtComponentUpdateHandler {
+struct QtTextComponentUpdateHandler : public QtComponentUpdateHandler {
     void Update(Game& game, Entity entity, ComponentPointer& component) override {
-        _Log_("TextComponentUpdateHandler::Update");
+        _Log_("QtTextComponentUpdateHandler::Update");
         auto* textComponent = component_cast<TextComponent>(component);
         if (!textComponent) return;
         auto* graphicsItemComponent = game.Entities().GetComponent<QTGraphicsItemComponent>(entity);
@@ -72,13 +72,13 @@ struct QtComponentRenderer {
     ) = 0;
 };
 
-struct TextComponentRenderer : public QtComponentRenderer {
+struct QtTextComponentRenderer : public QtComponentRenderer {
     void Render(
         Game& game, Entity entity, ComponentPointer* component,
         ReadonlyEntityComponentCollection& components, QPainter* painter,
         const QStyleOptionGraphicsItem* option, QWidget* widget
     ) override {
-        _Log_("TextComponentRenderer::Render");
+        _Log_("QtTextComponentRenderer::Render");
 
         auto* rectangleComponent = components.GetComponent<RectangleComponent>();
         if (!rectangleComponent) return;
@@ -238,9 +238,10 @@ int main(int argc, char* argv[]) {
     game.Systems().AddSystem<CommandSystem>();
 
     auto* qtRenderSystem = new QtRenderSystem(game, scene);
-    qtRenderSystem->AddComponentUpdateHandler<PositionComponent, PositionComponentUpdateHandler>();
-    qtRenderSystem->AddComponentRenderer<TextComponent, TextComponentRenderer>();
-    qtRenderSystem->AddComponentUpdateHandler<TextComponent, TextComponentUpdateHandler>();
+    qtRenderSystem->AddComponentUpdateHandler<PositionComponent, QtPositionComponentUpdateHandler>(
+    );
+    qtRenderSystem->AddComponentRenderer<TextComponent, QtTextComponentRenderer>();
+    qtRenderSystem->AddComponentUpdateHandler<TextComponent, QtTextComponentUpdateHandler>();
     game.Systems().AddSystem(qtRenderSystem);
 
     auto label = game.Entities().CreateEntity();
