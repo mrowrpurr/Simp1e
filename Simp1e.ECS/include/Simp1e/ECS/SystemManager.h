@@ -1,5 +1,7 @@
 #pragma once
 
+#include <_Log_.h>
+
 #include <vector>
 
 #include "SystemExecutor.h"
@@ -48,6 +50,28 @@ namespace Simp1e::ECS {
         template <typename T>
         void RemoveSystem(T* system) {
             RemoveSystem(T::GetSystemType());
+        }
+
+        bool HasSystem(const SystemType& systemType) const {
+            return _systemIndices.find(systemType) != _systemIndices.end();
+        }
+
+        template <typename T>
+        bool HasSystem() const {
+            return HasSystem(T::GetSystemType());
+        }
+
+        SystemExecutor* GetSystem(const SystemType& systemType) {
+            auto it = _systemIndices.find(systemType);
+            if (it != _systemIndices.end()) return _systems[it->second].get();
+            return nullptr;
+        }
+
+        template <typename T>
+        T* GetSystem() {
+            auto* systemExecutor = GetSystem(T::GetSystemType());
+            if (systemExecutor) return systemExecutor->template GetSystem<T>();
+            return nullptr;
         }
 
         void RemoveSystem(const SystemType& systemType) {
@@ -103,7 +127,19 @@ namespace Simp1e::ECS {
 
         void Update() {
             for (auto& system : _systems) {
-                system->Update();
+                try {
+                    system->Update();
+                } catch (const std::exception& e) {
+                    _Log_(
+                        "SystemManager::Update() system: '{}' exception: {}",
+                        system->GetSystemType(), e.what()
+                    );
+                } catch (...) {
+                    _Log_(
+                        "SystemManager::Update() system: '{}' unknown exception",
+                        system->GetSystemType()
+                    );
+                }
             }
         }
 

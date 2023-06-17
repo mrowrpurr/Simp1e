@@ -1,5 +1,8 @@
 #include <Simp1e/Color.h>
 #include <Simp1e/ECS.h>
+#include <Simp1e/ECS/CommandSystem.h>
+#include <Simp1e/ECS/CommandTypeMacro.h>
+#include <Simp1e/ECS/EventTypeMacro.h>
 #include <Simp1e/ECS/Game.h>
 #include <Simp1e/ECS/PositionComponent.h>
 #include <Simp1e/ECS/RectangleComponent.h>
@@ -21,8 +24,8 @@ using namespace Simp1e::ECS;
 
 class OnClickEvent {
 public:
-    std::string      someData;
-    static EventType GetEventType() { return "OnClickEvent"; }
+    SIMP1E_ECS_EVENT("OnClickEvent")
+    std::string someData;
 };
 
 class SystemOne {
@@ -30,8 +33,8 @@ class SystemOne {
 
 public:
     SystemOne(Game& game) : _game(game) {}
-    static SystemType GetSystemType() { return "SystemOne"; }
-    void              Update() {
+    SIMP1E_ECS_SYSTEM("SystemOne")
+    void Update() {
         qDebug() << "SystemOne::Update()";
         qDebug() << "The game has " << _game.Systems().GetSystemCount() << " systems.";
         _game.Events().SendEvent<OnClickEvent>({"EVENT FROM SYSTEM ONE"});
@@ -40,19 +43,32 @@ public:
 
 class SystemTwo {
 public:
-    static SystemType GetSystemType() { return "SystemTwo"; }
-    void              Update() {
+    SIMP1E_ECS_SYSTEM("SystemTwo")
+    void Update() {
         qDebug() << "SystemTwo::Update()";
         // How can I emit an event here?
     }
+};
+
+class CommandOne {
+    std::string text;
+
+public:
+    SIMP1E_ECS_COMMAND("CommandOne")
+    CommandOne(const std::string& text) : text(text) {}
+    void Execute() { qDebug() << "CommandOne::Execute() - " << text.c_str(); }
 };
 
 int main(int argc, char* argv[]) {
     Game game;
     game.Systems().AddSystem<SystemOne>(game);
     game.Systems().AddSystem<SystemTwo>();
-    game.Events().AddListener<OnClickEvent>([](OnClickEvent* event) {
+    game.Systems().AddSystem<CommandSystem>();
+    game.Events().AddListener<OnClickEvent>([&game](OnClickEvent* event) {
         qDebug() << "OnClickEvent data: " << event->someData.c_str();
+        game.Systems().GetSystem<CommandSystem>()->AddCommand<CommandOne>(
+            {"Made command from click"}
+        );
     });
 
     QApplication   app(argc, argv);
@@ -70,6 +86,8 @@ int main(int argc, char* argv[]) {
     game.Update();
 
     game.Events().SendEvent<OnClickEvent>({"Some data"});
+
+    game.Update();
 
     window.setWindowTitle("Side Scroller");
     window.show();

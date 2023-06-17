@@ -29,6 +29,13 @@ namespace Simp1e::ECS {
         )
             : _systemType(systemType), _systemPointer(MakeSystemPointer(system)), _update(update) {}
 
+        SystemType GetSystemType() const { return _systemType; }
+
+        template <typename T>
+        T* GetSystem() const {
+            return static_cast<T*>(_systemPointer.get());
+        }
+
         bool IsEnabled() const { return _isEnabled; }
 
         void Enable() { _isEnabled = true; }
@@ -39,7 +46,5 @@ namespace Simp1e::ECS {
         void Update() {
             if (_isEnabled) _update(_systemPointer);
         }
-
-        void operator()() { Update(); }
     };
 }
