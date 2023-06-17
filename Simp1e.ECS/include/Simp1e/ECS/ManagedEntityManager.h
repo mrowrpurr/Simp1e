@@ -13,6 +13,8 @@ namespace Simp1e::ECS {
             return ManagedEntity(_entityManager, _entityManager.CreateEntity());
         }
 
+        EntityManagerEvents& Events() { return _entityManager.Events(); }
+
         ManagedEntity Get(Entity entity) { return ManagedEntity(_entityManager, entity); }
 
         bool Exists(Entity entity) { return _entityManager.HasEntity(entity); }
@@ -44,6 +46,11 @@ namespace Simp1e::ECS {
         template <typename T>
         void AddComponent(Entity entity, T* component) {
             _entityManager.AddComponent(entity, component);
+        }
+
+        template <typename T>
+        void AddComponent(Entity entity) {
+            _entityManager.AddComponent<T>(entity);
         }
 
         template <typename T>
@@ -84,7 +91,7 @@ namespace Simp1e::ECS {
 
         template <typename T>
         void RemoveComponent(Entity entity) {
-            _entityManager.RemoveComponent<T>(entity, T::GetComponentType());
+            _entityManager.RemoveComponent<T>(entity);
         }
 
         void RemoveEntity(Entity entity) { _entityManager.RemoveEntity(entity); }

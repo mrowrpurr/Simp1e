@@ -1,11 +1,14 @@
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <unordered_map>
+#include <vector>
 
 #include "ComponentPointer.h"
 #include "ComponentType.h"
 #include "Entity.h"
+#include "EntityManagerEvents.h"
 #include "ReadonlyEntityComponentCollection.h"
 
 namespace Simp1e::ECS {
@@ -13,6 +16,7 @@ namespace Simp1e::ECS {
     class EntityManager {
         std::unordered_map<ComponentType, std::unordered_map<Entity, ComponentPointer>> _components;
         std::unordered_map<Entity, std::unordered_map<ComponentType, ComponentPointer*>> _entities;
+        EntityManagerEvents                                                              _events;
 
     public:
         Entity CreateEntity() {
@@ -22,21 +26,35 @@ namespace Simp1e::ECS {
 
         bool HasEntity(Entity entity) { return _entities.find(entity) != _entities.end(); }
 
+        EntityManagerEvents& Events() { return _events; }
+
         ReadonlyEntityComponentCollection GetEntityComponents(Entity entity) {
             return ReadonlyEntityComponentCollection(_entities[entity]);
         }
 
         template <typename T>
+        void AddComponent(Entity entity, const ComponentType& componentType, T* component) {
+            Events().AddingComponent(entity, componentType);
+            _components[componentType][entity] = MakeComponentPointer(component);
+            _entities[entity][componentType]   = &_components[componentType][entity];
+            Events().AddedComponent(entity, componentType);
+        }
+
+        template <typename T>
         void AddComponent(Entity entity, const ComponentType& componentType) {
+            Events().AddingComponent(entity, componentType);
             _components[componentType][entity] = MakeComponentPointer(new T());
             _entities[entity][componentType]   = &_components[componentType][entity];
+            Events().AddedComponent(entity, componentType);
         }
 
         template <typename T>
         void AddComponent(Entity entity, const ComponentType& componentType, T&& component) {
+            Events().AddingComponent(entity, componentType);
             _components[componentType][entity] =
                 MakeComponentPointer(new T(std::forward<T>(component)));
             _entities[entity][componentType] = &_components[componentType][entity];
+            Events().AddedComponent(entity, componentType);
         }
 
         template <typename T>
@@ -45,14 +63,13 @@ namespace Simp1e::ECS {
         }
 
         template <typename T>
-        void AddComponent(Entity entity, const ComponentType& componentType, T* component) {
-            _components[componentType][entity] = MakeComponentPointer(component);
-            _entities[entity][componentType]   = &_components[componentType][entity];
+        void AddComponent(Entity entity, T* component) {
+            AddComponent(entity, T::GetComponentType(), component);
         }
 
         template <typename T>
-        void AddComponent(Entity entity, T* component) {
-            AddComponent(entity, T::GetComponentType(), component);
+        void AddComponent(Entity entity) {
+            AddComponent<T>(entity, T::GetComponentType(), new T());
         }
 
         template <typename T>
@@ -81,6 +98,7 @@ namespace Simp1e::ECS {
         }
 
         void RemoveComponent(Entity entity, const ComponentType& componentType) {
+            Events().RemovingComponent(entity, componentType);
             _components[componentType].erase(entity);
             for (auto& entityComponent : _entities[entity]) {
                 if (entityComponent.first == componentType) {
@@ -88,6 +106,7 @@ namespace Simp1e::ECS {
                     break;
                 }
             }
+            Events().RemovedComponent(entity, componentType);
         }
 
         template <typename T>
@@ -96,8 +115,10 @@ namespace Simp1e::ECS {
         }
 
         void RemoveEntity(Entity entity) {
+            Events().RemovingEntity(entity);
             for (auto& component : _components) component.second.erase(entity);
             _entities.erase(entity);
+            Events().RemovedEntity(entity);
         }
 
         void Clear() {
