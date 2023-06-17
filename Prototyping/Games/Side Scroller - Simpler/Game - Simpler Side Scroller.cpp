@@ -5,6 +5,7 @@
 #include <Simp1e/ECS.h>
 #include <Simp1e/ECS/CommandSystem.h>
 #include <Simp1e/ECS/Game.h>
+#include <Simp1e/ECS/PositionComponent.h>
 #include <Simp1e/ECS/QTGraphicsItemComponent.h>
 #include <Simp1e/ECS/TextComponent.h>
 #include <Simp1e/ECS/VisibleComponent.h>
@@ -27,18 +28,14 @@ int main(int argc, char* argv[]) {
     QGraphicsScene scene(0, 0, 800, 600);
     window.setScene(&scene);
 
-    auto  label          = game.Entities().CreateEntity();
-    auto* labelComponent = new QTGraphicsItemComponent(&scene);
-    labelComponent->SetSize({200, 100});
-    labelComponent->SetText("Hello from the entity.");
-    label.AddComponent(labelComponent);
+    auto label = game.Entities().CreateEntity();
 
-    auto  button          = game.Entities().CreateEntity();
-    auto* buttonComponent = new QTGraphicsItemComponent(&scene);
-    buttonComponent->SetSize({150, 150});
-    buttonComponent->SetPosition({200, 200});
-    buttonComponent->SetText("Click me!");
-    button.AddComponent(buttonComponent);
+    label.AddComponent<VisibleComponent>(VisibleComponent{true});
+    label.AddComponent<TextComponent>({"Hello from the entity."});
+    label.AddComponent<PositionComponent>({100, 100});
+
+    auto* labelGraphicsComponent = new QTGraphicsItemComponent(game, label, &scene);
+    label.AddComponent(labelGraphicsComponent);
 
     qDebug() << "Run app";
 

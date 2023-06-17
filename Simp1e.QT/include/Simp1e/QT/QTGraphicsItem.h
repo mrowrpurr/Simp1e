@@ -3,6 +3,7 @@
 #include <QGraphicsItem>
 #include <QGraphicsScene>
 #include <QPainter>
+#include <functional>
 #include <optional>
 
 namespace Simp1e {
@@ -12,26 +13,31 @@ namespace Simp1e {
         std::optional<std::string> _text;
         std::optional<QColor>      _borderColor;
 
-    public:
-        QTGraphicsItem() = default;
-        QTGraphicsItem(QGraphicsScene* scene) { scene->addItem(this); }
+        std::function<void(QPainter*, const QStyleOptionGraphicsItem*, QWidget*)> _painter =
+            [](auto, auto, auto) {};
 
-        void SetText(const std::string& text) { _text = text; }
-        void SetSize(const QSizeF& size) { _boundingRect.setSize(size); }
+    public:
+        QTGraphicsItem(
+            std::function<void(QPainter*, const QStyleOptionGraphicsItem*, QWidget*)> painter,
+            QGraphicsScene*                                                           scene
+        )
+            : _painter(painter) {
+            scene->addItem(this);
+        }
+
+        void   SetBoundingRect(const QRectF& boundingRect) { _boundingRect = boundingRect; }
+        QRectF GetBoundingRect() const { return _boundingRect; }
+
+        void                       SetText(const std::string& text) { _text = text; }
+        std::optional<std::string> GetText() const { return _text; }
+
+        void   SetSize(const QSizeF& size) { _boundingRect.setSize(size); }
+        QSizeF GetSize() const { return _boundingRect.size(); }
 
     protected:
         void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
             override {
-            // Draw white rectangle border
-            // if (_borderColor) {
-            painter->setPen(QPen(Qt::white, 1));
-            painter->drawRect(boundingRect());
-            // }
-
-            if (_text) {
-                painter->setPen(Qt::white);
-                painter->drawText(boundingRect(), Qt::AlignCenter, QString::fromStdString(*_text));
-            }
+            _painter(painter, option, widget);
         }
         QRectF boundingRect() const override { return _boundingRect; }
     };
