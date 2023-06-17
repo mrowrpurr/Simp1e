@@ -1,11 +1,14 @@
 #include <Simp1e/QT/_Log_.h>
 //
 
+// TODO rename all of my Qt* files and classes to QT* so it doesn't collide with Qt's classes
+
 #include <Simp1e/ECS.h>
 #include <Simp1e/ECS/CommandSystem.h>
 #include <Simp1e/ECS/Game.h>
 #include <Simp1e/ECS/PositionComponent.h>
 #include <Simp1e/ECS/QtPositionComponentUpdateHandler.h>
+#include <Simp1e/ECS/QtRectangleComponentRenderer.h>
 #include <Simp1e/ECS/QtRenderSystem.h>
 #include <Simp1e/ECS/QtTextComponentRenderer.h>
 #include <Simp1e/ECS/QtTextComponentUpdateHandler.h>
@@ -51,6 +54,7 @@ protected:
 void SetupQtRenderSystem(Game& game, QGraphicsScene& scene) {
     auto* qtRenderSystem = new QtRenderSystem(game, scene);
     qtRenderSystem->AddVisualComponentType<VisibleComponent>();
+    qtRenderSystem->AddComponentRenderer<RectangleComponent, QtRectangleComponentRenderer>();
     qtRenderSystem->AddComponentUpdateHandler<PositionComponent, QtPositionComponentUpdateHandler>(
     );
     qtRenderSystem->AddComponentRenderer<TextComponent, QtTextComponentRenderer>();
@@ -72,9 +76,10 @@ void AddTextLabel(Game& game) {
 void AddGraphicsRectButton(Game& game) {
     auto button = game.Entities().CreateEntity();
     button.AddComponent<RectangleComponent>({
-        {100, 100}
+        {100, 100},
+        Color::Yellow()
     });
-    button.AddComponent<TextComponent>({"Click me!"});
+    button.AddComponent<TextComponent>({"Click me!", Color::Black()});
 }
 
 Game    game;
@@ -85,7 +90,6 @@ int  loopIteration = 0;
 void GameLoop() {
     loopIteration++;
     loopIterationLabel->setText(QString("Loop Iteration: %1").arg(loopIteration));
-
     game.Update();
 }
 

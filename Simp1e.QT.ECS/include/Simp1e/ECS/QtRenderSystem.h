@@ -13,6 +13,7 @@
 #include <functional>
 #include <unordered_map>
 #include <unordered_set>
+#include <vector>
 
 #include "QtComponentRenderer.h"
 #include "QtComponentUpdateHandler.h"
@@ -24,6 +25,7 @@ namespace Simp1e::ECS {
         QGraphicsScene&                   _scene;
         std::unordered_set<ComponentType> _visualComponentTypes;
         std::unordered_map<ComponentType, std::unique_ptr<QtComponentRenderer>> _componentRenderers;
+        std::vector<ComponentType> _componentRenderersOrder;
         std::unordered_map<ComponentType, std::unique_ptr<QtComponentUpdateHandler>>
             _componentUpdateHandlers;
 
@@ -83,6 +85,7 @@ namespace Simp1e::ECS {
 
         void AddComponentRenderer(ComponentType componentType, QtComponentRenderer* renderer) {
             _componentRenderers[componentType] = std::unique_ptr<QtComponentRenderer>(renderer);
+            _componentRenderersOrder.push_back(componentType);
             AddVisualComponentType(componentType);
         }
 
@@ -134,10 +137,12 @@ namespace Simp1e::ECS {
             auto entity     = _game.Entities().Get(entityId);
             auto components = entity.GetComponents();
 
-            for (auto& [componentType, component] : components) {
-                if (!_visualComponentTypes.count(componentType)) continue;
+            for (int i = 0; i < _componentRenderersOrder.size(); ++i) {
+                auto componentType = _componentRenderersOrder[i];
+                if (!components.HasComponent(componentType)) continue;
                 auto foundRenderer = _componentRenderers.find(componentType);
                 if (foundRenderer == _componentRenderers.end()) continue;
+                auto* component = components.GetComponent(componentType);
                 foundRenderer->second->Render(
                     _game, entityId, component, components, painter, option, widget
                 );

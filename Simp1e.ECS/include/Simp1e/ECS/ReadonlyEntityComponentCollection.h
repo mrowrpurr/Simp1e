@@ -16,6 +16,12 @@ namespace Simp1e::ECS {
         )
             : _components(components) {}
 
+        ComponentPointer* GetComponent(const ComponentType& componentType) {
+            auto found = _components.find(componentType);
+            if (found != _components.end()) return found->second;
+            return nullptr;
+        }
+
         template <typename T>
         T* GetComponent(const ComponentType& componentType) {
             auto found = _components.find(componentType);
