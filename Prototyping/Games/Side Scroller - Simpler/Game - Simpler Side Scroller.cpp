@@ -57,12 +57,14 @@ protected:
 void SetupQtRenderSystem(Game& game, QGraphicsScene& scene) {
     auto* qtRenderSystem = new QtRenderSystem(game, scene);
     qtRenderSystem->AddVisualComponentType<VisibleComponent>();
-    qtRenderSystem->AddComponentRenderer<RectangleComponent, QtRectangleComponentRenderer>();
+    //
     qtRenderSystem->AddComponentUpdateHandler<PositionComponent, QtPositionComponentUpdateHandler>(
     );
-    qtRenderSystem->AddComponentRenderer<TextComponent, QtTextComponentRenderer>();
     qtRenderSystem->AddComponentUpdateHandler<TextComponent, QtTextComponentUpdateHandler>();
+    // Renderers (order matters)
+    qtRenderSystem->AddComponentRenderer<RectangleComponent, QtRectangleComponentRenderer>();
     qtRenderSystem->AddComponentRenderer<QTImageComponent, QTImageComponentRenderer>();
+    qtRenderSystem->AddComponentRenderer<TextComponent, QtTextComponentRenderer>();
     game.Systems().AddSystem(qtRenderSystem);
 }
 
@@ -71,6 +73,7 @@ void AddPlayer(Game& game) {
     player.AddComponent<PositionComponent>({200, 100});
     player.AddComponent<SizeComponent>({200, 200});
     player.AddComponent<QTImageComponent>({":/player/images/look/right.png"});
+    player.AddComponent<TextComponent>({"Player.", Color::Red()});
 }
 
 void AddTextLabel(Game& game) {

@@ -12,7 +12,7 @@
 namespace Simp1e::ECS {
     class TextComponent : public ComponentBase {
         std::string          _text;
-        std::optional<Color> _color;
+        std::optional<Color> _color;  // TODO make this required
 
     public:
         SIMP1E_ECS_COMPONENT("Text")

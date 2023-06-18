@@ -2,7 +2,7 @@
 
 #include <Simp1e/ECS/ComponentCast.h>
 #include <Simp1e/ECS/QTGraphicsItemComponent.h>
-#include <Simp1e/ECS/RectangleComponent.h>
+#include <Simp1e/ECS/SizeComponent.h>
 #include <Simp1e/ECS/TextComponent.h>
 #include <Simp1e/QT/Conversions/ToQColor.h>
 #include <Simp1e/QT/Conversions/ToQRectF.h>
@@ -19,8 +19,8 @@ namespace Simp1e::ECS {
             const QStyleOptionGraphicsItem* option, QWidget* widget
         ) override {
             // TODO make this like a SizeComponent maybe
-            auto* rectangleComponent = components.GetComponent<RectangleComponent>();
-            if (!rectangleComponent) return;
+            auto* sizeComponent = components.GetComponent<SizeComponent>();
+            if (!sizeComponent) return;
 
             auto* textComponent = component_cast<TextComponent>(component);
             if (!textComponent) return;
@@ -29,7 +29,7 @@ namespace Simp1e::ECS {
                 painter->setPen(ToQColor(textComponent->GetColor().value()));
 
             painter->drawText(
-                ToQRectF(rectangleComponent->GetRectangle()), ToQString(textComponent->GetText())
+                ToQRectF(sizeComponent->GetSize()), ToQString(textComponent->GetText())
             );
         }
     };

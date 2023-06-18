@@ -43,8 +43,9 @@ add_subdirectory("Simp1e.ECS.Components")
 add_subdirectory("Simp1e.QT")
 add_subdirectory("Simp1e.QT.ECS")
 
+# Update to support multiple or... just... hmm.
 function(qt_project target_name main_cpp_file)
-    qt_add_executable(${target_name} MANUAL_FINALIZATION "${main_cpp_file}")
+    qt_add_executable(${target_name} MANUAL_FINALIZATION "${main_cpp_file}" "Prototyping/Games/Side Scroller - Simpler/SideScroller.qrc")
     target_link_libraries(${target_name} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
     get_filename_component(main_cpp_folder ${main_cpp_file} DIRECTORY)
     target_include_directories(${target_name} PRIVATE ${main_cpp_folder})
