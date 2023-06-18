@@ -20,7 +20,12 @@ namespace Simp1e {
         sreal& width() { return _width; }
         sreal& height() { return _height; }
 
+        void SetWidth(sreal width) { _width = width; }
+        void SetHeight(sreal height) { _height = height; }
+
         const sreal& width() const { return _width; }
         const sreal& height() const { return _height; }
+
+        bool isNull() const { return _width == 0 && _height == 0; }
     };
 }

@@ -1,4 +1,3 @@
-#define FMT_HEADER_ONLY
 #include <Simp1e/QT/_Log_.h>
 //
 
@@ -8,12 +7,15 @@
 #include <Simp1e/ECS/CommandSystem.h>
 #include <Simp1e/ECS/Game.h>
 #include <Simp1e/ECS/PositionComponent.h>
+#include <Simp1e/ECS/QTImageComponent.h>
+#include <Simp1e/ECS/QTImageComponentRenderer.h>
 #include <Simp1e/ECS/QtPositionComponentUpdateHandler.h>
 #include <Simp1e/ECS/QtRectangleComponentRenderer.h>
 #include <Simp1e/ECS/QtRenderSystem.h>
 #include <Simp1e/ECS/QtTextComponentRenderer.h>
 #include <Simp1e/ECS/QtTextComponentUpdateHandler.h>
 #include <Simp1e/ECS/RectangleComponent.h>
+#include <Simp1e/ECS/SizeComponent.h>
 #include <Simp1e/ECS/TextComponent.h>
 #include <Simp1e/ECS/VisibleComponent.h>
 
@@ -60,7 +62,15 @@ void SetupQtRenderSystem(Game& game, QGraphicsScene& scene) {
     );
     qtRenderSystem->AddComponentRenderer<TextComponent, QtTextComponentRenderer>();
     qtRenderSystem->AddComponentUpdateHandler<TextComponent, QtTextComponentUpdateHandler>();
+    qtRenderSystem->AddComponentRenderer<QTImageComponent, QTImageComponentRenderer>();
     game.Systems().AddSystem(qtRenderSystem);
+}
+
+void AddPlayer(Game& game) {
+    auto player = game.Entities().CreateEntity();
+    player.AddComponent<PositionComponent>({200, 100});
+    player.AddComponent<SizeComponent>({200, 200});
+    player.AddComponent<QTImageComponent>({":/player/images/look/right.png"});
 }
 
 void AddTextLabel(Game& game) {
@@ -114,8 +124,7 @@ int main(int argc, char* argv[]) {
     SetupQtRenderSystem(game, scene);
     game.Systems().AddSystem<CommandSystem>();
 
-    AddTextLabel(game);
-    AddGraphicsRectButton(game);
+    AddPlayer(game);
 
     QObject::connect(&mainLoopTimer, &QTimer::timeout, &app, GameLoop);
     mainLoopTimer.start(16);

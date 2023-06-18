@@ -2,6 +2,9 @@
 
 // Require this file before any other file that uses _Log_
 
+// Required for me for android at the moment...
+#define FMT_HEADER_ONLY
+
 #include <string_format.h>
 
 #include <QDebug>

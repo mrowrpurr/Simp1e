@@ -2,11 +2,12 @@
 
 namespace Simp1e::ECS {
     class ComponentBase {
-        bool _isDirty =
-            true;  // Start out dirty so that the first update will be sent to the renderer.
+        bool _isDirty = true;
 
     public:
-        bool IsDirty() { return _isDirty; }
-        void SetDirty(bool isDirty = true) { _isDirty = isDirty; }
+        virtual ~ComponentBase() = default;
+
+        virtual bool IsDirty() { return _isDirty; }
+        virtual void SetDirty(bool isDirty = true) { _isDirty = isDirty; }
     };
 }

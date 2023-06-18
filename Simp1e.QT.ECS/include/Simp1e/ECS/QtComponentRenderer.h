@@ -12,6 +12,8 @@
 namespace Simp1e::ECS {
 
     struct QtComponentRenderer {
+        virtual ~QtComponentRenderer() = default;
+
         virtual void Render(
             Game& game, Entity entity, ComponentPointer* component,
             ReadonlyEntityComponentCollection& components, QPainter* painter,

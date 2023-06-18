@@ -26,27 +26,27 @@ namespace Simp1e::ECS {
         )
             : _rectangle(rectangle), _backgroundColor(backgroundColor), _borderColor(borderColor) {}
 
-        Rectangle            GetRectangle() const { return _rectangle; }
-        std::optional<Color> GetBackgroundColor() const { return _backgroundColor; }
-        std::optional<Color> GetBorderColor() const { return _borderColor; }
+        virtual Rectangle            GetRectangle() const { return _rectangle; }
+        virtual std::optional<Color> GetBackgroundColor() const { return _backgroundColor; }
+        virtual std::optional<Color> GetBorderColor() const { return _borderColor; }
 
-        void SetRectangle(const Rectangle& rectangle) {
+        virtual void SetRectangle(const Rectangle& rectangle) {
             _rectangle = rectangle;
             SetDirty();
         }
-        void SetBackgroundColor(Color backgroundColor) {
+        virtual void SetBackgroundColor(Color backgroundColor) {
             _backgroundColor = backgroundColor;
             SetDirty();
         }
-        void UnsetBackgroundColor() {
+        virtual void UnsetBackgroundColor() {
             _backgroundColor = std::nullopt;
             SetDirty();
         }
-        void SetBorderColor(Color borderColor) {
+        virtual void SetBorderColor(Color borderColor) {
             _borderColor = borderColor;
             SetDirty();
         }
-        void UnsetBorderColor() {
+        virtual void UnsetBorderColor() {
             _borderColor = std::nullopt;
             SetDirty();
         }
