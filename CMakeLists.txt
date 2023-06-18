@@ -2,8 +2,19 @@ cmake_minimum_required(VERSION 3.5)
 
 project(Simp1e-Projects VERSION 0.1 LANGUAGES CXX)
 
+# message(FATAL_ERROR "QT_INSTALL_PREFIX: ${QT_INSTALL_PREFIX}")
+# message(FATAL_ERROR "The system name is: ${CMAKE_SYSTEM_NAME}")
+# message(FATAL_ERROR "Can we see the prefix path? ${CMAKE_PREFIX_PATH}")
+
+message(STATUS "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
+message(STATUS "CMAKE_SYSTEM_PREFIX_PATH: ${CMAKE_SYSTEM_PREFIX_PATH}")
+message(STATUS "CMAKE_FIND_ROOT_PATH: ${CMAKE_FIND_ROOT_PATH}")
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Android")
-    set(CMAKE_PREFIX_PATH "C:/Code/vcpkg/installed/arm64-android")
+    #message(FATAL_ERROR "We are here")
+    set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
+    # set(CMAKE_PREFIX_PATH "C:/Code/vcpkg/installed/arm64-android")
+    set(CMAKE_PREFIX_PATH "C:/Qt/6.5.1/android_arm64_v8a;C:/Code/vcpkg/installed/arm64-android")
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
     set(CMAKE_PREFIX_PATH "C:/Code/vcpkg/installed/wasm32-emscripten")
 else()

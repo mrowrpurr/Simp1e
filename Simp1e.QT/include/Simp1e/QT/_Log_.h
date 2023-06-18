@@ -6,4 +6,4 @@
 
 #include <QDebug>
 
-#define _Log_(...) qDebug(string_format(__VA_ARGS__).c_str())
+#define _Log_(...) qDebug() << string_format(__VA_ARGS__).c_str()

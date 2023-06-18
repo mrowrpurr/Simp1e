@@ -3,6 +3,7 @@
 #include <functional>
 #include <memory>
 #include <queue>
+#include <_Log_.h>
 
 #include "CommandExecutor.h"
 #include "SystemTypeMacro.h"
@@ -49,8 +50,7 @@ namespace Simp1e::ECS {
                     command->Execute();
                 } catch (...) {
                     _Log_(
-                        "CommandSystem::Update() - Exception caught while executing command of "
-                        "type '{}'",
+                        "CommandSystem::Update() - Exception caught while executing command of type '{}'",
                         command->GetCommandType()
                     );
                 }
