@@ -1,3 +1,4 @@
+#define FMT_HEADER_ONLY
 #include <Simp1e/QT/_Log_.h>
 //
 
