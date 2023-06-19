@@ -11,7 +11,7 @@ namespace Simp1e::ECS {
         std::function<void(MouseClickEvent*)> _onMouseClickEvent;
 
     public:
-        SIMP1E_ECS_COMPONENT("OnMouseClickEvent")
+        SIMP1E_ECS_COMPONENT("OnMouseClick")
 
         OnMouseClickComponent(std::function<void(MouseClickEvent*)> onMouseClickEvent)
             : _onMouseClickEvent(onMouseClickEvent) {}

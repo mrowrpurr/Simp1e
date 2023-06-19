@@ -11,7 +11,7 @@ namespace Simp1e::ECS {
         std::function<void(KeyboardEvent*)> _onKeyEvent;
 
     public:
-        SIMP1E_ECS_COMPONENT("OnKeyboardEvent")
+        SIMP1E_ECS_COMPONENT("OnKeyboard")
 
         OnKeyboardComponent(std::function<void(KeyboardEvent*)> onKeyEvent)
             : _onKeyEvent(onKeyEvent) {}

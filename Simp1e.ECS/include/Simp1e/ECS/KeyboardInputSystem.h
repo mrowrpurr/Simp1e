@@ -28,7 +28,8 @@ namespace Simp1e::ECS {
             if (!_lastMouseClickEvent) return;
             auto& onKeyboardInputComponents = _entityManager.GetComponents<OnKeyboardComponent>();
             for (auto& [entity, component] : onKeyboardInputComponents) {
-                auto onKeyboardInputComponent = component_cast<OnKeyboardComponent>(component);
+                auto* onKeyboardInputComponent = component_cast<OnKeyboardComponent>(component);
+                if (!onKeyboardInputComponent) continue;
                 onKeyboardInputComponent->TriggerEvent(_lastMouseClickEvent.get());
             }
             _lastMouseClickEvent.reset();

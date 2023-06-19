@@ -29,7 +29,8 @@ namespace Simp1e::ECS {
             auto& onMouseClickInputComponents =
                 _entityManager.GetComponents<OnMouseClickComponent>();
             for (auto& [entity, component] : onMouseClickInputComponents) {
-                auto onMouseClickInputComponent = component_cast<OnMouseClickComponent>(component);
+                auto* onMouseClickInputComponent = component_cast<OnMouseClickComponent>(component);
+                if (!onMouseClickInputComponent) continue;
                 onMouseClickInputComponent->TriggerEvent(_lastMouseClickEvent.get());
             }
             if (!_lastMouseClickEvent->pressed()) _lastMouseClickEvent.reset();

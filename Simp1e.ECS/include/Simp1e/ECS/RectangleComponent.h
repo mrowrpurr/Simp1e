@@ -12,23 +12,28 @@
 
 namespace Simp1e::ECS {
     class RectangleComponent : public DirtyTrackingComponent {
-        Rectangle            _rectangle;
-        std::optional<Color> _backgroundColor;
-        std::optional<Color> _borderColor;
+        std::optional<Rectangle> _rectangle;
+        std::optional<Color>     _backgroundColor;
+        std::optional<Color>     _borderColor;
 
     public:
         SIMP1E_ECS_COMPONENT("Rectangle")
 
         RectangleComponent() = default;
         RectangleComponent(
-            const Rectangle& rectangle, std::optional<Color> backgroundColor = std::nullopt,
-            std::optional<Color> borderColor = std::nullopt
+            std::optional<Rectangle> rectangle       = std::nullopt,
+            std::optional<Color>     backgroundColor = std::nullopt,
+            std::optional<Color>     borderColor     = std::nullopt
         )
             : _rectangle(rectangle), _backgroundColor(backgroundColor), _borderColor(borderColor) {}
+        RectangleComponent(
+            std::optional<Color> backgroundColor, std::optional<Color> borderColor = std::nullopt
+        )
+            : _backgroundColor(backgroundColor), _borderColor(borderColor) {}
 
-        virtual Rectangle            GetRectangle() const { return _rectangle; }
-        virtual std::optional<Color> GetBackgroundColor() const { return _backgroundColor; }
-        virtual std::optional<Color> GetBorderColor() const { return _borderColor; }
+        virtual std::optional<Rectangle> GetRectangle() const { return _rectangle; }
+        virtual std::optional<Color>     GetBackgroundColor() const { return _backgroundColor; }
+        virtual std::optional<Color>     GetBorderColor() const { return _borderColor; }
 
         virtual void SetRectangle(const Rectangle& rectangle) {
             _rectangle = rectangle;

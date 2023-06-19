@@ -38,7 +38,8 @@ namespace Simp1e::ECS {
             }
         }
 
-        virtual sreal x() const { return _position.x(); }
-        virtual sreal y() const { return _position.y(); }
+        virtual sreal    x() const { return _position.x(); }
+        virtual sreal    y() const { return _position.y(); }
+        virtual Position position() const { return _position; }
     };
 }
