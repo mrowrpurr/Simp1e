@@ -46,17 +46,17 @@ namespace Simp1e::ECS {
         }
 
         template <typename T>
-        void SendEvent(T&& event) {
-            auto& handlers = _eventHandlers[T::GetEventType()];
-            for (auto& handler : handlers) {
-                auto ptr = MakeEventPointer(new T(std::forward<T>(event)));
-                handler(ptr);
-            }
+        void Emit(T&& event) {
+            auto found = _eventHandlers.find(T::GetEventType());
+            if (found == _eventHandlers.end()) return;
+            auto& handlers = found->second;
+            auto  ptr      = MakeEventPointer(new T(std::forward<T>(event)));
+            for (auto& handler : handlers) handler(ptr);
         }
 
         template <typename T>
-        void SendEvent() {
-            SendEvent(T());
+        void Emit() {
+            Emit(T());
         }
 
         void Clear() { _eventHandlers.clear(); }
