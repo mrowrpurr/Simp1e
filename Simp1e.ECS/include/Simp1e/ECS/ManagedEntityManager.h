@@ -5,10 +5,14 @@
 
 namespace Simp1e::ECS {
 
+    // TODO - make this a subclass of EntityManager.
+    // Note: CreateEntity() will need to be CreateManagedEntity() probs.
     class ManagedEntityManager {
         EntityManager _entityManager;
 
     public:
+        EntityManager& GetEntityManager() { return _entityManager; }
+
         ManagedEntity CreateEntity() {
             return ManagedEntity(_entityManager, _entityManager.CreateEntity());
         }
@@ -24,33 +28,33 @@ namespace Simp1e::ECS {
         }
 
         template <typename T>
-        void AddComponent(Entity entity, const ComponentType& componentType) {
-            _entityManager.AddComponent(entity, componentType);
+        T* AddComponent(Entity entity, const ComponentType& componentType) {
+            return _entityManager.AddComponent(entity, componentType);
         }
 
         template <typename T>
-        void AddComponent(Entity entity, const ComponentType& componentType, T&& component) {
-            _entityManager.AddComponent(entity, componentType, std::forward<T>(component));
+        T* AddComponent(Entity entity, const ComponentType& componentType, T&& component) {
+            return _entityManager.AddComponent(entity, componentType, std::forward<T>(component));
         }
 
         template <typename T>
-        void AddComponent(Entity entity, T&& component) {
-            _entityManager.AddComponent(entity, std::forward<T>(component));
+        T* AddComponent(Entity entity, T&& component) {
+            return _entityManager.AddComponent(entity, std::forward<T>(component));
         }
 
         template <typename T>
-        void AddComponent(Entity entity, const ComponentType& componentType, T* component) {
-            _entityManager.AddComponent(entity, componentType, component);
+        T* AddComponent(Entity entity, const ComponentType& componentType, T* component) {
+            return _entityManager.AddComponent(entity, componentType, component);
         }
 
         template <typename T>
-        void AddComponent(Entity entity, T* component) {
-            _entityManager.AddComponent(entity, component);
+        T* AddComponent(Entity entity, T* component) {
+            return _entityManager.AddComponent(entity, component);
         }
 
         template <typename T>
-        void AddComponent(Entity entity) {
-            _entityManager.AddComponent<T>(entity);
+        T* AddComponent(Entity entity) {
+            return _entityManager.AddComponent<T>(entity);
         }
 
         template <typename T>

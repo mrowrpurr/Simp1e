@@ -11,6 +11,8 @@
 #include <Simp1e/ECS/Game.h>
 #include <Simp1e/ECS/KeyboardEvent.h>
 #include <Simp1e/ECS/MouseClickEvent.h>
+#include <Simp1e/ECS/OnKeyboardEventComponent.h>
+#include <Simp1e/ECS/OnMouseClickEventComponent.h>
 #include <Simp1e/ECS/PositionComponent.h>
 #include <Simp1e/ECS/QTImageComponent.h>
 #include <Simp1e/ECS/QTImageComponentRenderer.h>
@@ -36,6 +38,7 @@
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <functional>
 
 using namespace Simp1e;
 using namespace Simp1e::ECS;
@@ -106,15 +109,54 @@ void SetupQtRenderSystem(Game& game, QGraphicsScene& scene) {
     game.Systems().AddSystem(qtRenderSystem);
 }
 
+class KeyboardInputSystem {
+    EntityManager&                 _entityManager;
+    std::unique_ptr<KeyboardEvent> _lastKeyboardEvent;
+
+public:
+    KeyboardInputSystem(EntityManager& entityManager) : _entityManager(entityManager) {}
+
+    SIMP1E_ECS_SYSTEM("KeyboardInputSystem")
+
+    void RegisterListener(EventManager& eventManager) {
+        eventManager.AddListener<KeyboardEvent>([this](KeyboardEvent* event) {
+            OnKeyboardEvent(event);
+        });
+    }
+
+    void Update() {
+        if (!_lastKeyboardEvent) return;
+        auto& onKeyboardInputComponents = _entityManager.GetComponents<OnKeyboardEventComponent>();
+        for (auto& [entity, component] : onKeyboardInputComponents) {
+            auto onKeyboardInputComponent = component_cast<OnKeyboardEventComponent>(component);
+            onKeyboardInputComponent->TriggerEvent(_lastKeyboardEvent.get());
+        }
+        _lastKeyboardEvent.reset();
+    }
+
+protected:
+    virtual void OnKeyboardEvent(KeyboardEvent* e) {
+        _lastKeyboardEvent = std::make_unique<KeyboardEvent>(*e);
+    }
+};
+
 void AddPlayer(Game& game) {
-    auto player = game.Entities().CreateEntity();
-    player.AddComponent<PositionComponent>({200, 100});
+    auto  player   = game.Entities().CreateEntity();
+    auto* position = player.AddComponent<PositionComponent>({200, 100});
     player.AddComponent<SizeComponent>({200, 200});
     player.AddComponent<QTImageComponent>({":/player/images/look/right.png"});
     player.AddComponent<TextComponent>({"Player.", Color::Red()});
-
-    // AddComponent <OnMouseClickEventComponent> ...
-    // AddComponent <OnKeyEventComponent> ...
+    player.AddComponent<OnKeyboardEventComponent>({[position](KeyboardEvent* e) {
+        if (e->key() == KeyboardEvent::Key::Left) _Log_("Left");
+        else if (e->key() == KeyboardEvent::Key::Right) _Log_("Right");
+        else if (e->key() == KeyboardEvent::Key::Up) _Log_("Up");
+        else if (e->key() == KeyboardEvent::Key::Down) _Log_("Down");
+        if (e->key() == KeyboardEvent::Key::Left) position->SetX(position->x() - 10);
+        else if (e->key() == KeyboardEvent::Key::Right) position->SetX(position->x() + 10);
+        else if (e->key() == KeyboardEvent::Key::Up) position->SetY(position->y() - 10);
+        else if (e->key() == KeyboardEvent::Key::Down) position->SetY(position->y() + 10);
+        _Log_("Player position x: {}, y: {}", position->x(), position->y());
+    }});
 }
 
 void AddTextLabel(Game& game) {
@@ -168,6 +210,10 @@ int main(int argc, char* argv[]) {
 
     SetupQtRenderSystem(game, scene);
     game.Systems().AddSystem<CommandSystem>();
+
+    KeyboardInputSystem keyboardInputSystem(game.Entities().GetEntityManager());
+    keyboardInputSystem.RegisterListener(game.Events());
+    game.Systems().AddSystem(&keyboardInputSystem);
 
     AddPlayer(game);
 

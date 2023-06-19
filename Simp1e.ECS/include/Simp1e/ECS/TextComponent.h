@@ -7,10 +7,10 @@
 #include <optional>
 #include <string>
 
-#include "ComponentBase.h"
+#include "DirtyTrackingComponent.h"
 
 namespace Simp1e::ECS {
-    class TextComponent : public ComponentBase {
+    class TextComponent : public DirtyTrackingComponent {
         std::string          _text;
         std::optional<Color> _color;  // TODO make this required
 

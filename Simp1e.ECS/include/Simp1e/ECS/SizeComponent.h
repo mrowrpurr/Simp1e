@@ -4,10 +4,10 @@
 #include <Simp1e/ECS/ComponentTypeMacro.h>
 #include <Simp1e/Size.h>
 
-#include "ComponentBase.h"
+#include "DirtyTrackingComponent.h"
 
 namespace Simp1e::ECS {
-    class SizeComponent : public ComponentBase {
+    class SizeComponent : public DirtyTrackingComponent {
         Size _size;
 
     public:

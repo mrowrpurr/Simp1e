@@ -21,28 +21,28 @@ namespace Simp1e::ECS {
         }
 
         template <typename T>
-        void AddComponent(const ComponentType& componentType, T* component) {
-            _entityManager.AddComponent(_entity, componentType, component);
+        T* AddComponent(const ComponentType& componentType, T* component) {
+            return _entityManager.AddComponent(_entity, componentType, component);
         }
 
         template <typename T>
-        void AddComponent(const ComponentType& componentType, T&& component) {
-            _entityManager.AddComponent(_entity, componentType, std::forward<T>(component));
+        T* AddComponent(const ComponentType& componentType, T&& component) {
+            return _entityManager.AddComponent(_entity, componentType, std::forward<T>(component));
         }
 
         template <typename T>
-        void AddComponent(T&& component) {
-            AddComponent(T::GetComponentType(), std::forward<T>(component));
+        T* AddComponent(T&& component) {
+            return AddComponent(T::GetComponentType(), std::forward<T>(component));
         }
 
         template <typename T>
-        void AddComponent(T* component) {
-            AddComponent(T::GetComponentType(), component);
+        T* AddComponent(T* component) {
+            return AddComponent(T::GetComponentType(), component);
         }
 
         template <typename T>
-        void AddComponent() {
-            AddComponent(T::GetComponentType(), new T());
+        T* AddComponent() {
+            return AddComponent(T::GetComponentType(), new T());
         }
 
         template <typename T>

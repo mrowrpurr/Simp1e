@@ -5,10 +5,10 @@
 
 #include <string>
 
-#include "ComponentBase.h"
+#include "DirtyTrackingComponent.h"
 
 namespace Simp1e::ECS {
-    class ImageComponent : public ComponentBase {
+    class ImageComponent : public DirtyTrackingComponent {
         std::string _imageFilename;
 
     public:

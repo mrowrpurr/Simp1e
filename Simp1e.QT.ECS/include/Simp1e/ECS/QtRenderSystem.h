@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Simp1e/ECS/ComponentBase.h>
 #include <Simp1e/ECS/ComponentType.h>
+#include <Simp1e/ECS/DirtyTrackingComponent.h>
 #include <Simp1e/ECS/Game.h>
 #include <Simp1e/ECS/QTGraphicsItemComponent.h>
 #include <Simp1e/ECS/SystemTypeMacro.h>
@@ -17,6 +17,7 @@
 
 #include "QtComponentRenderer.h"
 #include "QtComponentUpdateHandler.h"
+
 
 namespace Simp1e::ECS {
 
@@ -121,7 +122,7 @@ namespace Simp1e::ECS {
             bool somethingChanged = false;
             for (auto& [componentType, componentUpdateHandler] : _componentUpdateHandlers)
                 for (auto& [entityId, componentPtr] : _game.Entities().GetComponents(componentType))
-                    if (auto* component = static_cast<ComponentBase*>(componentPtr.get()))
+                    if (auto* component = static_cast<DirtyTrackingComponent*>(componentPtr.get()))
                         if (component->IsDirty()) {
                             somethingChanged = true;
                             componentUpdateHandler->Update(_game, entityId, componentPtr);

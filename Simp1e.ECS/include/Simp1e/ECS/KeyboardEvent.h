@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "EventTypeMacro.h"
 
 namespace Simp1e::ECS {
@@ -14,6 +16,7 @@ namespace Simp1e::ECS {
             Shift,
             Ctrl,
             Alt,
+            Super,
             Pause,
             CapsLock,
             Escape,
@@ -118,21 +121,29 @@ namespace Simp1e::ECS {
         };
 
     private:
-        Key  _key;
-        bool _pressed;
-        bool _repeated;
+        Key              _key;
+        bool             _pressed;
+        bool             _repeated;
+        std::vector<Key> _modifierKeys;
 
     public:
         SIMP1E_ECS_EVENT("Keyboard")
 
-        KeyboardEvent(Key key, bool pressed = true, bool repeated = false)
-            : _key(key), _pressed(pressed), _repeated(repeated) {}
+        KeyboardEvent(
+            Key key, bool pressed = true, bool repeated = false, std::vector<Key> modifierKeys = {}
+        )
+            : _key(key), _pressed(pressed), _repeated(repeated), _modifierKeys(modifierKeys) {}
 
         virtual ~KeyboardEvent() = default;
 
-        virtual Key  key() const { return _key; }
-        virtual bool pressed() const { return _pressed; }
-        virtual bool released() const { return !_pressed; }
-        virtual bool repeated() const { return _repeated; }
+        virtual Key              key() const { return _key; }
+        virtual bool             pressed() const { return _pressed; }
+        virtual bool             released() const { return !_pressed; }
+        virtual bool             repeated() const { return _repeated; }
+        virtual std::vector<Key> modifierKeys() const { return _modifierKeys; }
+        virtual bool             isModifierPressed(Key modifierKey) const {
+            return std::find(_modifierKeys.begin(), _modifierKeys.end(), modifierKey) !=
+                   _modifierKeys.end();
+        }
     };
 }

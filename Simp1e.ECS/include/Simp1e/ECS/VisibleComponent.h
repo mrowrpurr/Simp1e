@@ -3,10 +3,10 @@
 #include <Simp1e/ECS/ComponentType.h>
 #include <Simp1e/ECS/ComponentTypeMacro.h>
 
-#include "ComponentBase.h"
+#include "DirtyTrackingComponent.h"
 
 namespace Simp1e::ECS {
-    class VisibleComponent : public ComponentBase {
+    class VisibleComponent : public DirtyTrackingComponent {
         bool _isVisible = true;
 
     public:

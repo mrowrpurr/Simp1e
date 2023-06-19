@@ -8,10 +8,10 @@
 #include <optional>
 #include <string>
 
-#include "ComponentBase.h"
+#include "DirtyTrackingComponent.h"
 
 namespace Simp1e::ECS {
-    class RectangleComponent : public ComponentBase {
+    class RectangleComponent : public DirtyTrackingComponent {
         Rectangle            _rectangle;
         std::optional<Color> _backgroundColor;
         std::optional<Color> _borderColor;

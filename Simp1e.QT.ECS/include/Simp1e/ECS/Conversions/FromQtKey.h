@@ -136,6 +136,18 @@ namespace Simp1e::ECS {
                 return KeyboardEvent::Key::NumLock;
             case Qt::Key::Key_ScrollLock:
                 return KeyboardEvent::Key::ScrollLock;
+            case Qt::Key::Key_CapsLock:
+                return KeyboardEvent::Key::CapsLock;
+            case Qt::Key::Key_Shift:
+                return KeyboardEvent::Key::LeftShift;
+            case Qt::Key::Key_Left:
+                return KeyboardEvent::Key::Left;
+            case Qt::Key::Key_Right:
+                return KeyboardEvent::Key::Right;
+            case Qt::Key::Key_Up:
+                return KeyboardEvent::Key::Up;
+            case Qt::Key::Key_Down:
+                return KeyboardEvent::Key::Down;
             default:
                 return KeyboardEvent::Key::Unknown;
         }

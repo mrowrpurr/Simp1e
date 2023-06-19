@@ -4,10 +4,10 @@
 #include <Simp1e/ECS/ComponentTypeMacro.h>
 #include <Simp1e/Position.h>
 
-#include "ComponentBase.h"
+#include "DirtyTrackingComponent.h"
 
 namespace Simp1e::ECS {
-    class PositionComponent : public ComponentBase {
+    class PositionComponent : public DirtyTrackingComponent {
         Position _position;
 
     public:
@@ -23,5 +23,22 @@ namespace Simp1e::ECS {
             _position = position;
             SetDirty();
         }
+        virtual void SetX(sreal x) {
+            auto& xRef = _position.x();
+            if (xRef != x) {
+                xRef = x;
+                SetDirty();
+            }
+        }
+        virtual void SetY(sreal y) {
+            auto& yRef = _position.y();
+            if (yRef != y) {
+                yRef = y;
+                SetDirty();
+            }
+        }
+
+        virtual sreal x() const { return _position.x(); }
+        virtual sreal y() const { return _position.y(); }
     };
 }

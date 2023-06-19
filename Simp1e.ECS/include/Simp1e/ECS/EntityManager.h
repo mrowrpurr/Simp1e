@@ -33,43 +33,47 @@ namespace Simp1e::ECS {
         }
 
         template <typename T>
-        void AddComponent(Entity entity, const ComponentType& componentType, T* component) {
+        T* AddComponent(Entity entity, const ComponentType& componentType, T* component) {
             Events().AddingComponent(entity, componentType);
             _components[componentType][entity] = MakeComponentPointer(component);
             _entities[entity][componentType]   = &_components[componentType][entity];
             Events().AddedComponent(entity, componentType);
+            return component;
         }
 
         template <typename T>
-        void AddComponent(Entity entity, const ComponentType& componentType) {
+        T* AddComponent(Entity entity, const ComponentType& componentType) {
             Events().AddingComponent(entity, componentType);
-            _components[componentType][entity] = MakeComponentPointer(new T());
+            auto* component                    = new T();
+            _components[componentType][entity] = MakeComponentPointer(component);
             _entities[entity][componentType]   = &_components[componentType][entity];
             Events().AddedComponent(entity, componentType);
+            return component;
         }
 
         template <typename T>
-        void AddComponent(Entity entity, const ComponentType& componentType, T&& component) {
+        T* AddComponent(Entity entity, const ComponentType& componentType, T&& componentValue) {
             Events().AddingComponent(entity, componentType);
-            _components[componentType][entity] =
-                MakeComponentPointer(new T(std::forward<T>(component)));
-            _entities[entity][componentType] = &_components[componentType][entity];
+            auto* component                    = new T(std::forward<T>(componentValue));
+            _components[componentType][entity] = MakeComponentPointer(component);
+            _entities[entity][componentType]   = &_components[componentType][entity];
             Events().AddedComponent(entity, componentType);
+            return component;
         }
 
         template <typename T>
-        void AddComponent(Entity entity, T&& component) {
-            AddComponent(entity, T::GetComponentType(), std::forward<T>(component));
+        T* AddComponent(Entity entity, T&& component) {
+            return AddComponent(entity, T::GetComponentType(), std::forward<T>(component));
         }
 
         template <typename T>
-        void AddComponent(Entity entity, T* component) {
-            AddComponent(entity, T::GetComponentType(), component);
+        T* AddComponent(Entity entity, T* component) {
+            return AddComponent(entity, T::GetComponentType(), component);
         }
 
         template <typename T>
-        void AddComponent(Entity entity) {
-            AddComponent<T>(entity, T::GetComponentType(), new T());
+        T* AddComponent(Entity entity) {
+            return AddComponent<T>(entity, T::GetComponentType(), new T());
         }
 
         template <typename T>
