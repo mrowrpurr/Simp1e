@@ -18,7 +18,7 @@ namespace Simp1e::ECS {
         ) override {
             auto* imageComponent = component_cast<QTImageComponent>(component);
             if (!imageComponent) return;
-            if (imageComponent->GetPixmap().isNull()) return;
+            if (imageComponent->pixmap().isNull()) return;
 
             auto positionComponent = components.GetComponent<PositionComponent>();
             if (!positionComponent) return;
@@ -28,8 +28,9 @@ namespace Simp1e::ECS {
             if (sizeComponent->size().isNull()) return;
             imageComponent->SetSize(sizeComponent->size());
 
+            painter->resetTransform();
             painter->drawPixmap(
-                ToQPointF(positionComponent->GetPosition()), imageComponent->GetPixmap()
+                ToQPointF(positionComponent->position()), imageComponent->GetPixmap()
             );
         }
     };

@@ -18,7 +18,6 @@
 #include "QtComponentRenderer.h"
 #include "QtComponentUpdateHandler.h"
 
-
 namespace Simp1e::ECS {
 
     class QtRenderSystem {
@@ -44,7 +43,11 @@ namespace Simp1e::ECS {
                     _scene,
                     [this, entity](
                         QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget
-                    ) { PaintEntity(entity, painter, option, widget); }
+                    ) {
+                        painter->save();
+                        PaintEntity(entity, painter, option, widget);
+                        painter->restore();
+                    }
                 );
                 _game.Entities().AddComponent<QTGraphicsItemComponent>(
                     entity, graphicsItemComponent

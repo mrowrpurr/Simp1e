@@ -74,6 +74,7 @@ class SideScrollerGraphicsView : public QGraphicsView {
 
 public:
     SideScrollerGraphicsView(EventManager& eventManager) : _eventManager(eventManager) {
+        setRenderHint(QPainter::Antialiasing);  // Enable smooth rendering.
         fpsTimer.start();
     }
 
@@ -92,14 +93,21 @@ protected:
 
     void keyPressEvent(QKeyEvent* event) override {
         _eventManager.Emit<KeyboardEvent>(ToKeyboardEvent(event, true));
+        QGraphicsView::keyPressEvent(event);
     }
     void keyReleaseEvent(QKeyEvent* event) override {
         _eventManager.Emit<KeyboardEvent>(ToKeyboardEvent(event, false));
+        QGraphicsView::keyReleaseEvent(event);
     }
     void resizeEvent(QResizeEvent* event) override {
-        _eventManager.Emit<ResizeEvent>(
+        fitInView(sceneRect(), Qt::KeepAspectRatio);
+        auto topLeft = mapToScene(0, 0);
+        _eventManager.Emit<ResizeEvent>({
+            {static_cast<sreal>(topLeft.x()),           static_cast<sreal>(topLeft.y())           },
             {static_cast<sreal>(event->size().width()), static_cast<sreal>(event->size().height())}
+        }
         );
+        QGraphicsView::resizeEvent(event);
     }
 };
 
@@ -154,14 +162,14 @@ public:
 };
 
 ManagedEntity AddPlayer(Game& game, const QRectF& sceneRect) {
-    auto  player = game.Entities().CreateEntity();
-    auto* position =
-        player.AddComponent<PositionComponent>({static_cast<sreal>(sceneRect.width()) / 2 - 100, 0}
-        );
-
-    //  static_cast<sreal>(sceneRect.height()) - 200}
-
-    player.AddComponent<SizeComponent>({200, 200});
+    auto player = game.Entities().CreateEntity();
+    Size size{100, 100};
+    // auto* position = player.AddComponent<PositionComponent>({static_cast<sreal>(left), 0});
+    auto* position = player.AddComponent<PositionComponent>(
+        {static_cast<sreal>(sceneRect.width() / 2 - size.width() / 2),
+         static_cast<sreal>(sceneRect.height() - size.height())}
+    );
+    player.AddComponent<SizeComponent>(size);
     player.AddComponent<QTImageComponent>({":/player/images/look/right.png"});
     // TODO update to send a MovePositionCommand
     player.AddComponent<OnKeyboardComponent>({[position](KeyboardEvent* e) {
@@ -170,6 +178,7 @@ ManagedEntity AddPlayer(Game& game, const QRectF& sceneRect) {
         else if (e->key() == KeyboardEvent::Key::Up) position->SetY(position->y() - 10);
         else if (e->key() == KeyboardEvent::Key::Down) position->SetY(position->y() + 10);
     }});
+    // player.AddComponent<RectangleComponent>({Color::Magenta()});
     return player;
 }
 
@@ -185,12 +194,11 @@ void AddMoveLeftButton(
     auto  button   = game.Entities().CreateEntity();
     auto* position = button.AddComponent<PositionComponent>({0, 0});
     auto* size = button.AddComponent<SizeComponent>({sceneSize.width() / 2, sceneSize.height()});
-    auto* rectangle = button.AddComponent<RectangleComponent>({Color::Magenta(100)});
 
-    button.AddComponent<OnResizeComponent>({[size, rectangle](ResizeEvent* e) {
+    button.AddComponent<OnResizeComponent>({[size, position](ResizeEvent* e) {
         size->SetWidth(e->width() / 2);
         size->SetHeight(e->height());
-        rectangle->SetDirty();
+        position->SetPosition({e->x(), e->y()});
     }});
 
     button.AddComponent<OnMouseClickComponent>({[commandSystem, playerPosition, playerImage,
@@ -211,13 +219,13 @@ void AddMoveRightButton(
     auto  button   = game.Entities().CreateEntity();
     auto* position = button.AddComponent<PositionComponent>({sceneSize.width() / 2, 0});
     auto* size = button.AddComponent<SizeComponent>({sceneSize.width() / 2, sceneSize.height()});
-    auto* rectangle = button.AddComponent<RectangleComponent>({Color::Green(100)});
 
-    button.AddComponent<OnResizeComponent>({[size, position, rectangle](ResizeEvent* e) {
+    button.AddComponent<OnResizeComponent>({[size, position](ResizeEvent* e) {
+        qDebug() << "Resize event. Width: " << e->width() << " Height: " << e->height()
+                 << " x: " << e->x() << " y: " << e->y();
         size->SetWidth(e->width() / 2);
         size->SetHeight(e->height());
-        position->SetX(e->width() / 2);
-        rectangle->SetDirty();
+        position->SetPosition({e->x() + e->width() / 2, e->y()});
     }});
 
     button.AddComponent<OnMouseClickComponent>({[commandSystem, playerPosition, playerImage,
@@ -247,26 +255,20 @@ int main(int argc, char* argv[]) {
     app.setStyle("fusion");
     QWidget window;
     // make the background color of the QWidget red
-    window.setStyleSheet("background-color: #FF0000; color: #FFFFFF;");
     window.setWindowTitle("Side Scroller");
     loopIterationLabel = new QLabel();
     auto* layout       = new QVBoxLayout();
     window.setLayout(layout);
     SideScrollerGraphicsView view(game.Events());
     // set the background color of the view to blue
-    view.setStyleSheet("background-color: #0000FF; color: #FFFFFF;");
     SideScrollerGraphicsScene scene(game.Events());
-    Size                      gameSize{400, 300};
+    Size                      gameSize{1600, 800};
     QRectF                    sceneRect(0, 0, gameSize.width(), gameSize.height());
-    // auto                      screenRect = QGuiApplication::primaryScreen()->geometry();
-    // Size                      gameSize(screenRect.width(), screenRect.height());
+    view.setFixedSize(gameSize.width(), gameSize.height());
     view.setScene(&scene);
-    // QRectF sceneRect(
-    //     0, 0, gameSize.width(),
-    //     gameSize.height() - loopIterationLabel->height() - view.FPSLabel().height()
-    // );
     view.setGeometry(sceneRect.toRect());
     scene.setSceneRect(sceneRect);
+    view.fitInView(sceneRect, Qt::KeepAspectRatio);
     layout->addWidget(&view.FPSLabel());
     layout->addWidget(loopIterationLabel);
     layout->addWidget(&view);
@@ -287,18 +289,6 @@ int main(int argc, char* argv[]) {
     ResizeNotificationSystem resizeNotificationSystem(game.Entities().GetEntityManager());
     resizeNotificationSystem.RegisterListener(game.Events());
     game.Systems().AddSystem(&resizeNotificationSystem);
-
-    // background
-    auto background = game.Entities().CreateEntity();
-    background.AddComponent<PositionComponent>({0, 0});
-    auto* backgroundSize =
-        background.AddComponent<SizeComponent>({gameSize.width(), gameSize.height()});
-    background.AddComponent<RectangleComponent>({Color::White()});
-    background.AddComponent<TextComponent>({"0x0", Color::Black()});
-    background.AddComponent<OnResizeComponent>({[backgroundSize](ResizeEvent* e) {
-        backgroundSize->SetWidth(e->width());
-        backgroundSize->SetHeight(e->height());
-    }});
 
     auto  player         = AddPlayer(game, sceneRect);
     auto* playerPosition = player.GetComponent<PositionComponent>();

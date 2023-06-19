@@ -21,6 +21,7 @@ namespace Simp1e::ECS {
         }
 
         virtual QPixmap GetPixmap() const { return _pixmap; }
+        virtual QPixmap pixmap() const { return _pixmap; }
 
         virtual void SetPixmap(const QPixmap& pixmap) {
             _pixmap = pixmap;

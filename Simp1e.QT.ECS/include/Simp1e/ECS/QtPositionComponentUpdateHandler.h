@@ -20,7 +20,7 @@ namespace Simp1e::ECS {
             if (!graphicsItemComponent) return;
             auto* graphicsItem = graphicsItemComponent->GetGraphicsItem();
             if (!graphicsItem) return;
-            graphicsItem->setPos(ToQPointF(positionComponent->GetPosition()));
+            graphicsItem->setPos(ToQPointF(positionComponent->position()));
             graphicsItem->update();
         }
     };
