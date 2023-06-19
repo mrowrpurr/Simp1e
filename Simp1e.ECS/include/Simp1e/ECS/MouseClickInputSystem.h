@@ -32,7 +32,7 @@ namespace Simp1e::ECS {
                 auto onMouseClickInputComponent = component_cast<OnMouseClickComponent>(component);
                 onMouseClickInputComponent->TriggerEvent(_lastMouseClickEvent.get());
             }
-            _lastMouseClickEvent.reset();
+            if (!_lastMouseClickEvent->pressed()) _lastMouseClickEvent.reset();
         }
 
     protected:

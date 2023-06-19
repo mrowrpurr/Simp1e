@@ -29,6 +29,7 @@
 #include <Simp1e/ECS/SizeComponent.h>
 #include <Simp1e/ECS/TextComponent.h>
 #include <Simp1e/ECS/VisibleComponent.h>
+#include <Simp1e/QT/Conversions/ToQString.h>
 
 #include <QApplication>
 #include <QElapsedTimer>
@@ -47,11 +48,11 @@
 using namespace Simp1e;
 using namespace Simp1e::ECS;
 
-class EventEmittingGraphicsScene : public QGraphicsScene {
+class SideScrollerGraphicsScene : public QGraphicsScene {
     EventManager& eventManager;
 
 public:
-    EventEmittingGraphicsScene(EventManager& eventManager, QObject* parent = nullptr)
+    SideScrollerGraphicsScene(EventManager& eventManager, QObject* parent = nullptr)
         : QGraphicsScene(parent), eventManager(eventManager) {}
 
 protected:
@@ -63,14 +64,14 @@ protected:
     }
 };
 
-class GraphicsViewWithFPS : public QGraphicsView {
+class SideScrollerGraphicsView : public QGraphicsView {
     EventManager& _eventManager;
     QLabel        fpsLabel;
     QElapsedTimer fpsTimer;
     int           frames = 0;
 
 public:
-    GraphicsViewWithFPS(EventManager& eventManager) : _eventManager(eventManager) {
+    SideScrollerGraphicsView(EventManager& eventManager) : _eventManager(eventManager) {
         fpsTimer.start();
     }
 
@@ -113,6 +114,19 @@ void SetupQtRenderSystem(Game& game, QGraphicsScene& scene) {
     game.Systems().AddSystem(qtRenderSystem);
 }
 
+class SetImageCommand {
+    QTImageComponent* _imageComponent;
+    std::string       _imageFilePath;
+
+public:
+    SIMP1E_ECS_COMMAND("SetImage")
+
+    SetImageCommand(QTImageComponent* imageComponent, const std::string& imageFilePath)
+        : _imageComponent(imageComponent), _imageFilePath(imageFilePath) {}
+
+    void Execute() { _imageComponent->SetPixmap(ToQString(_imageFilePath)); }
+};
+
 class MovePositionCommand {
     PositionComponent* position;
     Direction          direction;
@@ -125,7 +139,6 @@ public:
         : position(position), direction(direction), distance(distance) {}
 
     void Execute() {
-        _Log_("Executing MovePositionCommand.");
         if (direction == Direction::North) position->SetY(position->y() - distance);
         else if (direction == Direction::South) position->SetY(position->y() + distance);
         else if (direction == Direction::West) position->SetX(position->x() - distance);
@@ -138,7 +151,7 @@ ManagedEntity AddPlayer(Game& game) {
     auto* position = player.AddComponent<PositionComponent>({200, 100});
     player.AddComponent<SizeComponent>({200, 200});
     player.AddComponent<QTImageComponent>({":/player/images/look/right.png"});
-    player.AddComponent<TextComponent>({"Player.", Color::Red()});
+    // TODO update to send a MovePositionCommand
     player.AddComponent<OnKeyboardComponent>({[position](KeyboardEvent* e) {
         if (e->key() == KeyboardEvent::Key::Left) position->SetX(position->x() - 10);
         else if (e->key() == KeyboardEvent::Key::Right) position->SetX(position->x() + 10);
@@ -154,23 +167,40 @@ bool IsMouseOver(MouseClickEvent* event, PositionComponent* position, SizeCompon
 }
 
 void AddMoveLeftButton(
-    Game& game, CommandSystem* commandSystem, PositionComponent* playerPosition
+    Game& game, const Size& sceneSize, CommandSystem* commandSystem,
+    PositionComponent* playerPosition, QTImageComponent* playerImage
 ) {
     auto  button   = game.Entities().CreateEntity();
-    auto* position = button.AddComponent<PositionComponent>({100, 100});
-    auto* size     = button.AddComponent<SizeComponent>({100, 100});
+    auto* position = button.AddComponent<PositionComponent>({0, 0});
+    auto* size = button.AddComponent<SizeComponent>({sceneSize.width() / 2, sceneSize.height()});
 
-    // TODO update rectangle to use size component
-    button.AddComponent<RectangleComponent>({
-        {100, 100},
-        Color::Blue()
-    });
+    button.AddComponent<OnMouseClickComponent>({[commandSystem, playerPosition, playerImage,
+                                                 position, size](MouseClickEvent* e) {
+        if (IsMouseOver(e, position, size)) {
+            commandSystem->AddCommand<MovePositionCommand>({playerPosition, Direction::West, 5});
+            commandSystem->AddCommand<SetImageCommand>(
+                {playerImage, ":/player/images/look/left.png"}
+            );
+        }
+    }});
+}
 
-    button.AddComponent<TextComponent>({"Move Left", Color::White()});
-    button.AddComponent<OnMouseClickComponent>({[commandSystem, playerPosition, position,
-                                                 size](MouseClickEvent* e) {
-        if (IsMouseOver(e, position, size))
-            commandSystem->AddCommand<MovePositionCommand>({playerPosition, Direction::West, 10});
+void AddMoveRightButton(
+    Game& game, const Size& sceneSize, CommandSystem* commandSystem,
+    PositionComponent* playerPosition, QTImageComponent* playerImage
+) {
+    auto  button   = game.Entities().CreateEntity();
+    auto* position = button.AddComponent<PositionComponent>({sceneSize.width() / 2, 0});
+    auto* size = button.AddComponent<SizeComponent>({sceneSize.width() / 2, sceneSize.height()});
+
+    button.AddComponent<OnMouseClickComponent>({[commandSystem, playerPosition, playerImage,
+                                                 position, size](MouseClickEvent* e) {
+        if (IsMouseOver(e, position, size)) {
+            commandSystem->AddCommand<MovePositionCommand>({playerPosition, Direction::East, 5});
+            commandSystem->AddCommand<SetImageCommand>(
+                {playerImage, ":/player/images/look/right.png"}
+            );
+        }
     }});
 }
 
@@ -203,9 +233,10 @@ int main(int argc, char* argv[]) {
     window.setWindowTitle("Side Scroller");
     auto* layout = new QVBoxLayout();
     window.setLayout(layout);
-    GraphicsViewWithFPS        view(game.Events());
-    EventEmittingGraphicsScene scene(game.Events());
-    scene.setSceneRect(0, 0, 800, 600);
+    SideScrollerGraphicsView  view(game.Events());
+    SideScrollerGraphicsScene scene(game.Events());
+    Size                      gameSize(800, 600);
+    scene.setSceneRect(0, 0, gameSize.width(), gameSize.height());
     view.setScene(&scene);
     layout->addWidget(&view.FPSLabel());
     loopIterationLabel = new QLabel();
@@ -227,7 +258,9 @@ int main(int argc, char* argv[]) {
 
     auto  player         = AddPlayer(game);
     auto* playerPosition = player.GetComponent<PositionComponent>();
-    AddMoveLeftButton(game, commandSystem, playerPosition);
+    auto* playerImage    = player.GetComponent<QTImageComponent>();
+    AddMoveLeftButton(game, gameSize, commandSystem, playerPosition, playerImage);
+    AddMoveRightButton(game, gameSize, commandSystem, playerPosition, playerImage);
 
     QObject::connect(&mainLoopTimer, &QTimer::timeout, &app, GameLoop);
     mainLoopTimer.start(16);
@@ -235,3 +268,12 @@ int main(int argc, char* argv[]) {
     ///////////////////////
     return app.exec();
 }
+
+// bool viewportEvent(QEvent* event) override {
+//     switch (event->type()) {
+//         case QEvent::TouchBegin: {
+//             QTouchEvent*                   touchEvent  = static_cast<QTouchEvent*>(event);
+//             QList<QTouchEvent::TouchPoint> touchPoints = touchEvent->points();
+//             _touchTimer.restart();
+//             _recentTouchPos = _currentTouchPos = touchPoints.first().pressPosition();
+//         }
