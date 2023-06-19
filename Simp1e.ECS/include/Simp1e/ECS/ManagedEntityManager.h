@@ -29,7 +29,7 @@ namespace Simp1e::ECS {
 
         template <typename T>
         T* AddComponent(Entity entity, const ComponentType& componentType) {
-            return _entityManager.AddComponent(entity, componentType);
+            return _entityManager.AddComponent<T>(entity, componentType);
         }
 
         template <typename T>
