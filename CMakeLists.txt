@@ -39,7 +39,6 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 add_subdirectory("Simp1e")
 add_subdirectory("Simp1e.ECS")
-add_subdirectory("Simp1e.ECS.Components")
 add_subdirectory("Simp1e.QT")
 add_subdirectory("Simp1e.QT.ECS")
 
@@ -50,7 +49,7 @@ function(qt_project target_name main_cpp_file)
     get_filename_component(main_cpp_folder ${main_cpp_file} DIRECTORY)
     target_include_directories(${target_name} PRIVATE ${main_cpp_folder})
     target_link_libraries(${target_name} PRIVATE string_format::string_format _Log_::_Log_ fmt::fmt)
-    target_link_libraries(${target_name} PRIVATE Simp1e Simp1e.ECS Simp1e.ECS.Components Simp1e.QT Simp1e.QT.ECS)
+    target_link_libraries(${target_name} PRIVATE Simp1e Simp1e.ECS Simp1e.QT Simp1e.QT.ECS)
     set_target_properties(${target_name} PROPERTIES
         MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
         MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}

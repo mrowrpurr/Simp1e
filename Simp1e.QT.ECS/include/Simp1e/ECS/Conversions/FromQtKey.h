@@ -1,0 +1,143 @@
+#pragma once
+
+#include <Simp1e/ECS/KeyboardEvent.h>
+
+#include <QKeyEvent>
+
+namespace Simp1e::ECS {
+
+    KeyboardEvent::Key FromQtKey(int key) {
+        switch (key) {
+            case Qt::Key::Key_0:
+                return KeyboardEvent::Key::Key0;
+            case Qt::Key::Key_1:
+                return KeyboardEvent::Key::Key1;
+            case Qt::Key::Key_2:
+                return KeyboardEvent::Key::Key2;
+            case Qt::Key::Key_3:
+                return KeyboardEvent::Key::Key3;
+            case Qt::Key::Key_4:
+                return KeyboardEvent::Key::Key4;
+            case Qt::Key::Key_5:
+                return KeyboardEvent::Key::Key5;
+            case Qt::Key::Key_6:
+                return KeyboardEvent::Key::Key6;
+            case Qt::Key::Key_7:
+                return KeyboardEvent::Key::Key7;
+            case Qt::Key::Key_8:
+                return KeyboardEvent::Key::Key8;
+            case Qt::Key::Key_9:
+                return KeyboardEvent::Key::Key9;
+            case Qt::Key::Key_A:
+                return KeyboardEvent::Key::KeyA;
+            case Qt::Key::Key_B:
+                return KeyboardEvent::Key::KeyB;
+            case Qt::Key::Key_C:
+                return KeyboardEvent::Key::KeyC;
+            case Qt::Key::Key_D:
+                return KeyboardEvent::Key::KeyD;
+            case Qt::Key::Key_E:
+                return KeyboardEvent::Key::KeyE;
+            case Qt::Key::Key_F:
+                return KeyboardEvent::Key::KeyF;
+            case Qt::Key::Key_G:
+                return KeyboardEvent::Key::KeyG;
+            case Qt::Key::Key_H:
+                return KeyboardEvent::Key::KeyH;
+            case Qt::Key::Key_I:
+                return KeyboardEvent::Key::KeyI;
+            case Qt::Key::Key_J:
+                return KeyboardEvent::Key::KeyJ;
+            case Qt::Key::Key_K:
+                return KeyboardEvent::Key::KeyK;
+            case Qt::Key::Key_L:
+                return KeyboardEvent::Key::KeyL;
+            case Qt::Key::Key_M:
+                return KeyboardEvent::Key::KeyM;
+            case Qt::Key::Key_N:
+                return KeyboardEvent::Key::KeyN;
+            case Qt::Key::Key_O:
+                return KeyboardEvent::Key::KeyO;
+            case Qt::Key::Key_P:
+                return KeyboardEvent::Key::KeyP;
+            case Qt::Key::Key_Q:
+                return KeyboardEvent::Key::KeyQ;
+            case Qt::Key::Key_R:
+                return KeyboardEvent::Key::KeyR;
+            case Qt::Key::Key_S:
+                return KeyboardEvent::Key::KeyS;
+            case Qt::Key::Key_T:
+                return KeyboardEvent::Key::KeyT;
+            case Qt::Key::Key_U:
+                return KeyboardEvent::Key::KeyU;
+            case Qt::Key::Key_V:
+                return KeyboardEvent::Key::KeyV;
+            case Qt::Key::Key_W:
+                return KeyboardEvent::Key::KeyW;
+            case Qt::Key::Key_X:
+                return KeyboardEvent::Key::KeyX;
+            case Qt::Key::Key_Y:
+                return KeyboardEvent::Key::KeyY;
+            case Qt::Key::Key_Z:
+                return KeyboardEvent::Key::KeyZ;
+            case Qt::Key::Key_Super_L:
+                return KeyboardEvent::Key::LeftSuper;
+            case Qt::Key::Key_Super_R:
+                return KeyboardEvent::Key::RightSuper;
+            case Qt::Key::Key_Menu:
+                return KeyboardEvent::Key::Menu;
+            case Qt::Key::Key_F1:
+                return KeyboardEvent::Key::F1;
+            case Qt::Key::Key_F2:
+                return KeyboardEvent::Key::F2;
+            case Qt::Key::Key_F3:
+                return KeyboardEvent::Key::F3;
+            case Qt::Key::Key_F4:
+                return KeyboardEvent::Key::F4;
+            case Qt::Key::Key_F5:
+                return KeyboardEvent::Key::F5;
+            case Qt::Key::Key_F6:
+                return KeyboardEvent::Key::F6;
+            case Qt::Key::Key_F7:
+                return KeyboardEvent::Key::F7;
+            case Qt::Key::Key_F8:
+                return KeyboardEvent::Key::F8;
+            case Qt::Key::Key_F9:
+                return KeyboardEvent::Key::F9;
+            case Qt::Key::Key_F10:
+                return KeyboardEvent::Key::F10;
+            case Qt::Key::Key_F11:
+                return KeyboardEvent::Key::F11;
+            case Qt::Key::Key_F12:
+                return KeyboardEvent::Key::F12;
+            case Qt::Key::Key_AsciiTilde:
+                return KeyboardEvent::Key::Backquote;
+            case Qt::Key::Key_Minus:
+                return KeyboardEvent::Key::Hyphen;
+            case Qt::Key::Key_Equal:
+                return KeyboardEvent::Key::Equal;
+            case Qt::Key::Key_BracketLeft:
+                return KeyboardEvent::Key::LeftBracket;
+            case Qt::Key::Key_BracketRight:
+                return KeyboardEvent::Key::RightBracket;
+            case Qt::Key::Key_Backslash:
+                return KeyboardEvent::Key::Backslash;
+            case Qt::Key::Key_Semicolon:
+                return KeyboardEvent::Key::Semicolon;
+            case Qt::Key::Key_Apostrophe:
+                return KeyboardEvent::Key::Apostrophe;
+            case Qt::Key::Key_Comma:
+                return KeyboardEvent::Key::Comma;
+            case Qt::Key::Key_Period:
+                return KeyboardEvent::Key::Period;
+            case Qt::Key::Key_Slash:
+                return KeyboardEvent::Key::Slash;
+            case Qt::Key::Key_NumLock:
+                return KeyboardEvent::Key::NumLock;
+            case Qt::Key::Key_ScrollLock:
+                return KeyboardEvent::Key::ScrollLock;
+            default:
+                return KeyboardEvent::Key::Unknown;
+        }
+    }
+}
