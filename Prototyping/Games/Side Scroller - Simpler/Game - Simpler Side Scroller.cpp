@@ -3,16 +3,20 @@
 
 // TODO rename all of my Qt* files and classes to QT* so it doesn't collide with Qt's classes
 
+#include <Simp1e/Direction.h>
 #include <Simp1e/ECS.h>
 #include <Simp1e/ECS/CommandSystem.h>
+#include <Simp1e/ECS/CommandTypeMacro.h>
 #include <Simp1e/ECS/Conversions/ToKeyboardEvent.h>
 #include <Simp1e/ECS/Conversions/ToMouseClickEvent.h>
 #include <Simp1e/ECS/EventTypeMacro.h>
 #include <Simp1e/ECS/Game.h>
 #include <Simp1e/ECS/KeyboardEvent.h>
+#include <Simp1e/ECS/KeyboardInputSystem.h>
 #include <Simp1e/ECS/MouseClickEvent.h>
-#include <Simp1e/ECS/OnKeyboardEventComponent.h>
-#include <Simp1e/ECS/OnMouseClickEventComponent.h>
+#include <Simp1e/ECS/MouseClickInputSystem.h>
+#include <Simp1e/ECS/OnKeyboardComponent.h>
+#include <Simp1e/ECS/OnMouseClickComponent.h>
 #include <Simp1e/ECS/PositionComponent.h>
 #include <Simp1e/ECS/QTImageComponent.h>
 #include <Simp1e/ECS/QTImageComponentRenderer.h>
@@ -109,63 +113,65 @@ void SetupQtRenderSystem(Game& game, QGraphicsScene& scene) {
     game.Systems().AddSystem(qtRenderSystem);
 }
 
-class KeyboardInputSystem {
-    EntityManager&                 _entityManager;
-    std::unique_ptr<KeyboardEvent> _lastKeyboardEvent;
+class MovePositionCommand {
+    PositionComponent* position;
+    Direction          direction;
+    sreal              distance;
 
 public:
-    KeyboardInputSystem(EntityManager& entityManager) : _entityManager(entityManager) {}
+    SIMP1E_ECS_COMMAND("MovePosition")
 
-    SIMP1E_ECS_SYSTEM("KeyboardInputSystem")
+    MovePositionCommand(PositionComponent* position, Direction direction, sreal distance)
+        : position(position), direction(direction), distance(distance) {}
 
-    void RegisterListener(EventManager& eventManager) {
-        eventManager.AddListener<KeyboardEvent>([this](KeyboardEvent* event) {
-            OnKeyboardEvent(event);
-        });
-    }
-
-    void Update() {
-        if (!_lastKeyboardEvent) return;
-        auto& onKeyboardInputComponents = _entityManager.GetComponents<OnKeyboardEventComponent>();
-        for (auto& [entity, component] : onKeyboardInputComponents) {
-            auto onKeyboardInputComponent = component_cast<OnKeyboardEventComponent>(component);
-            onKeyboardInputComponent->TriggerEvent(_lastKeyboardEvent.get());
-        }
-        _lastKeyboardEvent.reset();
-    }
-
-protected:
-    virtual void OnKeyboardEvent(KeyboardEvent* e) {
-        _lastKeyboardEvent = std::make_unique<KeyboardEvent>(*e);
+    void Execute() {
+        _Log_("Executing MovePositionCommand.");
+        if (direction == Direction::North) position->SetY(position->y() - distance);
+        else if (direction == Direction::South) position->SetY(position->y() + distance);
+        else if (direction == Direction::West) position->SetX(position->x() - distance);
+        else if (direction == Direction::East) position->SetX(position->x() + distance);
     }
 };
 
-void AddPlayer(Game& game) {
+ManagedEntity AddPlayer(Game& game) {
     auto  player   = game.Entities().CreateEntity();
     auto* position = player.AddComponent<PositionComponent>({200, 100});
     player.AddComponent<SizeComponent>({200, 200});
     player.AddComponent<QTImageComponent>({":/player/images/look/right.png"});
     player.AddComponent<TextComponent>({"Player.", Color::Red()});
-    player.AddComponent<OnKeyboardEventComponent>({[position](KeyboardEvent* e) {
-        if (e->key() == KeyboardEvent::Key::Left) _Log_("Left");
-        else if (e->key() == KeyboardEvent::Key::Right) _Log_("Right");
-        else if (e->key() == KeyboardEvent::Key::Up) _Log_("Up");
-        else if (e->key() == KeyboardEvent::Key::Down) _Log_("Down");
+    player.AddComponent<OnKeyboardComponent>({[position](KeyboardEvent* e) {
         if (e->key() == KeyboardEvent::Key::Left) position->SetX(position->x() - 10);
         else if (e->key() == KeyboardEvent::Key::Right) position->SetX(position->x() + 10);
         else if (e->key() == KeyboardEvent::Key::Up) position->SetY(position->y() - 10);
         else if (e->key() == KeyboardEvent::Key::Down) position->SetY(position->y() + 10);
-        _Log_("Player position x: {}, y: {}", position->x(), position->y());
     }});
+    return player;
 }
 
-void AddTextLabel(Game& game) {
-    auto label = game.Entities().CreateEntity();
-    label.AddComponent<PositionComponent>({100, 100});
-    label.AddComponent<RectangleComponent>({
-        {100, 100}
+bool IsMouseOver(MouseClickEvent* event, PositionComponent* position, SizeComponent* size) {
+    return event->x() >= position->x() && event->x() <= position->x() + size->width() &&
+           event->y() >= position->y() && event->y() <= position->y() + size->height();
+}
+
+void AddMoveLeftButton(
+    Game& game, CommandSystem* commandSystem, PositionComponent* playerPosition
+) {
+    auto  button   = game.Entities().CreateEntity();
+    auto* position = button.AddComponent<PositionComponent>({100, 100});
+    auto* size     = button.AddComponent<SizeComponent>({100, 100});
+
+    // TODO update rectangle to use size component
+    button.AddComponent<RectangleComponent>({
+        {100, 100},
+        Color::Blue()
     });
-    label.AddComponent<TextComponent>({"Hello from the entity."});
+
+    button.AddComponent<TextComponent>({"Move Left", Color::White()});
+    button.AddComponent<OnMouseClickComponent>({[commandSystem, playerPosition, position,
+                                                 size](MouseClickEvent* e) {
+        if (IsMouseOver(e, position, size))
+            commandSystem->AddCommand<MovePositionCommand>({playerPosition, Direction::West, 10});
+    }});
 }
 
 // We'll add a click handler component to this one or figure out how to use Qt input event --->
@@ -209,16 +215,19 @@ int main(int argc, char* argv[]) {
     ///////////////////////
 
     SetupQtRenderSystem(game, scene);
-    game.Systems().AddSystem<CommandSystem>();
+    auto* commandSystem = game.Systems().AddSystem<CommandSystem>();
 
     KeyboardInputSystem keyboardInputSystem(game.Entities().GetEntityManager());
     keyboardInputSystem.RegisterListener(game.Events());
     game.Systems().AddSystem(&keyboardInputSystem);
 
-    AddPlayer(game);
+    MouseClickInputSystem mouseClickInputSystem(game.Entities().GetEntityManager());
+    mouseClickInputSystem.RegisterListener(game.Events());
+    game.Systems().AddSystem(&mouseClickInputSystem);
 
-    game.Events().AddListener<KeyboardEvent>([](KeyboardEvent* event) { qDebug() << "Key"; });
-    game.Events().AddListener<MouseClickEvent>([](MouseClickEvent* event) { qDebug() << "Mouse"; });
+    auto  player         = AddPlayer(game);
+    auto* playerPosition = player.GetComponent<PositionComponent>();
+    AddMoveLeftButton(game, commandSystem, playerPosition);
 
     QObject::connect(&mainLoopTimer, &QTimer::timeout, &app, GameLoop);
     mainLoopTimer.start(16);

@@ -24,8 +24,8 @@ namespace Simp1e::ECS {
 
         virtual ~MouseClickEvent() = default;
 
-        virtual sreal  X() const { return _x; }
-        virtual sreal  Y() const { return _y; }
+        virtual sreal  x() const { return _x; }
+        virtual sreal  y() const { return _y; }
         virtual Button button() const { return _button; }
         virtual bool   leftButton() const { return _button == Button::Left; }
         virtual bool   rightButton() const { return _button == Button::Right; }

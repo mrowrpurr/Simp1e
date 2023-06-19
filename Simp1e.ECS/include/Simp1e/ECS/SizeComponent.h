@@ -17,7 +17,9 @@ namespace Simp1e::ECS {
         SizeComponent(const Size& size) : _size(size) {}
         SizeComponent(sreal width, sreal height) : _size(width, height) {}
 
-        virtual Size GetSize() const { return _size; }
+        virtual Size  size() const { return _size; }
+        virtual sreal width() const { return _size.width(); }
+        virtual sreal height() const { return _size.height(); }
 
         virtual void SetSize(const Size& size) {
             _size = size;

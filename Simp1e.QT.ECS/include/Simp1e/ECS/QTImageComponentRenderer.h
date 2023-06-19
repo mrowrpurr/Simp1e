@@ -25,8 +25,8 @@ namespace Simp1e::ECS {
 
             auto sizeComponent = components.GetComponent<SizeComponent>();
             if (!sizeComponent) return;
-            if (sizeComponent->GetSize().isNull()) return;
-            imageComponent->SetSize(sizeComponent->GetSize());
+            if (sizeComponent->size().isNull()) return;
+            imageComponent->SetSize(sizeComponent->size());
 
             painter->drawPixmap(
                 ToQPointF(positionComponent->GetPosition()), imageComponent->GetPixmap()

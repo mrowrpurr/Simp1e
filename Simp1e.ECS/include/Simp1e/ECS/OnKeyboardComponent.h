@@ -7,13 +7,13 @@
 
 namespace Simp1e::ECS {
 
-    class OnKeyboardEventComponent {
+    class OnKeyboardComponent {
         std::function<void(KeyboardEvent*)> _onKeyEvent;
 
     public:
         SIMP1E_ECS_COMPONENT("OnKeyboardEvent")
 
-        OnKeyboardEventComponent(std::function<void(KeyboardEvent*)> onKeyEvent)
+        OnKeyboardComponent(std::function<void(KeyboardEvent*)> onKeyEvent)
             : _onKeyEvent(onKeyEvent) {}
 
         virtual void TriggerEvent(KeyboardEvent* event) { _onKeyEvent(event); }

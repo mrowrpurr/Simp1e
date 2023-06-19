@@ -28,9 +28,7 @@ namespace Simp1e::ECS {
             if (textComponent->GetColor().has_value())
                 painter->setPen(ToQColor(textComponent->GetColor().value()));
 
-            painter->drawText(
-                ToQRectF(sizeComponent->GetSize()), ToQString(textComponent->GetText())
-            );
+            painter->drawText(ToQRectF(sizeComponent->size()), ToQString(textComponent->GetText()));
         }
     };
 }

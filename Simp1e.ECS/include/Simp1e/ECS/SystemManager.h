@@ -14,37 +14,43 @@ namespace Simp1e::ECS {
 
     public:
         template <typename T>
-        void AddSystem(const SystemType& systemType, T* system) {
+        T* AddSystem(const SystemType& systemType, T* system) {
             _systems.emplace_back(std::make_unique<SystemExecutor>(
                 systemType, system,
                 [](SystemPointer& system) { static_cast<T*>(system.get())->Update(); }
             ));
             _systemIndices[systemType] = _systems.size() - 1;
+            return system;
         }
 
         template <typename T>
-        void AddSystem(const SystemType& systemType) {
-            AddSystem(systemType, new T());
+        T* AddSystem(const SystemType& systemType) {
+            auto* system = new T();
+            AddSystem(systemType, system);
+            return system;
         }
 
         template <typename T>
-        void AddSystem(T* system) {
+        T* AddSystem(T* system) {
             AddSystem(T::GetSystemType(), system);
+            return system;
         }
 
         template <typename T>
-        void AddSystem(const SystemType& systemType, T&& system) {
-            AddSystem(systemType, new T(std::forward<T>(system)));
+        T* AddSystem(const SystemType& systemType, T&& systemValue) {
+            auto* system = new T(std::forward<T>(systemValue));
+            AddSystem(systemType, system);
+            return system;
         }
 
         template <typename T>
-        void AddSystem(T&& system) {
-            AddSystem(T::GetSystemType(), std::forward<T>(system));
+        T* AddSystem(T&& system) {
+            return AddSystem(T::GetSystemType(), std::forward<T>(system));
         }
 
         template <typename T>
-        void AddSystem() {
-            AddSystem(T::GetSystemType(), new T());
+        T* AddSystem() {
+            return AddSystem(T::GetSystemType(), new T());
         }
 
         template <typename T>
