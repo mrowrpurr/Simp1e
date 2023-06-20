@@ -28,7 +28,8 @@ namespace Simp1e::ECS {
             if (sizeComponent->size().isNull()) return;
             imageComponent->SetSize(sizeComponent->size());
 
-            painter->resetTransform();
+            // painter->resetTransform();
+            qDebug() << "Drawing pixmap at position: " << ToQPointF(positionComponent->position());
             painter->drawPixmap(
                 ToQPointF(positionComponent->position()), imageComponent->GetPixmap()
             );

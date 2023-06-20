@@ -127,6 +127,7 @@ namespace Simp1e::ECS {
                 for (auto& [entityId, componentPtr] : _game.Entities().GetComponents(componentType))
                     if (auto* component = static_cast<DirtyTrackingComponent*>(componentPtr.get()))
                         if (component->IsDirty()) {
+                            component->SetDirty(false);
                             somethingChanged = true;
                             componentUpdateHandler->Update(_game, entityId, componentPtr);
                         }

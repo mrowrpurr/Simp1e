@@ -23,6 +23,7 @@
 #include <Simp1e/ECS/QtPositionComponentUpdateHandler.h>
 #include <Simp1e/ECS/QtRectangleComponentRenderer.h>
 #include <Simp1e/ECS/QtRenderSystem.h>
+#include <Simp1e/ECS/QtSizeComponentUpdateHandler.h>
 #include <Simp1e/ECS/QtTextComponentRenderer.h>
 #include <Simp1e/ECS/QtTextComponentUpdateHandler.h>
 #include <Simp1e/ECS/RectangleComponent.h>
@@ -50,6 +51,18 @@
 using namespace Simp1e;
 using namespace Simp1e::ECS;
 
+Size GetGameSize(int labelHeight = 0) {
+    qDebug() << "GetGameSize() label height: " << labelHeight;
+    // #ifdef Q_OS_ANDROID
+    auto screenGeometry = QGuiApplication::primaryScreen()->geometry();
+    return {
+        static_cast<sreal>(screenGeometry.width()),
+        static_cast<sreal>(screenGeometry.height() - labelHeight)};
+    // #else
+    //     return {1600, 800};
+    // #endif
+}
+
 class SideScrollerGraphicsScene : public QGraphicsScene {
     EventManager& eventManager;
 
@@ -75,6 +88,11 @@ class SideScrollerGraphicsView : public QGraphicsView {
 public:
     SideScrollerGraphicsView(EventManager& eventManager) : _eventManager(eventManager) {
         setRenderHint(QPainter::Antialiasing);  // Enable smooth rendering.
+
+        // show scroll bars
+        setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+        setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+
         fpsTimer.start();
     }
 
@@ -100,14 +118,32 @@ protected:
         QGraphicsView::keyReleaseEvent(event);
     }
     void resizeEvent(QResizeEvent* event) override {
-        fitInView(sceneRect(), Qt::KeepAspectRatio);
+        qDebug() << "RESIZE";
+
+        int newWidth  = event->size().width();
+        int newHeight = event->size().height();
+
+        // setFixedSize(newHeight - 50, newWidth - 50);
+
+        // Calculate the scaling factor based on the height.
+        // qreal scaleFactor = static_cast<qreal>(newHeight) / scene()->sceneRect().height();
+        qreal scaleFactor = static_cast<qreal>(newHeight) / scene()->sceneRect().height();
+
+        // Apply the transformation.
+        QTransform transform;
+        transform.scale(scaleFactor, scaleFactor);
+        setTransform(transform);
+
+        qDebug() << "Transform has been set.";
+
         auto topLeft = mapToScene(0, 0);
         _eventManager.Emit<ResizeEvent>({
             {static_cast<sreal>(topLeft.x()),           static_cast<sreal>(topLeft.y())           },
             {static_cast<sreal>(event->size().width()), static_cast<sreal>(event->size().height())}
         }
         );
-        QGraphicsView::resizeEvent(event);
+        for (auto item : scene()->items()) item->update();
+        qDebug() << "Scene items have been updated";
     }
 };
 
@@ -120,6 +156,7 @@ void SetupQtRenderSystem(Game& game, QGraphicsScene& scene) {
     qtRenderSystem->AddComponentUpdateHandler<PositionComponent, QtPositionComponentUpdateHandler>(
     );
     qtRenderSystem->AddComponentUpdateHandler<TextComponent, QtTextComponentUpdateHandler>();
+    qtRenderSystem->AddComponentUpdateHandler<SizeComponent, QtSizeComponentUpdateHandler>();
 
     // Renderers (order matters)
     qtRenderSystem->AddComponentRenderer<RectangleComponent, QtRectangleComponentRenderer>();
@@ -154,6 +191,7 @@ public:
         : position(position), direction(direction), distance(distance) {}
 
     void Execute() {
+        qDebug() << "MOVE PLAYER";
         if (direction == Direction::North) position->SetY(position->y() - distance);
         else if (direction == Direction::South) position->SetY(position->y() + distance);
         else if (direction == Direction::West) position->SetX(position->x() - distance);
@@ -165,9 +203,14 @@ ManagedEntity AddPlayer(Game& game, const QRectF& sceneRect) {
     auto player = game.Entities().CreateEntity();
     Size size{100, 100};
     // auto* position = player.AddComponent<PositionComponent>({static_cast<sreal>(left), 0});
+    // auto* position = player.AddComponent<PositionComponent>(
+    //     {static_cast<sreal>(sceneRect.width() / 2 - size.width() / 2),
+    //      static_cast<sreal>(sceneRect.height() - size.height())}
+    // );
+    // auto* position = player.AddComponent<PositionComponent>({500, 600});
     auto* position = player.AddComponent<PositionComponent>(
-        {static_cast<sreal>(sceneRect.width() / 2 - size.width() / 2),
-         static_cast<sreal>(sceneRect.height() - size.height())}
+        {static_cast<sreal>(sceneRect.width() / 2 - 50),
+         static_cast<sreal>(sceneRect.height() / 2 - 50)}
     );
     player.AddComponent<SizeComponent>(size);
     player.AddComponent<QTImageComponent>({":/player/images/look/right.png"});
@@ -250,29 +293,38 @@ void GameLoop() {
     game.Update();
 }
 
+// TODO XXX TODO - update the movement click/tap handlers to move the player based on if the
+// position is to the right or left of the PLAYER.
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
     app.setStyle("fusion");
     QWidget window;
-    // make the background color of the QWidget red
     window.setWindowTitle("Side Scroller");
     loopIterationLabel = new QLabel();
-    auto* layout       = new QVBoxLayout();
+    loopIterationLabel->setMaximumHeight(20);
+    auto* layout = new QVBoxLayout();
     window.setLayout(layout);
-    SideScrollerGraphicsView view(game.Events());
-    // set the background color of the view to blue
+    SideScrollerGraphicsView  view(game.Events());
     SideScrollerGraphicsScene scene(game.Events());
-    Size                      gameSize{1600, 800};
-    QRectF                    sceneRect(0, 0, gameSize.width(), gameSize.height());
-    view.setFixedSize(gameSize.width(), gameSize.height());
+    view.FPSLabel().setMaximumHeight(20);
+    auto gameSize = GetGameSize(view.FPSLabel().height() + loopIterationLabel->height());
+    qDebug() << "Game size width " << gameSize.width() << " height " << gameSize.height();
+    QRectF sceneRect(0, 0, gameSize.width(), gameSize.height());
+    scene.setSceneRect(sceneRect);
+    view.setFixedSize(gameSize.width() - 100, gameSize.height() - 100);
     view.setScene(&scene);
     view.setGeometry(sceneRect.toRect());
-    scene.setSceneRect(sceneRect);
     view.fitInView(sceneRect, Qt::KeepAspectRatio);
     layout->addWidget(&view.FPSLabel());
     layout->addWidget(loopIterationLabel);
     layout->addWidget(&view);
     window.show();
+
+    auto* screen = QGuiApplication::primaryScreen();
+    QObject::connect(screen, &QScreen::geometryChanged, &window, [&]() {
+
+    });
+
     ///////////////////////
 
     SetupQtRenderSystem(game, scene);
@@ -289,6 +341,35 @@ int main(int argc, char* argv[]) {
     ResizeNotificationSystem resizeNotificationSystem(game.Entities().GetEntityManager());
     resizeNotificationSystem.RegisterListener(game.Events());
     game.Systems().AddSystem(&resizeNotificationSystem);
+
+    auto background = game.Entities().CreateEntity();
+    background.AddComponent<PositionComponent>({0, 0});
+    background.AddComponent<SizeComponent>({gameSize.width(), gameSize.height()});
+    background.AddComponent<RectangleComponent>({Color::Green(10)});
+
+    // auto topLeftRect = game.Entities().CreateEntity();
+    // topLeftRect.AddComponent<PositionComponent>({0, 0});
+    // topLeftRect.AddComponent<SizeComponent>({100, 100});
+    // topLeftRect.AddComponent<RectangleComponent>({Color::Red()});
+
+    auto middleRect = game.Entities().CreateEntity();
+    middleRect.AddComponent<PositionComponent>(
+        {gameSize.width() / 2 - 50, gameSize.height() / 2 - 50}
+    );
+    middleRect.AddComponent<SizeComponent>({100, 100});
+    middleRect.AddComponent<RectangleComponent>({Color::Blue(69)});
+
+    auto anotherRect = game.Entities().CreateEntity();
+    anotherRect.AddComponent<PositionComponent>({600, 500});
+    anotherRect.AddComponent<SizeComponent>({100, 100});
+    anotherRect.AddComponent<RectangleComponent>({Color::Purple(69)});
+
+    // auto bottomRightRect = game.Entities().CreateEntity();
+    // bottomRightRect.AddComponent<PositionComponent>(
+    //     {gameSize.width() - 100, gameSize.height() - 100}
+    // );
+    // bottomRightRect.AddComponent<SizeComponent>({100, 100});
+    // bottomRightRect.AddComponent<RectangleComponent>({Color::Yellow()});
 
     auto  player         = AddPlayer(game, sceneRect);
     auto* playerPosition = player.GetComponent<PositionComponent>();
