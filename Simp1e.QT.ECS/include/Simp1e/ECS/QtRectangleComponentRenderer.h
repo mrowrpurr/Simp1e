@@ -15,9 +15,8 @@ namespace Simp1e::ECS {
 
     struct QtRectangleComponentRenderer : public QtComponentRenderer {
         void Render(
-            Game& game, Entity entity, ComponentPointer* component,
-            ReadonlyEntityComponentCollection& components, QPainter* painter,
-            const QStyleOptionGraphicsItem* option, QWidget* widget
+            Game& game, Entity entity, ComponentPointer* component, ReadonlyEntityComponentCollection& components,
+            QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget
         ) override {
             auto* rectangleComponent = component_cast<RectangleComponent>(component);
             if (!rectangleComponent) return;
@@ -30,16 +29,10 @@ namespace Simp1e::ECS {
                 if (!positionComponent) return;
                 auto sizeComponent = components.GetComponent<SizeComponent>();
                 if (!sizeComponent) return;
-                // rectangle = Rectangle(positionComponent->position(), sizeComponent->size());
+                // rectangle = Rectangle(positionComponent->position(), sizeComponent->size()); // This breaks, why...
                 rectangle = Rectangle(
-                    {positionComponent->x(), positionComponent->y()},
-                    {sizeComponent->width(), sizeComponent->height()}
+                    {positionComponent->x(), positionComponent->y()}, {sizeComponent->width(), sizeComponent->height()}
                 );
-                qDebug() << "Position position x " << positionComponent->position().x() << " y "
-                         << positionComponent->position().y();
-                qDebug() << "Position x " << positionComponent->x() << " y "
-                         << positionComponent->y();
-                qDebug() << "Rectangle x " << rectangle.x() << " y " << rectangle.y();
             }
 
             auto rect = ToQRectF(rectangle);

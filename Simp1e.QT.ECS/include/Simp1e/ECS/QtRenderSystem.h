@@ -21,13 +21,12 @@
 namespace Simp1e::ECS {
 
     class QtRenderSystem {
-        Game&                             _game;
-        QGraphicsScene&                   _scene;
-        std::unordered_set<ComponentType> _visualComponentTypes;
-        std::unordered_map<ComponentType, std::unique_ptr<QtComponentRenderer>> _componentRenderers;
-        std::vector<ComponentType> _componentRenderersOrder;
-        std::unordered_map<ComponentType, std::unique_ptr<QtComponentUpdateHandler>>
-            _componentUpdateHandlers;
+        Game&                                                                        _game;
+        QGraphicsScene&                                                              _scene;
+        std::unordered_set<ComponentType>                                            _visualComponentTypes;
+        std::unordered_map<ComponentType, std::unique_ptr<QtComponentRenderer>>      _componentRenderers;
+        std::vector<ComponentType>                                                   _componentRenderersOrder;
+        std::unordered_map<ComponentType, std::unique_ptr<QtComponentUpdateHandler>> _componentUpdateHandlers;
 
         // Delete copy constructor
         QtRenderSystem(const QtRenderSystem&) = delete;
@@ -41,28 +40,22 @@ namespace Simp1e::ECS {
                 if (_game.Entities().HasComponent<QTGraphicsItemComponent>(entity)) return;
                 auto* graphicsItemComponent = new QTGraphicsItemComponent(
                     _scene,
-                    [this, entity](
-                        QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget
-                    ) {
+                    [this, entity](QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
                         painter->save();
                         PaintEntity(entity, painter, option, widget);
                         painter->restore();
                     }
                 );
-                _game.Entities().AddComponent<QTGraphicsItemComponent>(
-                    entity, graphicsItemComponent
-                );
+                _game.Entities().AddComponent<QTGraphicsItemComponent>(entity, graphicsItemComponent);
             });
             _game.Entities().Events().OnComponentAdded([this](auto entity, auto& componentType) {
                 if (!this->_visualComponentTypes.count(componentType)) return;
-                auto* graphicsItemComponent =
-                    _game.Entities().GetComponent<QTGraphicsItemComponent>(entity);
+                auto* graphicsItemComponent = _game.Entities().GetComponent<QTGraphicsItemComponent>(entity);
                 if (graphicsItemComponent) graphicsItemComponent->update();
             });
             _game.Entities().Events().OnComponentRemoved([this](auto entity, auto& componentType) {
                 if (!this->_visualComponentTypes.count(componentType)) return;
-                auto* graphicsItemComponent =
-                    _game.Entities().GetComponent<QTGraphicsItemComponent>(entity);
+                auto* graphicsItemComponent = _game.Entities().GetComponent<QTGraphicsItemComponent>(entity);
                 if (graphicsItemComponent) graphicsItemComponent->update();
 
                 // If there are no more visual components on this entity, remove the graphics item
@@ -73,14 +66,11 @@ namespace Simp1e::ECS {
                         hasVisualComponent = true;
                         break;
                     }
-                if (!hasVisualComponent)
-                    _game.Entities().RemoveComponent<QTGraphicsItemComponent>(entity);
+                if (!hasVisualComponent) _game.Entities().RemoveComponent<QTGraphicsItemComponent>(entity);
             });
         }
 
-        void AddVisualComponentType(ComponentType componentType) {
-            _visualComponentTypes.insert(componentType);
-        }
+        void AddVisualComponentType(ComponentType componentType) { _visualComponentTypes.insert(componentType); }
 
         template <typename T>
         void AddVisualComponentType() {
@@ -103,11 +93,8 @@ namespace Simp1e::ECS {
             AddComponentRenderer(T::GetComponentType(), new R());
         }
 
-        void AddComponentUpdateHandler(
-            ComponentType componentType, QtComponentUpdateHandler* updateHandler
-        ) {
-            _componentUpdateHandlers[componentType] =
-                std::unique_ptr<QtComponentUpdateHandler>(updateHandler);
+        void AddComponentUpdateHandler(ComponentType componentType, QtComponentUpdateHandler* updateHandler) {
+            _componentUpdateHandlers[componentType] = std::unique_ptr<QtComponentUpdateHandler>(updateHandler);
             AddVisualComponentType(componentType);
         }
 
@@ -132,13 +119,10 @@ namespace Simp1e::ECS {
                             componentUpdateHandler->Update(_game, entityId, componentPtr);
                         }
 
-            if (somethingChanged) _scene.update();
+            // if (somethingChanged) _scene.update();
         }
 
-        void PaintEntity(
-            Entity entityId, QPainter* painter, const QStyleOptionGraphicsItem* option,
-            QWidget* widget
-        ) {
+        void PaintEntity(Entity entityId, QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
             auto entity     = _game.Entities().Get(entityId);
             auto components = entity.GetComponents();
 
@@ -148,9 +132,7 @@ namespace Simp1e::ECS {
                 auto foundRenderer = _componentRenderers.find(componentType);
                 if (foundRenderer == _componentRenderers.end()) continue;
                 auto* component = components.GetComponent(componentType);
-                foundRenderer->second->Render(
-                    _game, entityId, component, components, painter, option, widget
-                );
+                foundRenderer->second->Render(_game, entityId, component, components, painter, option, widget);
             }
         }
     };

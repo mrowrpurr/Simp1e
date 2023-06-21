@@ -25,8 +25,10 @@
 #include <QApplication>
 #include <QTimer>
 
+#include "Simp1e/SideScroller/QtViewCenteredSystem.h"
 #include "Simp1e/SideScroller/SideScrollerGraphicsScene.h"
 #include "Simp1e/SideScroller/SideScrollerGraphicsView.h"
+#include "Simp1e/SideScroller/ViewCenteredComponent.h"
 
 using namespace Simp1e;
 using namespace Simp1e::ECS;
@@ -53,20 +55,36 @@ void SetupQtRenderSystem(Game& game, QGraphicsScene& scene) {
 }
 
 ManagedEntity AddPlayer(Game& game, const QRectF& sceneRect) {
-    auto  player = game.Entities().CreateEntity();
-    Size  size{100, 100};
+    Size size{100, 100};
+    auto player = game.Entities().CreateEntity();
+    player.AddComponent<ViewCenteredComponent>();
     auto* position = player.AddComponent<PositionComponent>(
         {static_cast<sreal>(sceneRect.width() / 2 - 50), static_cast<sreal>(sceneRect.height() / 2 - 50)}
     );
-    player.AddComponent<SizeComponent>(size);
+    auto* sizeComponent = player.AddComponent<SizeComponent>(size);
     player.AddComponent<QTImageComponent>({":/player/images/look/right.png"});
-    player.AddComponent<OnKeyboardComponent>({[position](KeyboardEvent* e) {
+    player.AddComponent<OnKeyboardComponent>({[position, sizeComponent](KeyboardEvent* e) {
         if (e->key() == KeyboardEvent::Key::Left) position->SetX(position->x() - 10);
         else if (e->key() == KeyboardEvent::Key::Right) position->SetX(position->x() + 10);
         else if (e->key() == KeyboardEvent::Key::Up) position->SetY(position->y() - 10);
         else if (e->key() == KeyboardEvent::Key::Down) position->SetY(position->y() + 10);
     }});
     player.AddComponent<RectangleComponent>({Color::Magenta(20)});
+
+    bool isMoving;
+    bool isMovingRight;
+    player.AddComponent<OnMouseClickComponent>({[&isMovingRight, &isMoving, position](MouseClickEvent* e) {
+        if (!e->pressed()) {
+            isMoving = false;
+            return;
+        } else if (!isMoving) {
+            isMoving      = true;
+            isMovingRight = e->x() > position->x();
+        }
+        if (isMovingRight) position->SetX(position->x() + 10);
+        else position->SetX(position->x() - 10);
+    }});
+
     return player;
 }
 
@@ -84,6 +102,7 @@ int main(int argc, char* argv[]) {
     view.resize(1600, 900);
 
     SetupQtRenderSystem(game, scene);
+
     auto* commandSystem = game.Systems().AddSystem<CommandSystem>();
 
     KeyboardInputSystem keyboardInputSystem(game.Entities().GetEntityManager());
@@ -97,6 +116,9 @@ int main(int argc, char* argv[]) {
     ResizeNotificationSystem resizeNotificationSystem(game.Entities().GetEntityManager());
     resizeNotificationSystem.RegisterListener(game.Events());
     game.Systems().AddSystem(&resizeNotificationSystem);
+
+    QtViewCenteredSystem viewCenteredSystem(view, game.Entities().GetEntityManager());
+    game.Systems().AddSystem(&viewCenteredSystem);
 
     auto backgroundRectangle = game.Entities().CreateEntity();
     backgroundRectangle.AddComponent<PositionComponent>({0, 0});

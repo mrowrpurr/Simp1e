@@ -14,7 +14,7 @@
 namespace Simp1e::ECS {
 
     class EntityManager {
-        std::unordered_map<ComponentType, std::unordered_map<Entity, ComponentPointer>> _components;
+        std::unordered_map<ComponentType, std::unordered_map<Entity, ComponentPointer>>  _components;
         std::unordered_map<Entity, std::unordered_map<ComponentType, ComponentPointer*>> _entities;
         EntityManagerEvents                                                              _events;
 
@@ -81,9 +81,12 @@ namespace Simp1e::ECS {
             return static_cast<T*>(_components[componentType][entity].get());
         }
 
-        std::unordered_map<Entity, ComponentPointer>& GetComponents(
-            const ComponentType& componentType
-        ) {
+        template <typename T>
+        T* GetComponent(Entity entity) {
+            return GetComponent<T>(entity, T::GetComponentType());
+        }
+
+        std::unordered_map<Entity, ComponentPointer>& GetComponents(const ComponentType& componentType) {
             return _components[componentType];
         }
 
