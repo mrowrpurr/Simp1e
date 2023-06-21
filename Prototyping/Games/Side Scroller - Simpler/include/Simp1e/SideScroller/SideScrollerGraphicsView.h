@@ -22,12 +22,10 @@ namespace Simp1e::ECS {
     protected:
         void keyPressEvent(QKeyEvent* event) override {
             _eventManager.Emit<KeyboardEvent>(ToKeyboardEvent(event, true));
-            QGraphicsView::keyPressEvent(event);
         }
 
         void keyReleaseEvent(QKeyEvent* event) override {
             _eventManager.Emit<KeyboardEvent>(ToKeyboardEvent(event, false));
-            QGraphicsView::keyReleaseEvent(event);
         }
 
         void resizeEvent(QResizeEvent* event) override {

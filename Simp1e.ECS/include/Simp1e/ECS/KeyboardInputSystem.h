@@ -19,9 +19,7 @@ namespace Simp1e::ECS {
         SIMP1E_ECS_SYSTEM("KeyboardInputSystem")
 
         void RegisterListener(EventManager& eventManager) {
-            eventManager.AddListener<KeyboardEvent>([this](KeyboardEvent* event) {
-                OnKeyboardEvent(event);
-            });
+            eventManager.AddListener<KeyboardEvent>([this](KeyboardEvent* event) { OnKeyboardEvent(event); });
         }
 
         void Update() {
@@ -32,12 +30,13 @@ namespace Simp1e::ECS {
                 if (!onKeyboardInputComponent) continue;
                 onKeyboardInputComponent->TriggerEvent(_lastMouseClickEvent.get());
             }
-            _lastMouseClickEvent.reset();
+            if (!_lastMouseClickEvent->pressed()) {
+                _lastMouseClickEvent.reset();
+                _lastMouseClickEvent = nullptr;
+            }
         }
 
     protected:
-        virtual void OnKeyboardEvent(KeyboardEvent* e) {
-            _lastMouseClickEvent = std::make_unique<KeyboardEvent>(*e);
-        }
+        virtual void OnKeyboardEvent(KeyboardEvent* e) { _lastMouseClickEvent = std::make_unique<KeyboardEvent>(*e); }
     };
 }
