@@ -54,6 +54,8 @@ void SetupQtRenderSystem(Game& game, QGraphicsScene& scene) {
     game.Systems().AddSystem(qtRenderSystem);
 }
 
+bool          isMoving      = false;
+bool          isMovingRight = false;
 ManagedEntity AddPlayer(Game& game, const QRectF& sceneRect) {
     Size size{100, 100};
     auto player = game.Entities().CreateEntity();
@@ -70,17 +72,22 @@ ManagedEntity AddPlayer(Game& game, const QRectF& sceneRect) {
         else if (e->key() == KeyboardEvent::Key::Down) position->SetY(position->y() + 10);
     }});
     player.AddComponent<RectangleComponent>({Color::Magenta(20)});
-
-    bool isMoving;
-    bool isMovingRight;
-    player.AddComponent<OnMouseClickComponent>({[&isMovingRight, &isMoving, position](MouseClickEvent* e) {
+    player.AddComponent<OnMouseClickComponent>({[position](MouseClickEvent* e) {
         if (!e->pressed()) {
             isMoving = false;
+            qDebug() << "HERE - stopping a move";
             return;
-        } else if (!isMoving) {
+        }
+        if (!isMoving) {
+            qDebug() << "HERE - starting a move";
             isMoving      = true;
             isMovingRight = e->x() > position->x();
+            qDebug() << "Is x (" << e->x() << ") > position->x() (" << position->x() << ")? " << isMovingRight;
+        } else {
+            qDebug() << "-isMoving-";
         }
+        qDebug() << "Click at x: " << e->x() << " y: " << e->y();
+        qDebug() << "Moving right? " << isMovingRight << " x: " << position->x() << " y: " << position->y();
         if (isMovingRight) position->SetX(position->x() + 10);
         else position->SetX(position->x() - 10);
     }});

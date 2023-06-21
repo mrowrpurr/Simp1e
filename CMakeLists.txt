@@ -47,7 +47,7 @@ function(qt_project target_name main_cpp_file)
     qt_add_executable(${target_name} MANUAL_FINALIZATION "${main_cpp_file}" "Prototyping/Games/Side Scroller - Simpler/SideScroller.qrc")
     target_link_libraries(${target_name} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
     get_filename_component(main_cpp_folder ${main_cpp_file} DIRECTORY)
-    target_include_directories(${target_name} PRIVATE ${main_cpp_folder})
+    target_include_directories(${target_name} PRIVATE "${main_cpp_folder}" "${main_cpp_folder}/include")
     target_link_libraries(${target_name} PRIVATE string_format::string_format _Log_::_Log_ fmt::fmt)
     target_link_libraries(${target_name} PRIVATE Simp1e Simp1e.ECS Simp1e.QT Simp1e.QT.ECS)
     set_target_properties(${target_name} PROPERTIES
