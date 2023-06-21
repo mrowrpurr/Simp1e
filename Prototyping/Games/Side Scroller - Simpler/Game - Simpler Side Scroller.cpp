@@ -34,7 +34,7 @@ using namespace Simp1e;
 using namespace Simp1e::ECS;
 
 Game   game;
-Size   levelSize{8000, 600};
+Size   levelSize{10000, 1000};
 QTimer mainLoopTimer;
 
 int  loopIteration = 0;
@@ -111,8 +111,6 @@ int main(int argc, char* argv[]) {
     SideScrollerGraphicsView view(game.Events());
     view.setWindowTitle("Side Scroller");
     view.setScene(&scene);
-    view.setGeometry(0, 0, scene.sceneRect().width(), scene.sceneRect().height());
-    view.resize(1600, 900);
 
     SetupQtRenderSystem(game, scene);
 
@@ -137,6 +135,16 @@ int main(int argc, char* argv[]) {
     backgroundRectangle.AddComponent<PositionComponent>({0, 0});
     backgroundRectangle.AddComponent<SizeComponent>({levelSize.width(), levelSize.height()});
     backgroundRectangle.AddComponent<RectangleComponent>({Color::Magenta(20)});
+
+    auto topBar = game.Entities().CreateEntity();
+    topBar.AddComponent<PositionComponent>({0, 0});
+    topBar.AddComponent<SizeComponent>({levelSize.width(), 50});
+    topBar.AddComponent<RectangleComponent>({Color::Blue(50)});
+
+    auto bottomBar = game.Entities().CreateEntity();
+    bottomBar.AddComponent<PositionComponent>({0, levelSize.height() - 50});
+    bottomBar.AddComponent<SizeComponent>({levelSize.width(), 50});
+    bottomBar.AddComponent<RectangleComponent>({Color::Blue(100)});
 
     auto topLeftRectangle = game.Entities().CreateEntity();
     topLeftRectangle.AddComponent<PositionComponent>({0, 0});

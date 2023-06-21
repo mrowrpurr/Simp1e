@@ -19,6 +19,12 @@ namespace Simp1e::ECS {
             setRenderHint(QPainter::Antialiasing);  // Enable smooth rendering.
         }
 
+        void FitSceneToViewHeight() {
+            auto sceneRect   = scene()->sceneRect();
+            auto scaleFactor = height() / sceneRect.height();
+            setTransform(QTransform::fromScale(scaleFactor, scaleFactor));
+        }
+
     protected:
         void keyPressEvent(QKeyEvent* event) override {
             _eventManager.Emit<KeyboardEvent>(ToKeyboardEvent(event, true));
@@ -29,6 +35,7 @@ namespace Simp1e::ECS {
         }
 
         void resizeEvent(QResizeEvent* event) override {
+            FitSceneToViewHeight();
             auto topLeft = mapToScene(0, 0);
             _eventManager.Emit<ResizeEvent>({
                 {static_cast<sreal>(topLeft.x()),           static_cast<sreal>(topLeft.y())           },
