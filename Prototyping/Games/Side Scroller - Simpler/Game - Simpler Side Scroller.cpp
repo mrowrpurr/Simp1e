@@ -4,6 +4,7 @@
 #include <Simp1e/Direction.h>
 #include <Simp1e/ECS/CommandSystem.h>
 #include <Simp1e/ECS/Game.h>
+#include <Simp1e/ECS/GravityComponent.h>
 #include <Simp1e/ECS/GravitySystem.h>
 #include <Simp1e/ECS/KeyboardInputSystem.h>
 #include <Simp1e/ECS/MouseClickInputSystem.h>
@@ -63,6 +64,7 @@ ManagedEntity AddPlayer(Game& game, CommandSystem& commandSystem, const QRectF& 
     Size size{250, 250};
     auto player = game.Entities().CreateEntity();
     player.AddComponent<ViewCenteredComponent>();
+    player.AddComponent<GravityComponent>({{.gravityFactor = 10.0}});
     auto* position = player.AddComponent<PositionComponent>(
         {static_cast<sreal>(sceneRect.width() / 2 - 50), static_cast<sreal>(sceneRect.height() / 2 - 50)}
     );
@@ -94,6 +96,10 @@ ManagedEntity AddPlayer(Game& game, CommandSystem& commandSystem, const QRectF& 
 }
 
 int main(int argc, char* argv[]) {
+    /*
+        Qt UI
+    */
+
     QApplication app(argc, argv);
     app.setStyle("fusion");
 
@@ -104,10 +110,15 @@ int main(int argc, char* argv[]) {
     view.setWindowTitle("Side Scroller");
     view.setScene(&scene);
 
-    SetupQtRenderSystem(game, scene);
+    /*
+        Systems
+    */
 
     CommandSystem commandSystem(game);
     game.Systems().AddSystem(&commandSystem);
+
+    GravitySystem gravitySystem(game.Entities().GetEntityManager(), commandSystem);
+    game.Systems().AddSystem(&gravitySystem);
 
     KeyboardInputSystem keyboardInputSystem(game.Entities().GetEntityManager());
     keyboardInputSystem.RegisterListener(game.Events());
@@ -123,6 +134,12 @@ int main(int argc, char* argv[]) {
 
     QtViewCenteredSystem viewCenteredSystem(view, game.Entities().GetEntityManager());
     game.Systems().AddSystem(&viewCenteredSystem);
+
+    SetupQtRenderSystem(game, scene);
+
+    /*
+        Components
+    */
 
     auto backgroundRectangle = game.Entities().CreateEntity();
     backgroundRectangle.AddComponent<PositionComponent>({0, 0});
@@ -172,9 +189,12 @@ int main(int argc, char* argv[]) {
 
     AddPlayer(game, commandSystem, scene.sceneRect());
 
+    /*
+        Start game main() loop and run the application
+    */
+
     QObject::connect(&mainLoopTimer, &QTimer::timeout, &app, GameLoop);
     mainLoopTimer.start(16);
-
     view.show();
     return app.exec();
 }

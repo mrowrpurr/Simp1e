@@ -25,12 +25,12 @@ namespace Simp1e::ECS {
         SIMP1E_ECS_SYSTEM("Gravity")
 
         void Update() {
-            for (auto& [entity, component] : _entityManager.GetComponents<GravityComponent>()) {
-                if (auto* gravityComponent = component_cast<GravityComponent>(component)) {
-                    if (!gravityComponent->IsGrounded()) {
-                    }
-                }
-            }
+            for (auto& [entity, component] : _entityManager.GetComponents<GravityComponent>())
+                if (auto* gravityComponent = component_cast<GravityComponent>(component))
+                    if (!gravityComponent->IsGrounded())
+                        _commandSystem.AddCommand<MoveCommand>(
+                            {entity, Direction::South, gravityComponent->GravityFactor()}
+                        );
         }
     };
 }

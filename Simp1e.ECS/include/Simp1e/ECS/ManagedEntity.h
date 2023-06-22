@@ -40,7 +40,7 @@ namespace Simp1e::ECS {
 
         template <typename T>
         T* AddComponent() {
-            return AddComponent(T::GetComponentType(), new T());
+            return _entityManager.AddComponent(_entity, T::GetComponentType(), new T());
         }
 
         template <typename T>

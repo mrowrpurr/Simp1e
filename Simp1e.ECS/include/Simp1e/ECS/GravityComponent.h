@@ -13,9 +13,15 @@ namespace Simp1e::ECS {
         bool  _isGrounded             = false;
 
     public:
+        struct Params {
+            sreal gravityFactor          = 1.0;
+            sreal terminalVelocityFactor = 1.0;
+            sreal currentFallSpeed       = 0.0;
+            bool  isGrounded             = false;
+        };
+
         SIMP1E_ECS_COMPONENT("Gravity")
 
-        GravityComponent() = default;
         GravityComponent(
             sreal gravityFactor = 1.0, sreal terminalVelocityFactor = 1.0, sreal currentFallSpeed = 0.0,
             bool isGrounded = false
@@ -24,6 +30,11 @@ namespace Simp1e::ECS {
               _terminalVelocityFactor(terminalVelocityFactor),
               _currentFallSpeed(currentFallSpeed),
               _isGrounded(isGrounded) {}
+        GravityComponent(const Params& params)
+            : _gravityFactor(params.gravityFactor),
+              _terminalVelocityFactor(params.terminalVelocityFactor),
+              _currentFallSpeed(params.currentFallSpeed),
+              _isGrounded(params.isGrounded) {}
 
         virtual sreal GravityFactor() const { return _gravityFactor; }
         virtual sreal TerminalVelocityFactor() const { return _terminalVelocityFactor; }
