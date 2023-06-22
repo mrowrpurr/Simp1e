@@ -9,18 +9,18 @@
 
 namespace Simp1e::ECS {
     class ImageComponent : public DirtyTrackingComponent {
-        std::string _imageFilename;
+        std::string _imagePath;
 
     public:
         SIMP1E_ECS_COMPONENT("Image")
 
         ImageComponent() = default;
-        ImageComponent(const std::string& imageFilename) : _imageFilename(imageFilename) {}
+        ImageComponent(const std::string& imagePath) : _imagePath(imagePath) {}
 
-        virtual std::string GetImageFilename() const { return _imageFilename; }
+        virtual std::string GetImagePath() const { return _imagePath; }
 
-        virtual void SetImageFilename(const std::string& imageFilename) {
-            _imageFilename = imageFilename;
+        virtual void SetImagePath(const std::string& imagePath) {
+            _imagePath = imagePath;
             SetDirty();
         }
     };

@@ -16,18 +16,15 @@ namespace Simp1e::ECS {
     public:
         MouseClickInputSystem(EntityManager& entityManager) : _entityManager(entityManager) {}
 
-        SIMP1E_ECS_SYSTEM("MouseClickInputSystem")
+        SIMP1E_ECS_SYSTEM("MouseClickInput")
 
-        void RegisterListener(EventManager& eventManager) {
-            eventManager.AddListener<MouseClickEvent>([this](MouseClickEvent* event) {
-                OnMouseClickEvent(event);
-            });
+        virtual void RegisterListener(EventManager& eventManager) {
+            eventManager.AddListener<MouseClickEvent>([this](MouseClickEvent* event) { OnMouseClickEvent(event); });
         }
 
-        void Update() {
+        virtual void Update() {
             if (!_lastMouseClickEvent) return;
-            auto& onMouseClickInputComponents =
-                _entityManager.GetComponents<OnMouseClickComponent>();
+            auto& onMouseClickInputComponents = _entityManager.GetComponents<OnMouseClickComponent>();
             for (auto& [entity, component] : onMouseClickInputComponents) {
                 auto* onMouseClickInputComponent = component_cast<OnMouseClickComponent>(component);
                 if (!onMouseClickInputComponent) continue;

@@ -15,9 +15,8 @@ namespace Simp1e::ECS {
         virtual ~QtComponentRenderer() = default;
 
         virtual void Render(
-            Game& game, Entity entity, ComponentPointer* component,
-            ReadonlyEntityComponentCollection& components, QPainter* painter,
-            const QStyleOptionGraphicsItem* option, QWidget* widget
+            Game& game, Entity entity, ComponentPointer* component, ReadonlyEntityComponentCollection& components,
+            QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget
         ) = 0;
     };
 }

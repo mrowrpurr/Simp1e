@@ -16,13 +16,13 @@ namespace Simp1e::ECS {
     public:
         KeyboardInputSystem(EntityManager& entityManager) : _entityManager(entityManager) {}
 
-        SIMP1E_ECS_SYSTEM("KeyboardInputSystem")
+        SIMP1E_ECS_SYSTEM("KeyboardInput")
 
-        void RegisterListener(EventManager& eventManager) {
+        virtual void RegisterListener(EventManager& eventManager) {
             eventManager.AddListener<KeyboardEvent>([this](KeyboardEvent* event) { OnKeyboardEvent(event); });
         }
 
-        void Update() {
+        virtual void Update() {
             if (!_lastMouseClickEvent) return;
             auto& onKeyboardInputComponents = _entityManager.GetComponents<OnKeyboardComponent>();
             for (auto& [entity, component] : onKeyboardInputComponents) {

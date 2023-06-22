@@ -78,7 +78,13 @@ namespace Simp1e::ECS {
 
         template <typename T>
         T* GetComponent(Entity entity, const ComponentType& componentType) {
-            return static_cast<T*>(_components[componentType][entity].get());
+            auto foundEntity = _entities.find(entity);
+            if (foundEntity == _entities.end()) return nullptr;
+
+            auto foundComponent = foundEntity->second.find(componentType);
+            if (foundComponent == foundEntity->second.end()) return nullptr;
+
+            return static_cast<T*>(foundComponent->second->get());
         }
 
         template <typename T>
@@ -87,16 +93,22 @@ namespace Simp1e::ECS {
         }
 
         std::unordered_map<Entity, ComponentPointer>& GetComponents(const ComponentType& componentType) {
+            if (_components.find(componentType) == _components.end())
+                _components[componentType] = std::unordered_map<Entity, ComponentPointer>();
             return _components[componentType];
         }
 
         template <typename T>
         std::unordered_map<Entity, ComponentPointer>& GetComponents() {
-            return _components[T::GetComponentType()];
+            return GetComponents(T::GetComponentType());
         }
 
         bool HasComponent(Entity entity, const ComponentType& componentType) {
-            return _components[componentType].find(entity) != _components[componentType].end();
+            auto foundEntity = _entities.find(entity);
+            if (foundEntity == _entities.end()) return false;
+
+            auto foundComponent = foundEntity->second.find(componentType);
+            return foundComponent != foundEntity->second.end();
         }
 
         template <typename T>

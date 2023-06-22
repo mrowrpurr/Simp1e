@@ -1,14 +1,15 @@
 #include <Simp1e/QT/_Log_.h>
 //
 
+#include <Simp1e/Direction.h>
 #include <Simp1e/ECS/CommandSystem.h>
 #include <Simp1e/ECS/Game.h>
+#include <Simp1e/ECS/GravitySystem.h>
 #include <Simp1e/ECS/KeyboardInputSystem.h>
 #include <Simp1e/ECS/MouseClickInputSystem.h>
 #include <Simp1e/ECS/OnKeyboardComponent.h>
 #include <Simp1e/ECS/PositionComponent.h>
-#include <Simp1e/ECS/QTImageComponent.h>
-#include <Simp1e/ECS/QTImageComponentRenderer.h>
+#include <Simp1e/ECS/QtImageComponentRenderer.h>
 #include <Simp1e/ECS/QtPositionComponentUpdateHandler.h>
 #include <Simp1e/ECS/QtRectangleComponentRenderer.h>
 #include <Simp1e/ECS/QtRenderSystem.h>
@@ -25,6 +26,8 @@
 #include <QApplication>
 #include <QTimer>
 
+#include "Simp1e/SideScroller/Images.h"
+#include "Simp1e/SideScroller/MovePlayerCommand.h"
 #include "Simp1e/SideScroller/QtViewCenteredSystem.h"
 #include "Simp1e/SideScroller/SideScrollerGraphicsScene.h"
 #include "Simp1e/SideScroller/SideScrollerGraphicsView.h"
@@ -49,38 +52,32 @@ void SetupQtRenderSystem(Game& game, QGraphicsScene& scene) {
     qtRenderSystem->AddComponentUpdateHandler<TextComponent, QtTextComponentUpdateHandler>();
     qtRenderSystem->AddComponentUpdateHandler<SizeComponent, QtSizeComponentUpdateHandler>();
     qtRenderSystem->AddComponentRenderer<RectangleComponent, QtRectangleComponentRenderer>();
-    qtRenderSystem->AddComponentRenderer<QTImageComponent, QTImageComponentRenderer>();
+    qtRenderSystem->AddComponentRenderer<ImageComponent, QtImageComponentRenderer>();
     qtRenderSystem->AddComponentRenderer<TextComponent, QtTextComponentRenderer>();
     game.Systems().AddSystem(qtRenderSystem);
 }
 
-constexpr auto RIGHT_IMAGE   = ":/player/images/look/right.png";
-constexpr auto LEFT_IMAGE    = ":/player/images/look/left.png";
-bool           isMoving      = false;
-bool           isMovingRight = false;
-ManagedEntity  AddPlayer(Game& game, const QRectF& sceneRect) {
-    Size size{100, 100};
+bool          isMoving      = false;
+bool          isMovingRight = false;
+ManagedEntity AddPlayer(Game& game, CommandSystem& commandSystem, const QRectF& sceneRect) {
+    Size size{250, 250};
     auto player = game.Entities().CreateEntity();
     player.AddComponent<ViewCenteredComponent>();
     auto* position = player.AddComponent<PositionComponent>(
         {static_cast<sreal>(sceneRect.width() / 2 - 50), static_cast<sreal>(sceneRect.height() / 2 - 50)}
     );
     auto* sizeComponent = player.AddComponent<SizeComponent>(size);
-    auto* image         = player.AddComponent<QTImageComponent>({RIGHT_IMAGE});
-    player.AddComponent<OnKeyboardComponent>({[position, sizeComponent, image](KeyboardEvent* e) {
+    auto* image         = player.AddComponent<ImageComponent>({Images::Player::Look::Right});
+    player.AddComponent<OnKeyboardComponent>({[player, position, sizeComponent, image,
+                                               &commandSystem](KeyboardEvent* e) {
         if (!e->pressed()) return;
-        // if (e->repeated()) return;
-        if (e->key() == KeyboardEvent::Key::Left) {
-            position->SetX(position->x() - 10);
-            image->SetPixmap(LEFT_IMAGE);
-        } else if (e->key() == KeyboardEvent::Key::Right) {
-            position->SetX(position->x() + 10);
-            image->SetPixmap(RIGHT_IMAGE);
-        } else if (e->key() == KeyboardEvent::Key::Up) position->SetY(position->y() - 10);
-        else if (e->key() == KeyboardEvent::Key::Down) position->SetY(position->y() + 10);
+
+        if (e->key() == KeyboardEvent::Key::Left)
+            commandSystem.AddCommand<MovePlayerCommand>({player, Direction::West, 10});
+        else if (e->key() == KeyboardEvent::Key::Right)
+            commandSystem.AddCommand<MovePlayerCommand>({player, Direction::East, 10});
     }});
-    // player.AddComponent<RectangleComponent>({Color::Magenta(20)});
-    player.AddComponent<OnMouseClickComponent>({[position, image](MouseClickEvent* e) {
+    player.AddComponent<OnMouseClickComponent>({[player, position, image, &commandSystem](MouseClickEvent* e) {
         if (!e->pressed()) {
             isMoving = false;
             return;
@@ -89,13 +86,8 @@ ManagedEntity  AddPlayer(Game& game, const QRectF& sceneRect) {
             isMoving      = true;
             isMovingRight = e->x() > position->x();
         }
-        if (isMovingRight) {
-            position->SetX(position->x() + 10);
-            image->SetPixmap(RIGHT_IMAGE);
-        } else {
-            position->SetX(position->x() - 10);
-            image->SetPixmap(LEFT_IMAGE);
-        }
+        if (isMovingRight) commandSystem.AddCommand<MovePlayerCommand>({player, Direction::East, 10});
+        else commandSystem.AddCommand<MovePlayerCommand>({player, Direction::West, 10});
     }});
 
     return player;
@@ -114,7 +106,8 @@ int main(int argc, char* argv[]) {
 
     SetupQtRenderSystem(game, scene);
 
-    auto* commandSystem = game.Systems().AddSystem<CommandSystem>();
+    CommandSystem commandSystem(game);
+    game.Systems().AddSystem(&commandSystem);
 
     KeyboardInputSystem keyboardInputSystem(game.Entities().GetEntityManager());
     keyboardInputSystem.RegisterListener(game.Events());
@@ -177,7 +170,7 @@ int main(int argc, char* argv[]) {
     middleRectangle.AddComponent<TextComponent>({string_format("{}x{}", levelSize.width() / 2, levelSize.height() / 2)}
     );
 
-    AddPlayer(game, scene.sceneRect());
+    AddPlayer(game, commandSystem, scene.sceneRect());
 
     QObject::connect(&mainLoopTimer, &QTimer::timeout, &app, GameLoop);
     mainLoopTimer.start(16);

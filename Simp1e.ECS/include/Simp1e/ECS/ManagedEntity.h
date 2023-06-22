@@ -9,16 +9,14 @@ namespace Simp1e::ECS {
         Entity         _entity;
 
     public:
-        ManagedEntity(EntityManager& entityManager, Entity entity)
-            : _entityManager(entityManager), _entity(entity) {}
+        ManagedEntity(EntityManager& entityManager, Entity entity) : _entityManager(entityManager), _entity(entity) {}
 
         Entity GetEntity() { return _entity; }
 
         operator Entity&() { return _entity; }
+        operator Entity() const { return _entity; }
 
-        ReadonlyEntityComponentCollection GetComponents() {
-            return _entityManager.GetEntityComponents(_entity);
-        }
+        ReadonlyEntityComponentCollection GetComponents() { return _entityManager.GetEntityComponents(_entity); }
 
         template <typename T>
         T* AddComponent(const ComponentType& componentType, T* component) {
