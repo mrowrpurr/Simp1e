@@ -54,6 +54,38 @@ namespace Simp1e::ECS {
             AddCommand(T::GetCommandType(), new T(std::forward<Args>(args)...));
         }
 
+        template <typename T>
+        void RunCommand(const CommandType& commandType, T* command) {
+            std::make_unique<CommandExecutor>(commandType, command, [&](Game& game, CommandPointer& command) {
+                static_cast<T*>(command.get())->Execute(_game);
+            })->Execute(_game);
+        }
+
+        template <typename T>
+        void RunCommand(const CommandType& commandType, T command) {
+            RunCommand(commandType, new T(std::move(command)));
+        }
+
+        template <typename T>
+        void RunCommand(T* command) {
+            RunCommand(T::GetCommandType(), command);
+        }
+
+        template <typename T>
+        void RunCommand(T command) {
+            RunCommand(T::GetCommandType(), command);
+        }
+
+        template <typename T>
+        void RunCommand() {
+            RunCommand(T::GetCommandType(), new T());
+        }
+
+        template <typename T, typename... Args>
+        void RunCommand(Args&&... args) {
+            RunCommand(T::GetCommandType(), new T(std::forward<Args>(args)...));
+        }
+
         void Update() {
             while (!_commands.empty()) {
                 auto& command = _commands.front();

@@ -7,6 +7,9 @@
 #include <Simp1e/ECS/Game.h>
 #include <Simp1e/ECS/GravityComponent.h>
 #include <Simp1e/ECS/GravitySystem.h>
+#include <Simp1e/ECS/JumpCommand.h>
+#include <Simp1e/ECS/JumpSystem.h>
+#include <Simp1e/ECS/JumpingComponent.h>
 #include <Simp1e/ECS/KeyboardInputSystem.h>
 #include <Simp1e/ECS/MouseClickInputSystem.h>
 #include <Simp1e/ECS/OnKeyboardComponent.h>
@@ -19,11 +22,13 @@
 #include <Simp1e/ECS/QtSizeComponentUpdateHandler.h>
 #include <Simp1e/ECS/QtTextComponentRenderer.h>
 #include <Simp1e/ECS/QtTextComponentUpdateHandler.h>
+#include <Simp1e/ECS/QtViewCenteredSystem.h>
 #include <Simp1e/ECS/RectangleComponent.h>
 #include <Simp1e/ECS/ResizeNotificationSystem.h>
 #include <Simp1e/ECS/SizeComponent.h>
 #include <Simp1e/ECS/StoreLastPositionSystem.h>
 #include <Simp1e/ECS/TextComponent.h>
+#include <Simp1e/ECS/ViewCenteredComponent.h>
 #include <Simp1e/Size.h>
 #include <string_format.h>
 
@@ -32,10 +37,8 @@
 
 #include "Simp1e/SideScroller/Images.h"
 #include "Simp1e/SideScroller/MovePlayerCommand.h"
-#include "Simp1e/SideScroller/QtViewCenteredSystem.h"
 #include "Simp1e/SideScroller/SideScrollerGraphicsScene.h"
 #include "Simp1e/SideScroller/SideScrollerGraphicsView.h"
-#include "Simp1e/SideScroller/ViewCenteredComponent.h"
 
 using namespace Simp1e;
 using namespace Simp1e::ECS;
@@ -82,10 +85,20 @@ ManagedEntity AddPlayer(Game& game, CommandSystem& commandSystem, const QRectF& 
             commandSystem.AddCommand<MovePlayerCommand>({player, Direction::West, 10});
         else if (e->key() == KeyboardEvent::Key::Right || e->key() == KeyboardEvent::Key::KeyD)
             commandSystem.AddCommand<MovePlayerCommand>({player, Direction::East, 10});
+        else if (e->key() == KeyboardEvent::Key::Space) {
+            qDebug() << "Jump";
+            commandSystem.RunCommand<JumpCommand>(player, 300, 20);
+        }
     }});
-    player.AddComponent<OnMouseClickComponent>({[player, position, image, &commandSystem](MouseClickEvent* e) {
+    player.AddComponent<OnMouseClickComponent>({[player, position, image, sizeComponent,
+                                                 &commandSystem](MouseClickEvent* e) {
         if (!e->pressed()) {
             isMoving = false;
+            return;
+        }
+        bool isJumping = e->y() < position->y() - sizeComponent->size().height() / 2;
+        if (isJumping) {
+            commandSystem.RunCommand<JumpCommand>(player, 300, 20);
             return;
         }
         if (!isMoving) {
@@ -123,6 +136,9 @@ int main(int argc, char* argv[]) {
 
     CommandSystem commandSystem(game);
     game.Systems().AddSystem(&commandSystem);
+
+    JumpSystem jumpSystem(game.Entities().GetEntityManager(), commandSystem);
+    game.Systems().AddSystem(&jumpSystem);
 
     GravitySystem gravitySystem(game.Entities().GetEntityManager(), commandSystem);
     game.Systems().AddSystem(&gravitySystem);

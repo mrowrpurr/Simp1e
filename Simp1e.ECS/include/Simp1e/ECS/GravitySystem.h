@@ -1,8 +1,5 @@
 #pragma once
 
-#include <Simp1e/ECS/PositionComponent.h>
-#include <Simp1e/ECS/SizeComponent.h>
-
 #include <memory>
 
 #include "CommandSystem.h"
@@ -10,6 +7,8 @@
 #include "EntityManager.h"
 #include "GravityComponent.h"
 #include "MoveCommand.h"
+#include "PositionComponent.h"
+#include "SizeComponent.h"
 #include "SystemTypeMacro.h"
 
 namespace Simp1e::ECS {

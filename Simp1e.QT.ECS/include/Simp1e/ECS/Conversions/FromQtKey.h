@@ -148,6 +148,8 @@ namespace Simp1e::ECS {
                 return KeyboardEvent::Key::Up;
             case Qt::Key::Key_Down:
                 return KeyboardEvent::Key::Down;
+            case Qt::Key::Key_Space:
+                return KeyboardEvent::Key::Space;
             default:
                 return KeyboardEvent::Key::Unknown;
         }

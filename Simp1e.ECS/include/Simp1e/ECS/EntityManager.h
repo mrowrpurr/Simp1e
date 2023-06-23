@@ -34,6 +34,8 @@ namespace Simp1e::ECS {
 
         template <typename T>
         T* AddComponent(Entity entity, const ComponentType& componentType, T* component) {
+            if (HasComponent<T>(entity)) return GetComponent<T>(entity, componentType);
+
             Events().AddingComponent(entity, componentType);
             _components[componentType][entity] = MakeComponentPointer(component);
             _entities[entity][componentType]   = &_components[componentType][entity];
@@ -43,6 +45,8 @@ namespace Simp1e::ECS {
 
         template <typename T>
         T* AddComponent(Entity entity, const ComponentType& componentType) {
+            if (HasComponent<T>(entity)) return GetComponent<T>(entity, componentType);
+
             Events().AddingComponent(entity, componentType);
             auto* component                    = new T();
             _components[componentType][entity] = MakeComponentPointer(component);
@@ -53,6 +57,8 @@ namespace Simp1e::ECS {
 
         template <typename T>
         T* AddComponent(Entity entity, const ComponentType& componentType, T&& componentValue) {
+            if (HasComponent<T>(entity)) return GetComponent<T>(entity, componentType);
+
             Events().AddingComponent(entity, componentType);
             auto* component                    = new T(std::forward<T>(componentValue));
             _components[componentType][entity] = MakeComponentPointer(component);

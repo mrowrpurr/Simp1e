@@ -1,12 +1,12 @@
 #pragma once
 
 #include <Simp1e/ECS/EntityManager.h>
-#include <Simp1e/ECS/QTGraphicsItemComponent.h>
 #include <Simp1e/ECS/SystemTypeMacro.h>
+#include <Simp1e/ECS/ViewCenteredComponent.h>
 
 #include <QGraphicsView>
 
-#include "ViewCenteredComponent.h"
+#include "QTGraphicsItemComponent.h"
 
 namespace Simp1e::ECS {
 

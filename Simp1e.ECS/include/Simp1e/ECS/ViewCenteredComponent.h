@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Simp1e/ECS/ComponentTypeMacro.h>
+#include "ComponentTypeMacro.h"
 
 namespace Simp1e::ECS {
 
