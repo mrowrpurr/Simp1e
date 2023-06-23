@@ -44,10 +44,11 @@ Game   game;
 Size   levelSize{10000, 1000};
 QTimer mainLoopTimer;
 
-int  loopIteration = 0;
 void GameLoop() {
-    loopIteration++;
     game.Update();
+
+    // Run any remaining commands before the next game loop
+    game.Systems().GetSystem<CommandSystem>()->Update();
 }
 
 void SetupQtRenderSystem(Game& game, QGraphicsScene& scene) {
@@ -68,7 +69,7 @@ ManagedEntity AddPlayer(Game& game, CommandSystem& commandSystem, const QRectF& 
     auto player = game.Entities().CreateEntity();
     player.AddComponent<ViewCenteredComponent>();
     player.AddComponent<CollisionComponent>({true});
-    player.AddComponent<GravityComponent>({{.gravityFactor = 1.0}});
+    player.AddComponent<GravityComponent>({{.gravityFactor = 10.0}});
     auto* position = player.AddComponent<PositionComponent>(
         {static_cast<sreal>(sceneRect.width() / 2 - 50), static_cast<sreal>(sceneRect.height() / 2 - 50)}
     );
@@ -77,9 +78,9 @@ ManagedEntity AddPlayer(Game& game, CommandSystem& commandSystem, const QRectF& 
     player.AddComponent<OnKeyboardComponent>({[player, position, sizeComponent, image,
                                                &commandSystem](KeyboardEvent* e) {
         if (!e->pressed()) return;
-        if (e->key() == KeyboardEvent::Key::Left)
+        if (e->key() == KeyboardEvent::Key::Left || e->key() == KeyboardEvent::Key::KeyA)
             commandSystem.AddCommand<MovePlayerCommand>({player, Direction::West, 10});
-        else if (e->key() == KeyboardEvent::Key::Right)
+        else if (e->key() == KeyboardEvent::Key::Right || e->key() == KeyboardEvent::Key::KeyD)
             commandSystem.AddCommand<MovePlayerCommand>({player, Direction::East, 10});
     }});
     player.AddComponent<OnMouseClickComponent>({[player, position, image, &commandSystem](MouseClickEvent* e) {
@@ -138,7 +139,7 @@ int main(int argc, char* argv[]) {
     resizeNotificationSystem.RegisterListener(game.Events());
     game.Systems().AddSystem(&resizeNotificationSystem);
 
-    QtCollisionSystem qtCollisionSystem(game.Entities().GetEntityManager(), game.Events(), scene);
+    QtCollisionSystem qtCollisionSystem(game.Entities().GetEntityManager(), game.Events(), commandSystem, scene);
     game.Systems().AddSystem(&qtCollisionSystem);
 
     SetupQtRenderSystem(game, scene);

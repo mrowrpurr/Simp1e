@@ -44,19 +44,14 @@ namespace Simp1e::ECS {
             AddCommand(T::GetCommandType(), command);
         }
 
-        // template <typename T>
-        // void AddCommand(const CommandType& commandType, T&& command) {
-        //     AddCommand(commandType, new T(std::forward<T>(command)));
-        // }
-
-        // template <typename T>
-        // void AddCommand(T&& command) {
-        //     AddCommand(T::GetCommandType(), std::forward<T>(command));
-        // }
-
         template <typename T>
         void AddCommand() {
             AddCommand(T::GetCommandType(), new T());
+        }
+
+        template <typename T, typename... Args>
+        void AddCommand(Args&&... args) {
+            AddCommand(T::GetCommandType(), new T(std::forward<Args>(args)...));
         }
 
         void Update() {

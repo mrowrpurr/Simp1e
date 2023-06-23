@@ -22,5 +22,7 @@ namespace Simp1e {
 
         virtual const sreal& x() const { return _x; }
         virtual const sreal& y() const { return _y; }
+
+        bool operator==(const Point& other) const { return _x == other._x && _y == other._y; }
     };
 }

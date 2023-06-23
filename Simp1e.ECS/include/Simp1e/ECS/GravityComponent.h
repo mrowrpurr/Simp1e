@@ -59,7 +59,7 @@ namespace Simp1e::ECS {
                 SetDirty();
             }
         }
-        virtual void SetIsGrounded(bool isGrounded) {
+        virtual void SetIsGrounded(bool isGrounded = true) {
             if (_isGrounded != isGrounded) {
                 _isGrounded = isGrounded;
                 SetDirty();

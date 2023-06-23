@@ -16,8 +16,7 @@ namespace Simp1e {
         };
 
         Position() = default;
-        Position(sreal x, sreal y, sreal z = 0, sreal angle = 0)
-            : _point(x, y), _z(z), _angle(angle) {}
+        Position(sreal x, sreal y, sreal z = 0, sreal angle = 0) : _point(x, y), _z(z), _angle(angle) {}
         Position(const Params& params) : _point(params.point), _z(params.z), _angle(params.angle) {}
 
         virtual Point& point() { return _point; }
@@ -32,5 +31,9 @@ namespace Simp1e {
         sreal&       y() override { return _point.y(); }
         const sreal& x() const override { return _point.x(); }
         const sreal& y() const override { return _point.y(); }
+
+        bool operator==(const Position& other) const {
+            return _point == other._point && _z == other._z && _angle == other._angle;
+        }
     };
 }
