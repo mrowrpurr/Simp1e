@@ -7,6 +7,7 @@
 #include "CommandTypeMacro.h"
 #include "Entity.h"
 #include "Game.h"
+#include "GravityComponent.h"
 #include "JumpingComponent.h"
 
 namespace Simp1e::ECS {
@@ -23,6 +24,12 @@ namespace Simp1e::ECS {
         JumpCommand(const Entity& entity, sreal jumpHeight, sreal jumpSpeed)
             : _entity(entity), _jumpHeight(jumpHeight), _jumpSpeed(jumpSpeed) {}
 
-        void Execute(Game& game) { game.Entities().AddComponent<JumpingComponent>(_entity, {_jumpHeight, _jumpSpeed}); }
+        void Execute(Game& game) {
+            auto* gravityComponent = game.Entities().GetComponent<GravityComponent>(_entity);
+            if (!gravityComponent) return;
+            if (!gravityComponent->IsGrounded()) return;
+
+            game.Entities().AddComponent(_entity, JumpingComponent{_jumpHeight, _jumpSpeed});
+        }
     };
 }

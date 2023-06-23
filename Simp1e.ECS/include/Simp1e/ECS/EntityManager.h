@@ -34,9 +34,13 @@ namespace Simp1e::ECS {
 
         template <typename T>
         T* AddComponent(Entity entity, const ComponentType& componentType, T* component) {
-            if (HasComponent<T>(entity)) return GetComponent<T>(entity, componentType);
+            if (HasComponent<T>(entity)) {
+                qDebug() << "Entity " << entity << " already has component " << componentType;
+                return GetComponent<T>(entity, componentType);
+            }
 
             Events().AddingComponent(entity, componentType);
+            qDebug() << "Adding component " << componentType << " to entity " << entity;
             _components[componentType][entity] = MakeComponentPointer(component);
             _entities[entity][componentType]   = &_components[componentType][entity];
             Events().AddedComponent(entity, componentType);
@@ -45,26 +49,12 @@ namespace Simp1e::ECS {
 
         template <typename T>
         T* AddComponent(Entity entity, const ComponentType& componentType) {
-            if (HasComponent<T>(entity)) return GetComponent<T>(entity, componentType);
-
-            Events().AddingComponent(entity, componentType);
-            auto* component                    = new T();
-            _components[componentType][entity] = MakeComponentPointer(component);
-            _entities[entity][componentType]   = &_components[componentType][entity];
-            Events().AddedComponent(entity, componentType);
-            return component;
+            return AddComponent<T>(entity, componentType, new T());
         }
 
         template <typename T>
         T* AddComponent(Entity entity, const ComponentType& componentType, T&& componentValue) {
-            if (HasComponent<T>(entity)) return GetComponent<T>(entity, componentType);
-
-            Events().AddingComponent(entity, componentType);
-            auto* component                    = new T(std::forward<T>(componentValue));
-            _components[componentType][entity] = MakeComponentPointer(component);
-            _entities[entity][componentType]   = &_components[componentType][entity];
-            Events().AddedComponent(entity, componentType);
-            return component;
+            return AddComponent<T>(entity, componentType, new T(std::forward<T>(componentValue)));
         }
 
         template <typename T>
@@ -81,6 +71,8 @@ namespace Simp1e::ECS {
         T* AddComponent(Entity entity) {
             return AddComponent<T>(entity, T::GetComponentType(), new T());
         }
+
+        // add a variadic one...
 
         template <typename T>
         T* GetComponent(Entity entity, const ComponentType& componentType) {

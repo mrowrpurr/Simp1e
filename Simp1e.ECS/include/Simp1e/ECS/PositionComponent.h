@@ -50,5 +50,6 @@ namespace Simp1e::ECS {
             _position = _previousPosition;
             SetDirty();
         }
+        virtual bool HasChanged() const { return _position != _previousPosition; }
     };
 }

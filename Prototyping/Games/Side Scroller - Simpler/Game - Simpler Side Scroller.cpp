@@ -85,10 +85,7 @@ ManagedEntity AddPlayer(Game& game, CommandSystem& commandSystem, const QRectF& 
             commandSystem.AddCommand<MovePlayerCommand>({player, Direction::West, 10});
         else if (e->key() == KeyboardEvent::Key::Right || e->key() == KeyboardEvent::Key::KeyD)
             commandSystem.AddCommand<MovePlayerCommand>({player, Direction::East, 10});
-        else if (e->key() == KeyboardEvent::Key::Space) {
-            qDebug() << "Jump";
-            commandSystem.RunCommand<JumpCommand>(player, 300, 20);
-        }
+        else if (e->key() == KeyboardEvent::Key::Space) commandSystem.RunCommand<JumpCommand>(player, 500, 20);
     }});
     player.AddComponent<OnMouseClickComponent>({[player, position, image, sizeComponent,
                                                  &commandSystem](MouseClickEvent* e) {
@@ -98,7 +95,7 @@ ManagedEntity AddPlayer(Game& game, CommandSystem& commandSystem, const QRectF& 
         }
         bool isJumping = e->y() < position->y() - sizeComponent->size().height() / 2;
         if (isJumping) {
-            commandSystem.RunCommand<JumpCommand>(player, 300, 20);
+            commandSystem.RunCommand<JumpCommand>(player, 500, 20);
             return;
         }
         if (!isMoving) {
@@ -207,12 +204,11 @@ int main(int argc, char* argv[]) {
     bottomRightRectangle.AddComponent<RectangleComponent>({Color::Yellow(20)});
     bottomRightRectangle.AddComponent<TextComponent>({string_format("{}x{}", levelSize.width(), levelSize.height())});
 
-    auto middleRectangle = game.Entities().CreateEntity();
-    middleRectangle.AddComponent<PositionComponent>({levelSize.width() / 2 - 50, levelSize.height() / 2 - 50});
-    middleRectangle.AddComponent<SizeComponent>({100, 100});
-    middleRectangle.AddComponent<RectangleComponent>({Color::Cyan(20)});
-    middleRectangle.AddComponent<TextComponent>({string_format("{}x{}", levelSize.width() / 2, levelSize.height() / 2)}
-    );
+    auto platform1 = game.Entities().CreateEntity();
+    platform1.AddComponent<PositionComponent>({levelSize.width() / 2 + 600, levelSize.height() - 200});
+    platform1.AddComponent<SizeComponent>({400, 50});
+    platform1.AddComponent<RectangleComponent>({Color::Red(50)});
+    platform1.AddComponent<CollisionComponent>();
 
     AddPlayer(game, commandSystem, scene.sceneRect());
 

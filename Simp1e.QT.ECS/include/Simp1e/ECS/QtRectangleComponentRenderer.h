@@ -43,7 +43,6 @@ namespace Simp1e::ECS {
             if (rectangleComponent->GetBorderColor().has_value())
                 painter->setPen(ToQColor(rectangleComponent->GetBorderColor().value()));
 
-            qDebug() << "Drawing rectangle" << rect;
             painter->drawRect(rect);
         }
     };

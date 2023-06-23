@@ -34,7 +34,6 @@ namespace Simp1e::ECS {
             _lastViewCenteredPoint = centerPoint;
 
             _view.centerOn(centerPoint);
-            qDebug() << "Centered at point " << centerPoint;
         }
     };
 }

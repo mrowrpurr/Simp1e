@@ -6,8 +6,8 @@
 #include "CommandTypeMacro.h"
 #include "Entity.h"
 #include "Game.h"
+#include "GravityComponent.h"
 #include "PositionComponent.h"
-#include "SizeComponent.h"
 
 namespace Simp1e::ECS {
 

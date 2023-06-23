@@ -22,7 +22,6 @@ namespace Simp1e::ECS {
             auto* positionComponent = game.Entities().GetComponent<PositionComponent>(entity);
             if (positionComponent) rect.moveTopLeft(ToQPointF(positionComponent->position()));
             if (graphicsItem->GetBoundingRect() != rect) {
-                qDebug() << "SetBoundingRect to " << rect;
                 graphicsItem->SetBoundingRect(rect);
                 graphicsItem->update();
             }

@@ -29,10 +29,13 @@ namespace Simp1e::ECS {
         void Update() {
             for (auto& [entity, component] : _entityManager.GetComponents<JumpingComponent>()) {
                 if (auto* jumpingComponent = component_cast<JumpingComponent>(component)) {
+                    qDebug() << "Jump System";
+
                     auto* positionComponent = _entityManager.GetComponent<PositionComponent>(entity);
                     if (!positionComponent) continue;
 
                     if (jumpingComponent->CurrentJumpHeight() >= jumpingComponent->JumpHeight()) {
+                        qDebug() << "JumpingComponent::Update() - Jump height reached, removing component";
                         _entityManager.RemoveComponent<JumpingComponent>(entity);
                         continue;
                     }

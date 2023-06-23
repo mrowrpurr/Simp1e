@@ -21,7 +21,6 @@ namespace Simp1e::ECS {
             auto* sizeComponent = game.Entities().GetComponent<SizeComponent>(entity);
             if (sizeComponent) {
                 sizeComponent->SetDirty(true);
-                qDebug() << "Updating position of entity " << entity;
             }
         }
     };

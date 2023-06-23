@@ -60,6 +60,9 @@ namespace Simp1e::ECS {
                 if (right > collidedLeft && right < collidedRight) rightCollision = true;
             }
 
+            auto* gravityComponent = game.Entities().GetComponent<GravityComponent>(_entity);
+            gravityComponent->SetIsGrounded(false);
+
             if (bottomCollision) {
                 auto highestGround = -std::numeric_limits<sreal>::infinity();
                 for (auto& collidedEntity : _collidedEntities) {
@@ -72,7 +75,6 @@ namespace Simp1e::ECS {
                     if (collidedTop > highestGround) highestGround = collidedTop;
                 }
                 positionComponent->SetY(highestGround - sizeComponent->size().height() + 1);
-                auto* gravityComponent = game.Entities().GetComponent<GravityComponent>(_entity);
                 if (gravityComponent) {
                     gravityComponent->SetIsGrounded();
                 }
