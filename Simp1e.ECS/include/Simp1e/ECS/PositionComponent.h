@@ -9,6 +9,7 @@
 namespace Simp1e::ECS {
     class PositionComponent : public DirtyTrackingComponent {
         Position _position;
+        Position _previousPosition;
 
     public:
         SIMP1E_ECS_COMPONENT("Position")
@@ -41,5 +42,13 @@ namespace Simp1e::ECS {
         virtual sreal    x() const { return _position.x(); }
         virtual sreal    y() const { return _position.y(); }
         virtual Position position() const { return _position; }
+
+        virtual Position const previousPosition() { return _previousPosition; }
+        virtual void           SetPreviousPosition(const Position& position) { _previousPosition = position; }
+        virtual void           StoreLastPosition() { _previousPosition = _position; }
+        virtual void           RestoreLastPosition() {
+            _position = _previousPosition;
+            SetDirty();
+        }
     };
 }

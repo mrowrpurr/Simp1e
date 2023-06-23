@@ -2,6 +2,7 @@
 //
 
 #include <Simp1e/Direction.h>
+#include <Simp1e/ECS/CollisionComponent.h>
 #include <Simp1e/ECS/CommandSystem.h>
 #include <Simp1e/ECS/Game.h>
 #include <Simp1e/ECS/GravityComponent.h>
@@ -10,6 +11,7 @@
 #include <Simp1e/ECS/MouseClickInputSystem.h>
 #include <Simp1e/ECS/OnKeyboardComponent.h>
 #include <Simp1e/ECS/PositionComponent.h>
+#include <Simp1e/ECS/QtCollisionSystem.h>
 #include <Simp1e/ECS/QtImageComponentRenderer.h>
 #include <Simp1e/ECS/QtPositionComponentUpdateHandler.h>
 #include <Simp1e/ECS/QtRectangleComponentRenderer.h>
@@ -20,6 +22,7 @@
 #include <Simp1e/ECS/RectangleComponent.h>
 #include <Simp1e/ECS/ResizeNotificationSystem.h>
 #include <Simp1e/ECS/SizeComponent.h>
+#include <Simp1e/ECS/StoreLastPositionSystem.h>
 #include <Simp1e/ECS/TextComponent.h>
 #include <Simp1e/Size.h>
 #include <string_format.h>
@@ -64,7 +67,8 @@ ManagedEntity AddPlayer(Game& game, CommandSystem& commandSystem, const QRectF& 
     Size size{250, 250};
     auto player = game.Entities().CreateEntity();
     player.AddComponent<ViewCenteredComponent>();
-    player.AddComponent<GravityComponent>({{.gravityFactor = 10.0}});
+    player.AddComponent<CollisionComponent>({true});
+    player.AddComponent<GravityComponent>({{.gravityFactor = 1.0}});
     auto* position = player.AddComponent<PositionComponent>(
         {static_cast<sreal>(sceneRect.width() / 2 - 50), static_cast<sreal>(sceneRect.height() / 2 - 50)}
     );
@@ -73,7 +77,6 @@ ManagedEntity AddPlayer(Game& game, CommandSystem& commandSystem, const QRectF& 
     player.AddComponent<OnKeyboardComponent>({[player, position, sizeComponent, image,
                                                &commandSystem](KeyboardEvent* e) {
         if (!e->pressed()) return;
-
         if (e->key() == KeyboardEvent::Key::Left)
             commandSystem.AddCommand<MovePlayerCommand>({player, Direction::West, 10});
         else if (e->key() == KeyboardEvent::Key::Right)
@@ -114,6 +117,9 @@ int main(int argc, char* argv[]) {
         Systems
     */
 
+    StoreLastPositionSystem storeLastPositionSystem(game.Entities().GetEntityManager());
+    game.Systems().AddSystem(&storeLastPositionSystem);
+
     CommandSystem commandSystem(game);
     game.Systems().AddSystem(&commandSystem);
 
@@ -132,10 +138,13 @@ int main(int argc, char* argv[]) {
     resizeNotificationSystem.RegisterListener(game.Events());
     game.Systems().AddSystem(&resizeNotificationSystem);
 
-    QtViewCenteredSystem viewCenteredSystem(view, game.Entities().GetEntityManager());
-    game.Systems().AddSystem(&viewCenteredSystem);
+    QtCollisionSystem qtCollisionSystem(game.Entities().GetEntityManager(), game.Events(), scene);
+    game.Systems().AddSystem(&qtCollisionSystem);
 
     SetupQtRenderSystem(game, scene);
+
+    QtViewCenteredSystem viewCenteredSystem(view, game.Entities().GetEntityManager());
+    game.Systems().AddSystem(&viewCenteredSystem);
 
     /*
         Components
@@ -155,6 +164,7 @@ int main(int argc, char* argv[]) {
     bottomBar.AddComponent<PositionComponent>({0, levelSize.height() - 50});
     bottomBar.AddComponent<SizeComponent>({levelSize.width(), 50});
     bottomBar.AddComponent<RectangleComponent>({Color::Blue(100)});
+    bottomBar.AddComponent<CollisionComponent>();
 
     auto topLeftRectangle = game.Entities().CreateEntity();
     topLeftRectangle.AddComponent<PositionComponent>({0, 0});

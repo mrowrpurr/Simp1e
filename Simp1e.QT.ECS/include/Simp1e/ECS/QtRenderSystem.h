@@ -39,7 +39,7 @@ namespace Simp1e::ECS {
                 if (!this->_visualComponentTypes.count(componentType)) return;
                 if (_game.Entities().HasComponent<QTGraphicsItemComponent>(entity)) return;
                 auto* graphicsItemComponent = new QTGraphicsItemComponent(
-                    _scene,
+                    entity, _scene,
                     [this, entity](QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
                         painter->save();
                         PaintEntity(entity, painter, option, widget);
