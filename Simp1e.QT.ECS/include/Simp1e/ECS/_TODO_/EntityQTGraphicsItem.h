@@ -1,19 +1,19 @@
 #pragma once
 
 #include <Simp1e/ECS/Entity.h>
-#include <Simp1e/QT/QTGraphicsItem.h>
+#include <Simp1e/QT/Simp1eQGraphicsItem.h>
 
 namespace Simp1e::ECS {
 
-    class EntityQTGraphicsItem : public QTGraphicsItem {
+    class EntitySimp1eQGraphicsItem : public Simp1eQGraphicsItem {
         // So that we can get from the Qt scene item ---> an entity and its components
         Entity _entity;
 
     public:
-        EntityQTGraphicsItem(
+        EntitySimp1eQGraphicsItem(
             Entity entity, std::function<void(QPainter*, const QStyleOptionGraphicsItem*, QWidget*)> painter
         )
-            : _entity(entity), QTGraphicsItem(painter) {}
+            : _entity(entity), Simp1eQGraphicsItem(painter) {}
 
         Entity GetEntity() const { return _entity; }
     };

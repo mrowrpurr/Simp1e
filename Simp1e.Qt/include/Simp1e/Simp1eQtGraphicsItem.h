@@ -8,7 +8,7 @@
 
 namespace Simp1e {
 
-    class QTGraphicsItem : public QGraphicsItem {
+    class Simp1eQGraphicsItem : public QGraphicsItem {
         QRectF                     _boundingRect{0, 0, 0, 0};
         std::optional<std::string> _text;
         std::optional<QColor>      _borderColor;
@@ -16,7 +16,7 @@ namespace Simp1e {
         std::function<void(QPainter*, const QStyleOptionGraphicsItem*, QWidget*)> _painter = [](auto, auto, auto) {};
 
     public:
-        QTGraphicsItem(std::function<void(QPainter*, const QStyleOptionGraphicsItem*, QWidget*)> painter)
+        Simp1eQGraphicsItem(std::function<void(QPainter*, const QStyleOptionGraphicsItem*, QWidget*)> painter)
             : _painter(painter) {}
 
         void SetBoundingRect(const QRectF& boundingRect) {

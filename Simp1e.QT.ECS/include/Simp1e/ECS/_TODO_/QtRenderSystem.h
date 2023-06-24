@@ -3,7 +3,7 @@
 #include <Simp1e/ECS/ComponentType.h>
 #include <Simp1e/ECS/DirtyTrackingComponent.h>
 #include <Simp1e/ECS/Game.h>
-#include <Simp1e/ECS/QTGraphicsItemComponent.h>
+#include <Simp1e/ECS/Simp1eQGraphicsItemComponent.h>
 #include <Simp1e/ECS/SystemTypeMacro.h>
 
 #include <QGraphicsScene>
@@ -37,8 +37,8 @@ namespace Simp1e::ECS {
         QtRenderSystem(Game& game, QGraphicsScene& scene) : _game(game), _scene(scene) {
             _game.Entities().Events().OnComponentAdded([this](auto entity, auto& componentType) {
                 if (!this->_visualComponentTypes.count(componentType)) return;
-                if (_game.Entities().HasComponent<QTGraphicsItemComponent>(entity)) return;
-                auto* graphicsItemComponent = new QTGraphicsItemComponent(
+                if (_game.Entities().HasComponent<Simp1eQGraphicsItemComponent>(entity)) return;
+                auto* graphicsItemComponent = new Simp1eQGraphicsItemComponent(
                     entity, _scene,
                     [this, entity](QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
                         painter->save();
@@ -46,16 +46,16 @@ namespace Simp1e::ECS {
                         painter->restore();
                     }
                 );
-                _game.Entities().AddComponent<QTGraphicsItemComponent>(entity, graphicsItemComponent);
+                _game.Entities().AddComponent<Simp1eQGraphicsItemComponent>(entity, graphicsItemComponent);
             });
             _game.Entities().Events().OnComponentAdded([this](auto entity, auto& componentType) {
                 if (!this->_visualComponentTypes.count(componentType)) return;
-                auto* graphicsItemComponent = _game.Entities().GetComponent<QTGraphicsItemComponent>(entity);
+                auto* graphicsItemComponent = _game.Entities().GetComponent<Simp1eQGraphicsItemComponent>(entity);
                 if (graphicsItemComponent) graphicsItemComponent->update();
             });
             _game.Entities().Events().OnComponentRemoved([this](auto entity, auto& componentType) {
                 if (!this->_visualComponentTypes.count(componentType)) return;
-                auto* graphicsItemComponent = _game.Entities().GetComponent<QTGraphicsItemComponent>(entity);
+                auto* graphicsItemComponent = _game.Entities().GetComponent<Simp1eQGraphicsItemComponent>(entity);
                 if (graphicsItemComponent) graphicsItemComponent->update();
 
                 // If there are no more visual components on this entity, remove the graphics item
@@ -66,7 +66,7 @@ namespace Simp1e::ECS {
                         hasVisualComponent = true;
                         break;
                     }
-                if (!hasVisualComponent) _game.Entities().RemoveComponent<QTGraphicsItemComponent>(entity);
+                if (!hasVisualComponent) _game.Entities().RemoveComponent<Simp1eQGraphicsItemComponent>(entity);
             });
         }
 

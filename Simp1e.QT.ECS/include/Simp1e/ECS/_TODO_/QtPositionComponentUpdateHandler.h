@@ -2,7 +2,7 @@
 
 #include <Simp1e/ECS/ComponentCast.h>
 #include <Simp1e/ECS/PositionComponent.h>
-#include <Simp1e/ECS/QTGraphicsItemComponent.h>
+#include <Simp1e/ECS/Simp1eQGraphicsItemComponent.h>
 #include <Simp1e/ECS/SizeComponent.h>
 #include <Simp1e/QT/Conversions/ToQPointF.h>
 #include <Simp1e/QT/Conversions/ToQRectF.h>

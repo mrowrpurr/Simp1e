@@ -7,16 +7,17 @@
 #include <Simp1e/ECS/EventManager.h>
 #include <Simp1e/ECS/GravityComponent.h>
 #include <Simp1e/ECS/PositionComponent.h>
-#include <Simp1e/ECS/QTGraphicsItemComponent.h>
 #include <Simp1e/ECS/ResolveCollisionCommand.h>
+#include <Simp1e/ECS/Simp1eQGraphicsItemComponent.h>
 #include <Simp1e/ECS/SizeComponent.h>
 #include <Simp1e/ECS/SystemTypeMacro.h>
 
 #include <QGraphicsScene>
 #include <vector>
 
-#include "EntityQTGraphicsItem.h"
-#include "QTGraphicsItemComponent.h"
+#include "EntitySimp1eQGraphicsItem.h"
+#include "Simp1eQGraphicsItemComponent.h"
+
 
 namespace Simp1e::ECS {
 
@@ -44,7 +45,7 @@ namespace Simp1e::ECS {
                 if (!collisionComponent) continue;
                 if (!collisionComponent->RaisesEvents()) continue;
 
-                auto* graphicsItemComponent = _entityManager.GetComponent<QTGraphicsItemComponent>(entity);
+                auto* graphicsItemComponent = _entityManager.GetComponent<Simp1eQGraphicsItemComponent>(entity);
                 if (!graphicsItemComponent) continue;
 
                 auto collidingItems =
@@ -52,7 +53,7 @@ namespace Simp1e::ECS {
 
                 std::vector<Entity> collidingEntities;
                 for (auto* sceneItem : collidingItems) {
-                    if (auto* otherGraphicsItem = dynamic_cast<EntityQTGraphicsItem*>(sceneItem)) {
+                    if (auto* otherGraphicsItem = dynamic_cast<EntitySimp1eQGraphicsItem*>(sceneItem)) {
                         auto  otherEntity             = otherGraphicsItem->GetEntity();
                         auto* otherCollisionComponent = _entityManager.GetComponent<CollisionComponent>(otherEntity);
                         if (!otherCollisionComponent) continue;

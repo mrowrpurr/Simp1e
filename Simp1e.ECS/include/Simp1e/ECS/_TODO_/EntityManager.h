@@ -1,5 +1,7 @@
 #pragma once
 
+#include <_Log_.h>
+
 #include <functional>
 #include <memory>
 #include <unordered_map>
@@ -35,12 +37,13 @@ namespace Simp1e::ECS {
         template <typename T>
         T* AddComponent(Entity entity, const ComponentType& componentType, T* component) {
             if (HasComponent<T>(entity)) {
-                qDebug() << "Entity " << entity << " already has component " << componentType;
+                _Log_("Entity {} already has component {}", entity, componentType);
                 return GetComponent<T>(entity, componentType);
             }
 
             Events().AddingComponent(entity, componentType);
-            qDebug() << "Adding component " << componentType << " to entity " << entity;
+            _Log_("Adding component {} to entity {}", componentType, entity);
+
             _components[componentType][entity] = MakeComponentPointer(component);
             _entities[entity][componentType]   = &_components[componentType][entity];
             Events().AddedComponent(entity, componentType);

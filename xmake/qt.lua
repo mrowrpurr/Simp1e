@@ -30,10 +30,11 @@ function add_qt_libs()
         add_includedirs(path.join(qt_include, "QtCore"))
         add_includedirs(path.join(qt_include, "QtGui"))
         add_includedirs(path.join(qt_include, "QtWidgets"))
+        add_includedirs(path.join(qt_include, "QtSvgWidgets"))
 
         -- link
         add_linkdirs(qt_lib)
-        add_links("Qt6Core", "Qt6Gui", "Qt6Widgets") -- , "Qt63DCore", "Qt63DRender", "Qt63DExtras")
+        add_links("Qt6Core", "Qt6Gui", "Qt6Widgets", "Qt6Svg", "Qt6SvgWidgets") -- , "Qt63DCore", "Qt63DRender", "Qt63DExtras")
 
         -- compiler flag
         add_cxflags("/Zc:__cplusplus")

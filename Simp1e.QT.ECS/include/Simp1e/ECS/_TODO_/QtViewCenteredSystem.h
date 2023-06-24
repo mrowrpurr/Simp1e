@@ -6,7 +6,7 @@
 
 #include <QGraphicsView>
 
-#include "QTGraphicsItemComponent.h"
+#include "Simp1eQGraphicsItemComponent.h"
 
 namespace Simp1e::ECS {
 
@@ -25,8 +25,9 @@ namespace Simp1e::ECS {
             auto& viewCenteredEntities = _entityManager.GetComponents<ViewCenteredComponent>();
             if (viewCenteredEntities.empty()) return;
 
-            auto viewCenteredEntity         = viewCenteredEntities.begin()->first;
-            auto viewCenteredQtGraphicsItem = _entityManager.GetComponent<QTGraphicsItemComponent>(viewCenteredEntity);
+            auto viewCenteredEntity = viewCenteredEntities.begin()->first;
+            auto viewCenteredQtGraphicsItem =
+                _entityManager.GetComponent<Simp1eQGraphicsItemComponent>(viewCenteredEntity);
             if (!viewCenteredQtGraphicsItem) return;
 
             auto centerPoint = viewCenteredQtGraphicsItem->GetGraphicsItem()->GetBoundingRect().center();
