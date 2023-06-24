@@ -24,7 +24,7 @@ namespace Simp1e::ECS {
         JumpSystem(EntityManager& entityManager, CommandSystem& commandSystem)
             : _entityManager(entityManager), _commandSystem(commandSystem) {}
 
-        SIMP1E_ECS_SYSTEM("Gravity")
+        SIMP1E_ECS_SYSTEM("Jump")
 
         void Update() {
             for (auto& [entity, component] : _entityManager.GetComponents<JumpingComponent>()) {
