@@ -41,12 +41,9 @@ class ParallaxScrollingView : public QGraphicsView {
 public:
     ParallaxScrollingView(QGraphicsScene* scene) : QGraphicsView(scene) {}
 
-    void addLayer(const QString& path, qreal speed, qreal scale = 1.0) {
+    void addLayer(const QString& path, qreal speed, qreal scale = 1.0, QColor color = {0, 0, 0}) {
         QPixmap pixmap(path);
-
-        if (scale != 1.0) {
-            pixmap = pixmap.scaled(pixmap.width() * scale, pixmap.height() * scale);
-        }
+        // if (scale != 1.0) pixmap = pixmap.scaled(pixmap.width() * scale, pixmap.height() * scale);
 
         int                     requiredInstances = (this->width() / pixmap.width()) + 2;
         QVector<ParallaxLayer*> layerInstances;
@@ -54,6 +51,13 @@ public:
             ParallaxLayer* layer = new ParallaxLayer(pixmap, speed);
             layer->setX(i * pixmap.width());
             layerInstances.append(layer);
+            if (color != QColor(0, 0, 0)) {
+                // HEAP memory leak - TODO fix later :)
+                QGraphicsColorizeEffect* effect = new QGraphicsColorizeEffect;
+                effect->setColor(color);
+                effect->setStrength(0.6);
+                layer->setGraphicsEffect(effect);
+            }
             scene()->addItem(layer);
         }
         layers.append(layerInstances);
@@ -127,7 +131,7 @@ void GameLoop() { game.Update(); }
 //     scene.addItem(svg);
 // }
 
-int main(int argc, char* argv[]) {
+int mainA(int argc, char* argv[]) {
     /*
         Qt UI
     */
@@ -148,7 +152,10 @@ int main(int argc, char* argv[]) {
 
     view.addLayer("C:/Code/mrowrpurr/StockImages/shutterstock_329111897.svg", 0.5);
     view.addLayer("C:/Code/mrowrpurr/StockImages/shutterstock_1575470704 - sky removed.svg", 1.0, 0.4);
-    // view.addLayer("C:/Code/mrowrpurr/PublicDomainResources/Openclipart/297667.svg", 1);
+    view.addLayer("C:/Code/mrowrpurr/StockImages/shutterstock_1174030309.svg", 2.0, 0.7);
+    // view.addLayer("C:/Code/mrowrpurr/StockImages/shutterstock_1008024175 - with alpha.svg", 3.0, 2.1);
+    // view.addLayer("C:/Code/mrowrpurr/StockImages/shutterstock_1008024175-with-alpha.png", 3.0, 0.7, QColor{59, 29,
+    // 0});
 
     // PlayWithScrollingBackgrounds(scene);
     // SetupSystems();
@@ -160,5 +167,82 @@ int main(int argc, char* argv[]) {
 
     // QObject::connect(&mainLoopTimer, &QTimer::timeout, &app, GameLoop);
     // mainLoopTimer.start(16);
+    return app.exec();
+}
+
+/////////////////////////////////
+
+#include <QApplication>
+#include <QDockWidget>
+#include <QLabel>
+#include <QMainWindow>
+#include <QMenu>
+#include <QMenuBar>
+#include <QMessageBox>
+#include <QStatusBar>
+#include <QTabWidget>
+
+
+int main(int argc, char** argv) {
+    QApplication app(argc, argv);
+
+    QMainWindow mainWindow;
+    mainWindow.setWindowTitle("This is the main window title");
+
+    QWidget* widgetA = new QWidget;
+    QLabel*  labelA  = new QLabel("Widget A", widgetA);
+
+    mainWindow.setCentralWidget(widgetA);
+
+    QDockWidget* topDock = new QDockWidget("Widget B", &mainWindow);
+    QLabel*      labelB  = new QLabel("Widget B", topDock);
+    topDock->setWidget(labelB);
+    mainWindow.addDockWidget(Qt::TopDockWidgetArea, topDock);
+
+    QDockWidget* bottomDock = new QDockWidget("Widget C", &mainWindow);
+    QLabel*      labelC     = new QLabel("Widget C", bottomDock);
+    bottomDock->setWidget(labelC);
+    mainWindow.addDockWidget(Qt::BottomDockWidgetArea, bottomDock);
+
+    QDockWidget* tabbedDock  = new QDockWidget("Already tabbed", &mainWindow);
+    QLabel*      labelTabbed = new QLabel("Already tabbed", tabbedDock);
+    tabbedDock->setWidget(labelTabbed);
+    mainWindow.tabifyDockWidget(bottomDock, tabbedDock);
+
+    QDockWidget* leftDock = new QDockWidget("Widget D", &mainWindow);
+    QLabel*      labelD   = new QLabel("Widget D", leftDock);
+    leftDock->setWidget(labelD);
+    mainWindow.addDockWidget(Qt::LeftDockWidgetArea, leftDock);
+
+    QDockWidget* rightDock = new QDockWidget("Widget E", &mainWindow);
+    QLabel*      labelE    = new QLabel("Widget E", rightDock);
+    rightDock->setWidget(labelE);
+    mainWindow.addDockWidget(Qt::RightDockWidgetArea, rightDock);
+
+    QDockWidget* tabDock   = new QDockWidget("Widget F", &mainWindow);
+    QTabWidget*  tabWidget = new QTabWidget(tabDock);
+    QLabel*      labelTab1 = new QLabel("Tab1 contents", tabWidget);
+    QLabel*      labelTab2 = new QLabel("Tab2 contents", tabWidget);
+    tabWidget->addTab(labelTab1, "Tab1");
+    tabWidget->addTab(labelTab2, "Tab2");
+    tabDock->setWidget(tabWidget);
+    mainWindow.addDockWidget(Qt::BottomDockWidgetArea, tabDock);
+
+    QMenu*   fileMenu = mainWindow.menuBar()->addMenu("File");
+    QAction* fileItem = fileMenu->addAction("File Item");
+    QObject::connect(fileItem, &QAction::triggered, [&]() {
+        QMessageBox::information(&mainWindow, "Menu Item Selected", "You selected File Item");
+    });
+
+    QMenu*   customMenu = mainWindow.menuBar()->addMenu("Custom");
+    QAction* customItem = customMenu->addAction("Custom Item");
+    QObject::connect(customItem, &QAction::triggered, [&]() {
+        QMessageBox::information(&mainWindow, "Menu Item Selected", "You selected Custom Item");
+    });
+
+    mainWindow.statusBar()->showMessage("This is the status bar text");
+
+    mainWindow.show();
+
     return app.exec();
 }
