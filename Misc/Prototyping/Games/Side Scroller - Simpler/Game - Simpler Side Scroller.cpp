@@ -43,7 +43,7 @@ public:
 
     void addLayer(const QString& path, qreal speed, qreal scale = 1.0, QColor color = {0, 0, 0}) {
         QPixmap pixmap(path);
-        // if (scale != 1.0) pixmap = pixmap.scaled(pixmap.width() * scale, pixmap.height() * scale);
+        if (scale != 1.0) pixmap = pixmap.scaled(pixmap.width() * scale, pixmap.height() * scale);
 
         int                     requiredInstances = (this->width() / pixmap.width()) + 2;
         QVector<ParallaxLayer*> layerInstances;
@@ -110,7 +110,7 @@ private:
 };
 
 Game   game;
-Size   levelSize{10000, 1000};
+Size   levelSize{10000, 1200};
 QTimer mainLoopTimer;
 
 void GameLoop() { game.Update(); }
@@ -131,7 +131,7 @@ void GameLoop() { game.Update(); }
 //     scene.addItem(svg);
 // }
 
-int mainA(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
     /*
         Qt UI
     */
@@ -152,7 +152,8 @@ int mainA(int argc, char* argv[]) {
 
     view.addLayer("C:/Code/mrowrpurr/StockImages/shutterstock_329111897.svg", 0.5);
     view.addLayer("C:/Code/mrowrpurr/StockImages/shutterstock_1575470704 - sky removed.svg", 1.0, 0.4);
-    view.addLayer("C:/Code/mrowrpurr/StockImages/shutterstock_1174030309.svg", 2.0, 0.7);
+    view.addLayer("C:/Code/mrowrpurr/StockImages/shutterstock_1174030309.svg", 2.0, 0.85);
+
     // view.addLayer("C:/Code/mrowrpurr/StockImages/shutterstock_1008024175 - with alpha.svg", 3.0, 2.1);
     // view.addLayer("C:/Code/mrowrpurr/StockImages/shutterstock_1008024175-with-alpha.png", 3.0, 0.7, QColor{59, 29,
     // 0});
@@ -182,8 +183,7 @@ int mainA(int argc, char* argv[]) {
 #include <QStatusBar>
 #include <QTabWidget>
 
-
-int main(int argc, char** argv) {
+int main2(int argc, char** argv) {
     QApplication app(argc, argv);
 
     QMainWindow mainWindow;

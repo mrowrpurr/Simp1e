@@ -37,19 +37,20 @@ find_package(fmt CONFIG REQUIRED)
 find_package(QT NAMES Qt6 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets SvgWidgets)
 
-add_subdirectory("Simp1e")
-add_subdirectory("Simp1e.ECS")
-add_subdirectory("Simp1e.QT")
-add_subdirectory("Simp1e.QT.ECS")
+# add_subdirectory("Simp1e")
+# add_subdirectory("Simp1e.ECS")
+# add_subdirectory("Simp1e.QT")
+# add_subdirectory("Simp1e.QT.ECS")
 
 # Update to support multiple or... just... hmm.
 function(qt_project target_name main_cpp_file)
-    qt_add_executable(${target_name} MANUAL_FINALIZATION "${main_cpp_file}" "Prototyping/Games/Side Scroller - Simpler/SideScroller.qrc")
+    # qt_add_executable(${target_name} MANUAL_FINALIZATION "${main_cpp_file}" "Prototyping/Games/Side Scroller - Simpler/SideScroller.qrc")
+    qt_add_executable(${target_name} MANUAL_FINALIZATION "${main_cpp_file}")
     target_link_libraries(${target_name} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::SvgWidgets)
     get_filename_component(main_cpp_folder ${main_cpp_file} DIRECTORY)
     target_include_directories(${target_name} PRIVATE "${main_cpp_folder}")
     target_link_libraries(${target_name} PRIVATE string_format::string_format _Log_::_Log_ fmt::fmt)
-    target_link_libraries(${target_name} PRIVATE Simp1e Simp1e.ECS Simp1e.QT Simp1e.QT.ECS)
+    # target_link_libraries(${target_name} PRIVATE Simp1e Simp1e.ECS Simp1e.QT Simp1e.QT.ECS)
     set_target_properties(${target_name} PROPERTIES
         MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
         MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
@@ -60,5 +61,5 @@ function(qt_project target_name main_cpp_file)
     qt_finalize_executable(${target_name})
 endfunction()
 
-qt_project(Side_Scroller_Simpler "Prototyping/Games/Side Scroller - Simpler/Game - Simpler Side Scroller.cpp")
-qt6_add_resources(Side_Scroller_Simpler "Prototyping/Games/Side Scroller - Simpler/SideScroller.qrc")
+qt_project(Simp1e_Editor_EXE "Simp1e.Editor.Exe/Simp1e.Editor.cpp")
+# qt6_add_resources(Side_Scroller_Simpler "Prototyping/Games/Side Scroller - Simpler/SideScroller.qrc")
