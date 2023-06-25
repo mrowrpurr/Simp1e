@@ -1,0 +1,6 @@
+target("Simp1e.Editor.exe")
+    add_files("Simp1e.Editor.cpp")
+    set_kind("binary")
+    set_basename("Simp1e.Editor")
+    add_qt()
+    add_defines("_CRT_SECURE_NO_WARNINGS")

@@ -2,8 +2,6 @@ compile_commands
 bin
 build
 .xmake
-*.dll
-*.exe
 .cache
 *.xcf
 .DS_Store
