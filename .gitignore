@@ -8,3 +8,5 @@ build
 .vscode
 *.jks
 CMakeLists.txt.user
+.idea
+*build*
