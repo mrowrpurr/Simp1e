@@ -34,3 +34,11 @@ function test_target(target_name)
         end)
         add_defines("SIMP1E_TESTING")
 end
+
+----------------------------
+-- TODO : bring back testing
+-- add_requires_for_specs()
+-- includes("Tests/xmake.lua")
+-- target("Specs and Editor")
+--     set_kind("phony")
+--     add_deps("Simp1e Tests", "Simp1e Editor")
