@@ -4,7 +4,13 @@ _LogToFile_("Dynamic Library.log");
 
 #include "Structures.h"
 
-extern "C" __declspec(dllexport) void CallMe(AppStruct* app) {
+#ifdef _WIN32
+    #define EXPORT __declspec(dllexport)
+#else
+    #define EXPORT
+#endif
+
+extern "C" EXPORT void CallMe(AppStruct* app) {
     _Log_("Calling CallMe() from library");
     CoolStruct*    cool    = app->GetCoolStruct();
     AwesomeStruct* awesome = app->GetAwesomeStruct();

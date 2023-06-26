@@ -2,6 +2,7 @@ target("ExperimentalLoadingApp")
     set_kind("binary")
     add_files("App.cpp")
     add_logging_support()
+    add_string_formatting()
 
 target("ExperimentalLoadingLibrary")
     set_kind("shared")

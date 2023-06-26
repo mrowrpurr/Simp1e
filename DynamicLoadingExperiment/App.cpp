@@ -11,6 +11,9 @@ _LogToFile_("App Library Loader.log");
 #ifdef _WIN32
     #include "DynamicLibraryManager_Windows.h"
 WindowsDynamicLibraryManager TheLibraryManager;
+#else
+    #include "DynamicLibraryManager_dlfcn.h"
+DlfcnDynamicLibraryManager TheLibraryManager;
 #endif
 
 struct MyAwesomeStruct : public AwesomeStruct {
@@ -33,8 +36,6 @@ public:
 };
 
 MyAppStruct App;
-
-extern "C" __declspec(dllexport) AppStruct* GetAppStruct() { return &App; }
 
 int main() {
     TheLibraryManager.LoadLib("ExperimentalLoadingLibrary");
