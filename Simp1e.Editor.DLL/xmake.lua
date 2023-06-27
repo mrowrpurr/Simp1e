@@ -1,0 +1,5 @@
+target("Simp1e.Editor.DLL")
+    set_kind("shared")
+    add_logging_runtime()
+    add_string_formatting()
+    add_files("Simp1e.Editor.DLL.cpp")
