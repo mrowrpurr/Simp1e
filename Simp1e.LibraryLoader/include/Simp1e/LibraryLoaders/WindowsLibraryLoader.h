@@ -53,10 +53,7 @@ namespace Simp1e {
             }
             try {
                 FARPROC functionPointer = GetProcAddress(_loadedLibraries[libraryFilePath], functionName);
-                if (!functionPointer) {
-                    _Log_("Failed to get function pointer '{}' from library '{}'", functionName, libraryFilePath);
-                    return nullptr;
-                }
+                if (!functionPointer) return nullptr;
                 return reinterpret_cast<void*>(functionPointer);
             } catch (const std::exception& e) {
                 _Log_(

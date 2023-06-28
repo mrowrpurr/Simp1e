@@ -1,0 +1,7 @@
+target("Simp1e.Qt.ECS.DLL")
+    set_kind("shared")
+    set_basename("Simp1e.Qt.ECS")
+    add_logging_runtime()
+    add_string_formatting()
+    add_deps("Simp1e.ServiceHost", "Simp1e.Qt.ECS")
+    add_files("Simp1e.Qt.ECS.DLL.cpp")

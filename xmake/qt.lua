@@ -15,7 +15,7 @@ function add_3d_qt_libs()
     end
 end
 
-function add_qt_libs()
+function add_qt()
     -- Path to your Qt installation folder, including the version
     -- e.g. C:\Qt\5.12.0\msvc2017_64 or /usr/local/Qt-5.12.0
     local qt_root = os.getenv("QTROOT")
@@ -81,7 +81,8 @@ function add_qt_libs()
 end
 
 -- Call this in an existing target to configure it as a Qt application.
-function add_qt()
+function set_kind_qt_application()
+    set_kind("binary")
     add_rules("qt.console")
     -- add_rules("qt.application")
     add_rules("qt.qrc")
