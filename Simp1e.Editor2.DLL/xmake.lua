@@ -1,0 +1,7 @@
+target("Simp1e.Editor2.DLL")
+    set_kind("shared")
+    set_basename("Simp1e.Editor2")
+    add_logging_runtime()
+    add_string_formatting()
+    add_deps("Simp1e.ServiceHost", "Simp1e.ECS.Services", "Simp1e.ECS.Components.GUI")
+    add_files("Simp1e.Editor2.DLL.cpp")

@@ -1,6 +1,5 @@
 #pragma once
 
 namespace Simp1e {
-
-    struct IEntityManager {};
+    using Entity = int;
 }

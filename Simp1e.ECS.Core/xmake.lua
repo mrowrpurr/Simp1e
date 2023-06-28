@@ -1,4 +1,4 @@
-target("Simp1e.ECS")
+target("Simp1e.ECS.Core")
     set_kind("headeronly")
     add_logging()
     add_includedirs("include", {public = true})

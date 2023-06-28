@@ -1,6 +1,5 @@
 #pragma once
 
 namespace Simp1e {
-
-    struct IEventManager {};
+    using EventType = const char*;
 }
