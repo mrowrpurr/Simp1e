@@ -14,20 +14,23 @@ namespace Simp1e {
 
     public:
         IEnvironment* CreateEnvironment(const char* name) override {
-            if (EnvironmentExists(name)) return nullptr;
+            auto* existing = GetEnvironment(name);
+            if (existing) return existing;
             auto* environment   = new Environment();
             _environments[name] = std::unique_ptr<Environment>(environment);
             return environment;
         }
 
         IEnvironment* GetEnvironment(const char* name) override {
-            if (!EnvironmentExists(name)) return nullptr;
-            return _environments[name].get();
+            auto found = _environments.find(name);
+            if (found == _environments.end()) return nullptr;
+            return found->second.get();
         }
 
         void DestroyEnvironment(const char* name) override {
-            if (!EnvironmentExists(name)) return;
-            _environments.erase(name);
+            auto found = _environments.find(name);
+            if (found == _environments.end()) return;
+            _environments.erase(found);
         }
 
         bool EnvironmentExists(const char* name) override { return _environments.find(name) != _environments.end(); }

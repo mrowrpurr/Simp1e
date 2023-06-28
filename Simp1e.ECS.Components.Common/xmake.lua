@@ -1,5 +1,5 @@
-target("Simp1e.ECS.Services")
+target("Simp1e.ECS.Components.Common")
     set_kind("headeronly")
+    add_deps("Simp1e.ECS.Components.Core")
     add_includedirs("include", {public = true})
     add_headerfiles("include/(**.h)")
-    add_deps("Simp1e.ECS")

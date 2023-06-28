@@ -1,5 +1,5 @@
 target("Simp1e.Qt.ECS.DLL")
-    set_kind("shared")
+    set_kind_qt_shared_library()
     set_basename("Simp1e.Qt.ECS")
     add_logging_runtime()
     add_string_formatting()

@@ -1,5 +1,5 @@
 target("Simp1e.Editor.Exe")
-    set_kind("binary")
+    set_kind_qt_application()
     set_basename("Simp1e")
     add_logging_runtime()
     add_string_formatting()

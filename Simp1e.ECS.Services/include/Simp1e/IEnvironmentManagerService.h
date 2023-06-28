@@ -1,12 +1,11 @@
 #pragma once
 
 #include <Simp1e/IEnvironmentManager.h>
-#include <Simp1e/ServiceDefinition.h>
 
 namespace Simp1e {
 
     struct IEnvironmentManagerService {
-        SIMP1E_SERVICE("EnvironmentManager")
+        static const char* GetServiceName() { return "EnvironmentManager"; }
 
         virtual ~IEnvironmentManagerService() = default;
 
