@@ -9,3 +9,4 @@ add_requires_for_logging()
 add_requires_for_string_formatting()
 
 includes("Simp1e*/xmake.lua")
+includes("Experimentation/xmake.lua")

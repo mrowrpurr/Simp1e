@@ -4,9 +4,11 @@
 #include <Simp1e/ComponentTypeHashKey.h>
 #include <Simp1e/EntityEventManager.h>
 #include <Simp1e/IEntityManager.h>
+#include <_Log_.h>
 
 #include <atomic>
 #include <unordered_map>
+
 
 namespace Simp1e {
 
@@ -39,13 +41,6 @@ namespace Simp1e {
         }
         bool EntityExists(Entity entity) override { return _entities.find(entity) != _entities.end(); }
 
-        void* AddComponentPointer(Entity entity, ComponentType componentType, void* component) override {
-            _eventManager.ComponentAdding(entity, componentType);
-            _componentPointers[componentType][entity] = component;
-            _entities[entity][componentType]          = component;
-            _eventManager.ComponentAdded(entity, componentType);
-            return component;
-        }
         void RemoveComponent(Entity entity, ComponentType componentType) override {
             _eventManager.ComponentRemoving(entity, componentType);
             _componentPointers[componentType].erase(entity);
@@ -68,6 +63,16 @@ namespace Simp1e {
             auto componentMap = _componentPointers.find(componentType);
             if (componentMap == _componentPointers.end()) return;
             for (auto& [entity, component] : componentMap->second) callback(entity, component);
+        }
+
+        template <typename T>
+        T* AddComponent(Entity entity, T* component) {
+            _Log_("[EntityPointerManager] AddComponent");
+            _eventManager.ComponentAdding(entity, T::GetComponentType());
+            _componentPointers[T::GetComponentType()][entity] = component;
+            _entities[entity][T::GetComponentType()]          = component;
+            _eventManager.ComponentAdded(entity, T::GetComponentType());
+            return component;
         }
     };
 }

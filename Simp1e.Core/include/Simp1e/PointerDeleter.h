@@ -8,8 +8,8 @@ namespace Simp1e {
     public:
         void SetDeletesPointer(bool deletesPointer = true) { _deletesPointer = deletesPointer; }
         bool DeletesPointer() const { return _deletesPointer; }
-        void operator()(T* ptr) const {
-            if (_deletesPointer) delete ptr;
+        void operator()(void* ptr) const {
+            if (_deletesPointer) delete static_cast<T*>(ptr);
         }
     };
 }

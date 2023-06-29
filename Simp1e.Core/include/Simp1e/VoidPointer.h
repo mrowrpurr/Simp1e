@@ -13,3 +13,10 @@ namespace Simp1e {
         return VoidPointer(new VoidPointerBaseTyped<T>(ptr));
     }
 }
+
+namespace std {
+    template <typename T>
+    Simp1e::VoidPointer make_void_pointer(T* ptr) {
+        return Simp1e::MakeVoidPointer(ptr);
+    }
+}
