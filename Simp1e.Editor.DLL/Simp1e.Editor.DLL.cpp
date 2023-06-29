@@ -26,15 +26,30 @@ EntityPointerManagerClient* _EntityManager;
 
 OnSimp1eLoad {
     _Log_("Hi from Editor Load()");
-    auto* quickTest    = new SomeComponent("Quick Test");
-    _ECSManagerService = Simp1eServices->GetService<IECSManagerService>();
-    _ECSManager        = _ECSManagerService->GetECSManager();
-    _ECS               = _ECSManager->CreateECS(ENVIRONMENT_NAME);
-    _ECSManagerServiceClient.SetEntityManager(_ECS->GetEntityManager());
+    auto* quickTest                      = new SomeComponent("Quick Test");
+    _ECSManagerService                   = Simp1eServices->GetService<IECSManagerService>();
+    _ECSManager                          = _ECSManagerService->GetECSManager();
+    _ECS                                 = _ECSManager->CreateECS(ENVIRONMENT_NAME);
+    IEntityManager* serviceEntityManager = _ECS->GetEntityManager();
+    _ECSManagerServiceClient.SetEntityManager(serviceEntityManager);
     _EntityManager = _ECSManagerServiceClient.GetEntityManager();
-    _Log_("Setup the things, now adding components");
-    _EntityManager->AddComponent<SomeComponent>(1, "Hello");
-    _EntityManager->AddComponent<SomeComponent>(2, "World");
+
+    _Log_("Setup the things, now adding centities");
+    auto entity1 = _EntityManager->CreateEntity();
+    auto entity2 = _EntityManager->CreateEntity();
+
+    _Log_("Adding components");
+    _EntityManager->AddComponent<SomeComponent>(entity1, "Hello");
+    _EntityManager->AddComponent<SomeComponent>(entity2, "World");
+    _Log_("????? Let's read from the interface/pointer storage");
+
+    auto* pointerEntityManager = dynamic_cast<EntityPointerManager*>(serviceEntityManager);
+
+    // serviceEntityManager->ForEachComponent<SomeComponent>([](Entity, void*) {
+    // serviceEntityManager->ForEachComponent(SomeComponent::GetComponentType(), [](Entity, void*) {
+    pointerEntityManager->ForEachComponent(SomeComponent::GetComponentType(), [](Entity, void*) {
+        _Log_("ForEachComponent<SomeComponent> callback");
+    });
     _Log_("DONE");
 }
 

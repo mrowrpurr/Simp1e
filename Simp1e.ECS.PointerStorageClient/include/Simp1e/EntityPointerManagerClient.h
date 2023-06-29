@@ -19,9 +19,13 @@ namespace Simp1e {
 
         IEntityEventManager* GetEventManager() override { return _entityManager->GetEventManager(); }
 
-        Entity CreateEntity() override { return _entityManager->CreateEntity(); }
-        void   DestroyEntity(Entity entity) override { _entityManager->DestroyEntity(entity); }
-        bool   EntityExists(Entity entity) override { return _entityManager->EntityExists(entity); }
+        Entity CreateEntity() override {
+            if (!_entityManager) _Log_("[EntityPointerManagerClient] CreateEntity - entity manager is null");
+            _Log_("[EntityPointerManagerClient] CreateEntity - calling entity manager create entity...");
+            return _entityManager->CreateEntity();
+        }
+        void DestroyEntity(Entity entity) override { _entityManager->DestroyEntity(entity); }
+        bool EntityExists(Entity entity) override { return _entityManager->EntityExists(entity); }
 
         void RemoveComponent(Entity entity, ComponentType componentType) override {
             _entityManager->RemoveComponent(entity, componentType);

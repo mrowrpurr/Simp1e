@@ -2,13 +2,13 @@
 
 #include <Simp1e/ComponentTypeFromHashKey.h>
 #include <Simp1e/ComponentTypeHashKey.h>
+#include <Simp1e/ComponentTypeToHashKey.h>
 #include <Simp1e/EntityEventManager.h>
 #include <Simp1e/IEntityManager.h>
 #include <_Log_.h>
 
 #include <atomic>
 #include <unordered_map>
-
 
 namespace Simp1e {
 
@@ -22,12 +22,14 @@ namespace Simp1e {
         IEntityEventManager* GetEventManager() override { return &_eventManager; }
 
         Entity CreateEntity() override {
+            _Log_("[EntityPointerManager] CreateEntity");
             auto entity       = _nextEntity++;
             _entities[entity] = {};
             _eventManager.EntityCreated(entity);
             return entity;
         }
         void DestroyEntity(Entity entity) override {
+            _Log_("[EntityPointerManager] DestroyEntity");
             _eventManager.EntityDestroying(entity);
             _entities.erase(entity);
             for (auto& [componentType, componentMap] : _componentPointers) {
@@ -53,6 +55,7 @@ namespace Simp1e {
             return entityMap->second.find(componentType) != entityMap->second.end();
         }
         void* GetComponentPointer(Entity entity, ComponentType componentType) const override {
+            _Log_("GetComponentPointer of type {}", componentType);
             auto entityMap = _entities.find(entity);
             if (entityMap == _entities.end()) return nullptr;
             auto found = entityMap->second.find(componentType);
@@ -60,14 +63,16 @@ namespace Simp1e {
             return found->second;
         }
         void ForEachComponent(ComponentType componentType, void (*callback)(Entity, void*)) override {
-            auto componentMap = _componentPointers.find(componentType);
+            _Log_("[EntityPointerManager] ForEachComponent of type {}", componentType);
+            ComponentTypeHashKey key          = ComponentTypeToHashKey(componentType);
+            auto                 componentMap = _componentPointers.find(key);
             if (componentMap == _componentPointers.end()) return;
             for (auto& [entity, component] : componentMap->second) callback(entity, component);
         }
 
         template <typename T>
         T* AddComponent(Entity entity, T* component) {
-            _Log_("[EntityPointerManager] AddComponent");
+            _Log_("[EntityPointerManager] AddComponent of type {}", T::GetComponentType());
             _eventManager.ComponentAdding(entity, T::GetComponentType());
             _componentPointers[T::GetComponentType()][entity] = component;
             _entities[entity][T::GetComponentType()]          = component;
