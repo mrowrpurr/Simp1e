@@ -2,7 +2,14 @@
 
 namespace Simp1e {
     template <typename T>
-    struct PointerDeleter {
-        void operator()(T* ptr) const { delete ptr; }
+    class PointerDeleter {
+        bool _deletesPointer = true;
+
+    public:
+        void SetDeletesPointer(bool deletesPointer = true) { _deletesPointer = deletesPointer; }
+        bool DeletesPointer() const { return _deletesPointer; }
+        void operator()(T* ptr) const {
+            if (_deletesPointer) delete ptr;
+        }
     };
 }

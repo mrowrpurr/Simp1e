@@ -16,6 +16,12 @@ namespace Simp1e {
         VoidPointerBaseTyped& operator=(const VoidPointerBaseTyped&) = delete;
 
     public:
+        void* void_pointer() const override { return _pointer.get(); }
+        void  set_destruct_on_delete(bool destruct_on_delete) override {
+            _pointer.get_deleter().SetDeletesPointer(destruct_on_delete);
+        }
+        bool does_destruct_on_delete() const override { return _pointer.get_deleter().DeletesPointer(); }
+
         VoidPointerBaseTyped(T* pointer) : _pointer(pointer) {}
         ~VoidPointerBaseTyped() override = default;
     };
