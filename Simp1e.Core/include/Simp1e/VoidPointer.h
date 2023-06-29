@@ -6,7 +6,7 @@
 
 namespace Simp1e {
 
-    using VoidPointer = std::unique_ptr<void, VoidPointerBase>;
+    using VoidPointer = std::unique_ptr<VoidPointerBase>;
 
     template <typename T>
     VoidPointer MakeVoidPointer(T* ptr) {

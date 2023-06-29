@@ -20,6 +20,13 @@ namespace Simp1e {
         virtual void* GetComponentPointer(Entity entity, ComponentType componentType) const            = 0;
         virtual void  ForEachComponent(ComponentType componentType, void (*callback)(Entity, void*))   = 0;
 
+        // template <typename T, typename... Args>
+        // T* AddComponent(Entity entity, Args&&... args) {
+        //     auto* component = new T(std::forward<Args>(args)...);
+        //     // _componentMap[T::GetComponentType()][entity] = MakeVoidPointer(component);
+        //     return component;
+        // }
+
         template <typename T>
         T* AddComponentPointer(Entity entity, T* component) {
             auto* componentPointer = AddComponentPointer(entity, T::GetComponentType(), component);

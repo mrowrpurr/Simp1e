@@ -11,6 +11,10 @@ namespace Simp1e {
     class VoidPointerBaseTyped : public VoidPointerBase {
         std::unique_ptr<void, PointerDeleter<T>> _pointer;
 
+        // Disable copy constructor and copy assignment operator
+        VoidPointerBaseTyped(const VoidPointerBaseTyped&)            = delete;
+        VoidPointerBaseTyped& operator=(const VoidPointerBaseTyped&) = delete;
+
     public:
         VoidPointerBaseTyped(T* pointer) : _pointer(pointer) {}
         ~VoidPointerBaseTyped() override = default;

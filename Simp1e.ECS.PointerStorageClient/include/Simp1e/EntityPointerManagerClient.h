@@ -41,11 +41,11 @@ namespace Simp1e {
             _entityManager->ForEachComponent(componentType, callback);
         }
 
-        template <typename T, typename... Args>
-        T* AddComponent(Entity entity, Args&&... args) {
-            auto* component                              = new T(std::forward<Args>(args)...);
-            _componentMap[T::GetComponentType()][entity] = MakeVoidPointer(component);
-            return component;
-        }
+        // template <typename T, typename... Args>
+        // T* AddComponent(Entity entity, Args&&... args) {
+        //     auto* component                              = new T(std::forward<Args>(args)...);
+        //     _componentMap[T::GetComponentType()][entity] = MakeVoidPointer(component);
+        //     return component;
+        // }
     };
 }
