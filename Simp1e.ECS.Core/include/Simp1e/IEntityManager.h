@@ -14,10 +14,9 @@ namespace Simp1e {
         virtual void   DestroyEntity(Entity entity) = 0;
         virtual bool   EntityExists(Entity entity)  = 0;
 
-        virtual void  RemoveComponent(Entity entity, ComponentType componentType)                      = 0;
-        virtual bool  HasComponent(Entity entity, ComponentType componentType) const                   = 0;
-        virtual void* GetComponentPointer(Entity entity, ComponentType componentType) const            = 0;
-        virtual void  ForEachComponent(ComponentType componentType, void (*callback)(Entity, void*))   = 0;
-        virtual void  AddComponentPointer(Entity entity, ComponentType componentType, void* component) = 0;
+        virtual void  RemoveComponent(Entity entity, ComponentType componentType)                    = 0;
+        virtual bool  HasComponent(Entity entity, ComponentType componentType) const                 = 0;
+        virtual void* GetComponentPointer(Entity entity, ComponentType componentType) const          = 0;
+        virtual void  ForEachComponent(ComponentType componentType, void (*callback)(Entity, void*)) = 0;
     };
 }

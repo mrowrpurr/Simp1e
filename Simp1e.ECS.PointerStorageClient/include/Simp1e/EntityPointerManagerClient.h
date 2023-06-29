@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Simp1e/ComponentTypeHashKey.h>
-#include <Simp1e/EntityPointerManager.h>
+#include <Simp1e/IEntityPointerManager.h>
 #include <Simp1e/VoidPointer.h>
 #include <_Log_.h>
 
@@ -11,11 +11,11 @@
 namespace Simp1e {
 
     class EntityPointerManagerClient : public IEntityManager {
-        EntityPointerManager*                                                             _entityManager;
+        IEntityPointerManager*                                                            _entityManager;
         std::unordered_map<ComponentTypeHashKey, std::unordered_map<Entity, VoidPointer>> _componentMap;
 
     public:
-        EntityPointerManagerClient(EntityPointerManager* entityManager) : _entityManager(entityManager) {}
+        EntityPointerManagerClient(IEntityPointerManager* entityManager) : _entityManager(entityManager) {}
 
         IEntityEventManager* GetEventManager() override { return _entityManager->GetEventManager(); }
 
@@ -48,14 +48,10 @@ namespace Simp1e {
 
         template <typename T, typename... Args>
         T* AddComponent(Entity entity, Args&&... args) {
-            _Log_("!! [EntityPointerManagerClient] AddComponent");
             auto* component                              = new T(std::forward<Args>(args)...);
             _componentMap[T::GetComponentType()][entity] = MakeVoidPointer(component);
-            _Log_("!! Calling entity manager AddComponentPointer() hmm");
             _entityManager->AddComponentPointer(entity, T::GetComponentType(), component);
             return component;
         }
-
-        void AddComponentPointer(Entity entity, ComponentType componentType, void* component) override {}
     };
 }

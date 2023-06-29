@@ -4,15 +4,16 @@
 #include <Simp1e/ComponentTypeHashKey.h>
 #include <Simp1e/ComponentTypeToHashKey.h>
 #include <Simp1e/EntityEventManager.h>
-#include <Simp1e/IEntityManager.h>
 #include <_Log_.h>
 
 #include <atomic>
 #include <unordered_map>
 
+#include "IEntityPointerManager.h"
+
 namespace Simp1e {
 
-    class EntityPointerManager : public IEntityManager {
+    class EntityPointerManager : public IEntityPointerManager {
         std::atomic<Entity>                                                         _nextEntity = 0;
         std::unordered_map<ComponentTypeHashKey, std::unordered_map<Entity, void*>> _componentPointers;
         std::unordered_map<Entity, std::unordered_map<ComponentTypeHashKey, void*>> _entities;
@@ -75,7 +76,6 @@ namespace Simp1e {
             for (auto& [entity, component] : componentMap->second) callback(entity, component);
         }
 
-        // void AddComponentPointer(Entity entity, ComponentType componentType, void* component) {
         void AddComponentPointer(Entity entity, ComponentType componentType, void* component) override {
             _Log_("[EntityPointerManager] AddComponentPointer of type {}", componentType);
             _eventManager.ComponentAdding(entity, componentType);

@@ -41,10 +41,11 @@ OnSimp1eLoad {
     _Log_("Adding components");
     _EntityManager->AddComponent<SomeComponent>(entity1, "Hello");
     _EntityManager->AddComponent<SomeComponent>(entity2, "World");
-    _Log_("??????????? Let's read from the interface/pointer storage");
 
-    serviceEntityManager->ForEachComponent(SomeComponent::GetComponentType(), [](Entity, void*) {
+    serviceEntityManager->ForEachComponent(SomeComponent::GetComponentType(), [](Entity entity, void* component) {
         _Log_("ForEachComponent<SomeComponent> callback");
+        auto* someComponent = static_cast<SomeComponent*>(component);
+        _Log_("Entity {} has component text {}", entity, someComponent->text);
     });
     _Log_("DONE");
 }
