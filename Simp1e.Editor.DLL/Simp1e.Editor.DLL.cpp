@@ -41,13 +41,9 @@ OnSimp1eLoad {
     _Log_("Adding components");
     _EntityManager->AddComponent<SomeComponent>(entity1, "Hello");
     _EntityManager->AddComponent<SomeComponent>(entity2, "World");
-    _Log_("????? Let's read from the interface/pointer storage");
+    _Log_("??????????? Let's read from the interface/pointer storage");
 
-    auto* pointerEntityManager = dynamic_cast<EntityPointerManager*>(serviceEntityManager);
-
-    // serviceEntityManager->ForEachComponent<SomeComponent>([](Entity, void*) {
-    // serviceEntityManager->ForEachComponent(SomeComponent::GetComponentType(), [](Entity, void*) {
-    pointerEntityManager->ForEachComponent(SomeComponent::GetComponentType(), [](Entity, void*) {
+    serviceEntityManager->ForEachComponent(SomeComponent::GetComponentType(), [](Entity, void*) {
         _Log_("ForEachComponent<SomeComponent> callback");
     });
     _Log_("DONE");

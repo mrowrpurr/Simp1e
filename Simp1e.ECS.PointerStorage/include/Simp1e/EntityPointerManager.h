@@ -28,6 +28,7 @@ namespace Simp1e {
             _eventManager.EntityCreated(entity);
             return entity;
         }
+
         void DestroyEntity(Entity entity) override {
             _Log_("[EntityPointerManager] DestroyEntity");
             _eventManager.EntityDestroying(entity);
@@ -41,6 +42,7 @@ namespace Simp1e {
             }
             _eventManager.EntityDestroyed(entity);
         }
+
         bool EntityExists(Entity entity) override { return _entities.find(entity) != _entities.end(); }
 
         void RemoveComponent(Entity entity, ComponentType componentType) override {
@@ -49,11 +51,13 @@ namespace Simp1e {
             _entities[entity].erase(componentType);
             _eventManager.ComponentRemoved(entity, componentType);
         }
+
         bool HasComponent(Entity entity, ComponentType componentType) const override {
             auto entityMap = _entities.find(entity);
             if (entityMap == _entities.end()) return false;
             return entityMap->second.find(componentType) != entityMap->second.end();
         }
+
         void* GetComponentPointer(Entity entity, ComponentType componentType) const override {
             _Log_("GetComponentPointer of type {}", componentType);
             auto entityMap = _entities.find(entity);
@@ -62,6 +66,7 @@ namespace Simp1e {
             if (found == entityMap->second.end()) return nullptr;
             return found->second;
         }
+
         void ForEachComponent(ComponentType componentType, void (*callback)(Entity, void*)) override {
             _Log_("[EntityPointerManager] ForEachComponent of type {}", componentType);
             ComponentTypeHashKey key          = ComponentTypeToHashKey(componentType);
@@ -70,14 +75,13 @@ namespace Simp1e {
             for (auto& [entity, component] : componentMap->second) callback(entity, component);
         }
 
-        template <typename T>
-        T* AddComponent(Entity entity, T* component) {
-            _Log_("[EntityPointerManager] AddComponent of type {}", T::GetComponentType());
-            _eventManager.ComponentAdding(entity, T::GetComponentType());
-            _componentPointers[T::GetComponentType()][entity] = component;
-            _entities[entity][T::GetComponentType()]          = component;
-            _eventManager.ComponentAdded(entity, T::GetComponentType());
-            return component;
+        // void AddComponentPointer(Entity entity, ComponentType componentType, void* component) {
+        void AddComponentPointer(Entity entity, ComponentType componentType, void* component) override {
+            _Log_("[EntityPointerManager] AddComponentPointer of type {}", componentType);
+            _eventManager.ComponentAdding(entity, componentType);
+            _componentPointers[componentType][entity] = component;
+            _entities[entity][componentType]          = component;
+            _eventManager.ComponentAdded(entity, componentType);
         }
     };
 }
