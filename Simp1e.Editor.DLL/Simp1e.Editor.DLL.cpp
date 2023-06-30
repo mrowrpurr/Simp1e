@@ -21,7 +21,14 @@ struct SomeComponent {
 
 struct SomeSystem {
     static SystemType GetSystemType() { return "SomeSystem"; }
-    void              Update() { _Log_("SomeSystem update!"); }  // TODO update this so it gets an IEntityManager*
+    void              Update(IEnvironment* environment) {
+        _Log_("SomeSystem update WITH ENVIRONMENT!!!");
+
+        environment->GetEntityManager()->ForEachComponent<SomeComponent>([](Entity entity, void* component) {
+            auto* someComponent = static_cast<SomeComponent*>(component);
+            _Log_("FROM SYSTEM Component text: {}", someComponent->text);
+        });
+    }
 };
 
 OnSimp1eLoad {
@@ -44,7 +51,7 @@ OnSimp1eLoad {
 
                 SystemPointerManagerClient systemManager(environment->GetSystemManager());
                 systemManager.AddSystem<SomeSystem>();
-                systemManager.Update();
+                systemManager.Update(environment);
             }
         }
     }

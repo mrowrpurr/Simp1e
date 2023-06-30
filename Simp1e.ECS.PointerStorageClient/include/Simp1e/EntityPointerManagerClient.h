@@ -51,10 +51,5 @@ namespace Simp1e {
             _entityManager->AddComponentPointer(entity, T::GetComponentType(), component);
             return component;
         }
-
-        template <typename T>
-        void ForEachComponent(void (*callback)(Entity, void*)) {
-            ForEachComponent(T::GetComponentType(), callback);
-        }
     };
 }

@@ -21,11 +21,14 @@ namespace Simp1e {
         SystemPointerManagerClient(ISystemManager* systemManager)
             : _systemManager(dynamic_cast<ISystemPointerManager*>(systemManager)) {}
 
-        void Update() override { _systemManager->Update(); }
+        void Update(IEnvironment* environment) override { _systemManager->Update(environment); }
 
         template <typename T>
         T* AddSystemPointer(SystemType systemType, T* system) {
-            auto* systemExecutable         = new Executable([system]() { system->Update(); });
+            auto* systemExecutable         = new Executable([system](void* environmentPointer) {
+                auto* environment = static_cast<IEnvironment*>(environmentPointer);
+                system->Update(environment);
+            });
             _systems[systemType]           = MakeVoidPointer(system);
             _systemExecutables[systemType] = std::unique_ptr<IExecutable>(systemExecutable);
             _systemManager->AddSystemPointer(systemType, systemExecutable);

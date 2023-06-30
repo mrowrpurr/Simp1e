@@ -11,6 +11,11 @@ namespace Simp1e {
 
     public:
         Executable(std::function<void*(void*)> execute) : _execute(execute) {}
+        Executable(std::function<void(void*)> execute)
+            : _execute([execute](void* data) {
+                  execute(data);
+                  return nullptr;
+              }) {}
         Executable(std::function<void()> execute)
             : _execute([execute](void*) {
                   execute();
