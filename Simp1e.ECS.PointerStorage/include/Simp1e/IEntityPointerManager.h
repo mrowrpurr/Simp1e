@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Simp1e/IEntityManager.h>
-#include <_Log_.h>
 
 namespace Simp1e {
 

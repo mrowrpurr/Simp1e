@@ -5,6 +5,7 @@ _LogToFile_("Simp1e.Editor.log");
 #include <Simp1e/IEnvironmentManagerService.h>
 #include <Simp1e/LabelComponent.h>
 #include <Simp1e/ServiceHostClient.h>
+#include <Simp1e/SystemPointerManagerClient.h>
 
 #include <memory>
 
@@ -13,9 +14,14 @@ using namespace Simp1e;
 constexpr auto* ENVIRONMENT_NAME = "Default";
 
 struct SomeComponent {
-    const char*        text;
-    static const char* GetComponentType() { return "SomeComponent"; }
+    const char*          text;
+    static ComponentType GetComponentType() { return "SomeComponent"; }
     SomeComponent(const char* text) : text(text) {}
+};
+
+struct SomeSystem {
+    static SystemType GetSystemType() { return "SomeSystem"; }
+    void              Update() { _Log_("SomeSystem update!"); }  // TODO update this so it gets an IEntityManager*
 };
 
 OnSimp1eLoad {
@@ -23,8 +29,7 @@ OnSimp1eLoad {
     if (auto* environmentManagerService = Simp1eServices->GetService<IEnvironmentManagerService>()) {
         if (auto* environmentManager = environmentManagerService->GetEnvironmentManager()) {
             if (auto* environment = environmentManager->GetEnvironment(ENVIRONMENT_NAME)) {
-                auto*                      removeEntityManager = environment->GetEntityManager();
-                EntityPointerManagerClient entityManager(removeEntityManager);
+                EntityPointerManagerClient entityManager(environment->GetEntityManager());
 
                 auto entity1 = entityManager.CreateEntity();
                 entityManager.AddComponent<SomeComponent>(entity1, "Hello, World");
@@ -36,6 +41,10 @@ OnSimp1eLoad {
                     auto* someComponent = static_cast<SomeComponent*>(component);
                     _Log_("Component text: {}", someComponent->text);
                 });
+
+                SystemPointerManagerClient systemManager(environment->GetSystemManager());
+                systemManager.AddSystem<SomeSystem>();
+                systemManager.Update();
             }
         }
     }

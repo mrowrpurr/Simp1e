@@ -5,6 +5,8 @@ _LogToFile_("Simp1e.ECS.log");
 #include <Simp1e/Environment.h>
 #include <Simp1e/EnvironmentManagerService.h>
 #include <Simp1e/ServiceHostClient.h>
+#include <Simp1e/SystemPointerManager.h>
+
 
 // Default empty structs:
 #include <Simp1e/CommandManager.h>
@@ -13,8 +15,8 @@ _LogToFile_("Simp1e.ECS.log");
 
 using namespace Simp1e;
 
-EnvironmentManagerService                                                      _environmentManagerService;
-Environment<EntityPointerManager, SystemManager, EventManager, CommandManager> _environment;
+EnvironmentManagerService                                                             _environmentManagerService;
+Environment<EntityPointerManager, SystemPointerManager, EventManager, CommandManager> _environment;
 
 OnSimp1eInit {
     _Log_("Registering ECS Environment Manager service");
