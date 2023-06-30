@@ -1,6 +1,6 @@
 # `Simp1e`.`ECS`.`DLL`
 
-The `Simp1e.ECS.dll/so/dylib` executable target.
+The `Simp1e.ECS.dll/so/dylib` target.
 
 Loaded dynamically by `Simp1e.exe` at runtime.
 

@@ -70,8 +70,7 @@ namespace Simp1e {
 
         void ForEachComponent(ComponentType componentType, void (*callback)(Entity, void*)) override {
             _Log_("[EntityPointerManager] ForEachComponent of type {}", componentType);
-            ComponentTypeHashKey key          = ComponentTypeToHashKey(componentType);
-            auto                 componentMap = _componentPointers.find(key);
+            auto componentMap = _componentPointers.find(componentType);
             if (componentMap == _componentPointers.end()) return;
             for (auto& [entity, component] : componentMap->second) callback(entity, component);
         }

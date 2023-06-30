@@ -16,14 +16,12 @@ namespace Simp1e {
 
     public:
         EntityPointerManagerClient(IEntityPointerManager* entityManager) : _entityManager(entityManager) {}
+        EntityPointerManagerClient(IEntityManager* entityManager)
+            : _entityManager(dynamic_cast<IEntityPointerManager*>(entityManager)) {}
 
         IEntityEventManager* GetEventManager() override { return _entityManager->GetEventManager(); }
 
-        Entity CreateEntity() override {
-            if (!_entityManager) _Log_("[EntityPointerManagerClient] CreateEntity - entity manager is null");
-            _Log_("[EntityPointerManagerClient] CreateEntity - calling entity manager create entity...");
-            return _entityManager->CreateEntity();
-        }
+        Entity CreateEntity() override { return _entityManager->CreateEntity(); }
 
         void DestroyEntity(Entity entity) override { _entityManager->DestroyEntity(entity); }
 
@@ -52,6 +50,11 @@ namespace Simp1e {
             _componentMap[T::GetComponentType()][entity] = MakeVoidPointer(component);
             _entityManager->AddComponentPointer(entity, T::GetComponentType(), component);
             return component;
+        }
+
+        template <typename T>
+        void ForEachComponent(void (*callback)(Entity, void*)) {
+            ForEachComponent(T::GetComponentType(), callback);
         }
     };
 }

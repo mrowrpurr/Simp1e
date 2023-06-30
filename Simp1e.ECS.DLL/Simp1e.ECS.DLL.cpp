@@ -1,16 +1,27 @@
 #include <_Log_.h>
 _LogToFile_("Simp1e.ECS.log");
 
-#include <Simp1e/ECSManagerService.h>
 #include <Simp1e/EntityPointerManager.h>
+#include <Simp1e/Environment.h>
+#include <Simp1e/EnvironmentManagerService.h>
 #include <Simp1e/ServiceHostClient.h>
+
+// Default empty structs:
+#include <Simp1e/CommandManager.h>
+#include <Simp1e/EventManager.h>
+#include <Simp1e/SystemManager.h>
 
 using namespace Simp1e;
 
-ECSManagerService<EntityPointerManager> _ECSManagerService;
+EnvironmentManagerService                                                      _environmentManagerService;
+Environment<EntityPointerManager, SystemManager, EventManager, CommandManager> _environment;
 
-OnSimp1eInit { _Log_("Init."); }
-OnSimp1eLoad {
-    _Log_("Registering ECS EnvironmentManager");
-    Simp1eServices->RegisterService(&_ECSManagerService);
+OnSimp1eInit {
+    _Log_("Registering ECS Environment Manager service");
+    Simp1eServices->RegisterService(&_environmentManagerService);
+
+    _Log_("Adding 'Default' environment");
+    _environmentManagerService.GetEnvironmentManager()->RegisterEnvironment("Default", &_environment);
+
+    _Log_("ECS ready.");
 }
