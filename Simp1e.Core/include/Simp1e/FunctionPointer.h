@@ -3,6 +3,7 @@
 #include <utility>
 
 #include "IFunctionPointer.h"
+#include "ValueWrapper.h"
 
 namespace Simp1e {
 
@@ -10,12 +11,21 @@ namespace Simp1e {
     class FunctionPointer : public IFunctionPointer {
         ReturnType (*_func)(Args...);
 
+        template <std::size_t... I>
+        IValueWrapper* InvokeImpl(std::index_sequence<I...>, IValueWrapper** args) {
+            return new ValueWrapper<ReturnType>(
+                _func(static_cast<ValueWrapper<typename std::tuple_element<I, std::tuple<Args...>>::type>*>(args[I])
+                          ->GetValue()...)
+            );
+        }
+
     public:
         FunctionPointer(ReturnType (*func)(Args...)) : _func(func) {}
 
         bool IsMemberFunction() const override { return false; }
 
-        ReturnType Invoke(Args... args) { return _func(std::forward<Args>(args)...); }
-        ReturnType operator()(Args... args) { return Invoke(std::forward<Args>(args)...); }
+        IValueWrapper* Invoke(IValueWrapper** args) override {
+            return InvokeImpl(std::index_sequence_for<Args...>{}, args);
+        }
     };
 }

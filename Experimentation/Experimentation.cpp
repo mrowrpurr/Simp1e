@@ -15,20 +15,26 @@ std::vector<std::unique_ptr<IFunctionPointer>> _callbacks;
 
 void RegisterCallback(IFunctionPointer* ptr) { _callbacks.push_back(std::unique_ptr<IFunctionPointer>(ptr)); }
 
-template <typename T>
-void RegisterCallback(T* ptr, void (T::*func)(int)) {
-    RegisterCallback(new MemberFunctionPointer<T, void, int>(ptr, func));
+// template <typename T>
+// void RegisterCallback(T* ptr, int (T::*func)(int)) {
+//     RegisterCallback(new MemberFunctionPointer<T, void, int>(ptr, func));
+// }
+
+void RegisterCallback(int (*func)(int)) { RegisterCallback(new FunctionPointer<int, int>(func)); }
+
+int ThisIsAFuntion(int value) {
+    _Log_("ThisIsAFuntion called with value = {}", value);
+    return value * 2;
 }
-
-void RegisterCallback(void (*func)(int)) { RegisterCallback(new FunctionPointer<void, int>(func)); }
-
-void ThisIsAFuntion(int value) { _Log_("ThisIsAFuntion called with value = {}", value); }
 
 void RunCallbacks() {
     // for (auto& callback : _callbacks) callback->Invoke(42);
     for (auto& callback : _callbacks) {
-        if (auto* functionPointer = dynamic_cast<FunctionPointer<void, int>*>(callback.get())) {
-            functionPointer->Invoke(42);
+        if (auto* functionPointer = dynamic_cast<FunctionPointer<int, int>*>(callback.get())) {
+            IValueWrapper* args[1];
+            args[0]     = new ValueWrapper<int>(69);
+            auto result = static_cast<ValueWrapper<int>*>(functionPointer->Invoke(args))->GetValue();
+            _Log_("result = {}", result);
         }
         // } else if (auto* memberFunctionPointer = dynamic_cast<MemberFunctionPointer<Environment, void,
         // int>*>(callback.get())) {
