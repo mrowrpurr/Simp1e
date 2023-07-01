@@ -11,33 +11,33 @@ namespace Simp1e {
     struct IEntityEventManager {
         virtual ~IEntityEventManager() = default;
 
-        virtual void RegisterForEntityCreated(FunctionPointerBase*)    = 0;
-        virtual void RegisterForEntityDestroying(FunctionPointerBase*) = 0;
-        virtual void RegisterForEntityDestroyed(FunctionPointerBase*)  = 0;
+        virtual void RegisterForEntityCreated(IFunctionPointer*)    = 0;
+        virtual void RegisterForEntityDestroying(IFunctionPointer*) = 0;
+        virtual void RegisterForEntityDestroyed(IFunctionPointer*)  = 0;
 
-        virtual void RegisterForComponentAdding(FunctionPointerBase*)   = 0;
-        virtual void RegisterForComponentAdded(FunctionPointerBase*)    = 0;
-        virtual void RegisterForComponentRemoving(FunctionPointerBase*) = 0;
-        virtual void RegisterForComponentRemoved(FunctionPointerBase*)  = 0;
+        virtual void RegisterForComponentAdding(IFunctionPointer*)   = 0;
+        virtual void RegisterForComponentAdded(IFunctionPointer*)    = 0;
+        virtual void RegisterForComponentRemoving(IFunctionPointer*) = 0;
+        virtual void RegisterForComponentRemoved(IFunctionPointer*)  = 0;
 
-        virtual void RegisterForComponentAdding(ComponentType componentType, FunctionPointerBase*)   = 0;
-        virtual void RegisterForComponentAdded(ComponentType componentType, FunctionPointerBase*)    = 0;
-        virtual void RegisterForComponentRemoving(ComponentType componentType, FunctionPointerBase*) = 0;
-        virtual void RegisterForComponentRemoved(ComponentType componentType, FunctionPointerBase*)  = 0;
+        virtual void RegisterForComponentAdding(ComponentType componentType, IFunctionPointer*)   = 0;
+        virtual void RegisterForComponentAdded(ComponentType componentType, IFunctionPointer*)    = 0;
+        virtual void RegisterForComponentRemoving(ComponentType componentType, IFunctionPointer*) = 0;
+        virtual void RegisterForComponentRemoved(ComponentType componentType, IFunctionPointer*)  = 0;
 
-        virtual void UnregisterForEntityCreated(FunctionPointerBase*)    = 0;
-        virtual void UnregisterForEntityDestroying(FunctionPointerBase*) = 0;
-        virtual void UnregisterForEntityDestroyed(FunctionPointerBase*)  = 0;
+        virtual void UnregisterForEntityCreated(IFunctionPointer*)    = 0;
+        virtual void UnregisterForEntityDestroying(IFunctionPointer*) = 0;
+        virtual void UnregisterForEntityDestroyed(IFunctionPointer*)  = 0;
 
-        virtual void UnregisterForComponentAdding(FunctionPointerBase*)   = 0;
-        virtual void UnregisterForComponentAdded(FunctionPointerBase*)    = 0;
-        virtual void UnregisterForComponentRemoving(FunctionPointerBase*) = 0;
-        virtual void UnregisterForComponentRemoved(FunctionPointerBase*)  = 0;
+        virtual void UnregisterForComponentAdding(IFunctionPointer*)   = 0;
+        virtual void UnregisterForComponentAdded(IFunctionPointer*)    = 0;
+        virtual void UnregisterForComponentRemoving(IFunctionPointer*) = 0;
+        virtual void UnregisterForComponentRemoved(IFunctionPointer*)  = 0;
 
-        virtual void UnregisterForComponentAdding(ComponentType componentType, FunctionPointerBase*)   = 0;
-        virtual void UnregisterForComponentAdded(ComponentType componentType, FunctionPointerBase*)    = 0;
-        virtual void UnregisterForComponentRemoving(ComponentType componentType, FunctionPointerBase*) = 0;
-        virtual void UnregisterForComponentRemoved(ComponentType componentType, FunctionPointerBase*)  = 0;
+        virtual void UnregisterForComponentAdding(ComponentType componentType, IFunctionPointer*)   = 0;
+        virtual void UnregisterForComponentAdded(ComponentType componentType, IFunctionPointer*)    = 0;
+        virtual void UnregisterForComponentRemoving(ComponentType componentType, IFunctionPointer*) = 0;
+        virtual void UnregisterForComponentRemoved(ComponentType componentType, IFunctionPointer*)  = 0;
 
         virtual void EntityCreated(Entity entity)    = 0;
         virtual void EntityDestroying(Entity entity) = 0;

@@ -2,9 +2,9 @@
 
 namespace Simp1e {
 
-    class FunctionPointerBase {
+    class IFunctionPointer {
     public:
-        virtual ~FunctionPointerBase() {}
+        virtual ~IFunctionPointer() {}
         virtual bool IsMemberFunction() const = 0;
     };
 }

@@ -1,46 +1,44 @@
 #include <_Log_.h>
 
-#include <string>
+// TODO: IValueWrapper and ValueWrapper<T>.
+// TODO: We'll pass multiple arguments as a IValueWrapper**
+
+#include <Simp1e/FunctionPointer.h>
+#include <Simp1e/MemberFunctionPointer.h>
+
 #include <unordered_map>
+#include <vector>
 
-struct Item {
-    std::string _name;
-};
+using namespace Simp1e;
 
-struct IStandardStuffStorageInterface {
-    virtual void* GetItemPointer(const std::string& name) = 0;
+std::vector<std::unique_ptr<IFunctionPointer>> _callbacks;
 
-    template <typename T>
-    T* GetItem(const std::string& name) {
-        return static_cast<T*>(GetItemPointer(name));
+void RegisterCallback(IFunctionPointer* ptr) { _callbacks.push_back(std::unique_ptr<IFunctionPointer>(ptr)); }
+
+template <typename T>
+void RegisterCallback(T* ptr, void (T::*func)(int)) {
+    RegisterCallback(new MemberFunctionPointer<T, void, int>(ptr, func));
+}
+
+void RegisterCallback(void (*func)(int)) { RegisterCallback(new FunctionPointer<void, int>(func)); }
+
+void ThisIsAFuntion(int value) { _Log_("ThisIsAFuntion called with value = {}", value); }
+
+void RunCallbacks() {
+    // for (auto& callback : _callbacks) callback->Invoke(42);
+    for (auto& callback : _callbacks) {
+        if (auto* functionPointer = dynamic_cast<FunctionPointer<void, int>*>(callback.get())) {
+            functionPointer->Invoke(42);
+        }
+        // } else if (auto* memberFunctionPointer = dynamic_cast<MemberFunctionPointer<Environment, void,
+        // int>*>(callback.get())) {
+        //     memberFunctionPointer->Invoke(nullptr, 42);
+        // }
     }
-
-    virtual void AddItemPointer(const std::string& name, void* pointer) = 0;
-
-    template <typename T, typename... Args>
-    void AddItem(const std::string& name, Args&&... args) {
-        auto* item = new T(std::forward<Args>(args)...);
-        // ???
-    }
-};
-
-class PointersToStuff : public IStandardStuffStorageInterface {
-    std::unordered_map<std::string, void*> _pointersToStuff;
-
-public:
-    // TODO implement IStandardStuffStorageInterface
-};
-
-class PointersToStuffLocalProxy : public IStandardStuffStorageInterface {
-    PointersToStuff*                      _pointersToStuff;
-    std::unordered_map<std::string, Item> _stuffItems;
-
-public:
-    // TODO implement IStandardStuffStorageInterface
-};
+}
 
 int main() {
-    _Log_("HELLO!");
-
-    // Let's
+    _Log_("hi");
+    RegisterCallback(ThisIsAFuntion);
+    RunCallbacks();
 }

@@ -2,12 +2,12 @@
 
 #include <utility>
 
-#include "FunctionPointerBase.h"
+#include "IFunctionPointer.h"
 
 namespace Simp1e {
 
     template <typename T, typename ReturnType, typename... Args>
-    class MemberFunctionPointer : public FunctionPointerBase {
+    class MemberFunctionPointer : public IFunctionPointer {
         ReturnType (T::*_func)(Args...);
         T* _instance;
 

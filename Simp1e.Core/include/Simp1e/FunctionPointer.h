@@ -2,12 +2,12 @@
 
 #include <utility>
 
-#include "FunctionPointerBase.h"
+#include "IFunctionPointer.h"
 
 namespace Simp1e {
 
     template <typename ReturnType, typename... Args>
-    class FunctionPointer : public FunctionPointerBase {
+    class FunctionPointer : public IFunctionPointer {
         ReturnType (*_func)(Args...);
 
     public:
@@ -15,7 +15,7 @@ namespace Simp1e {
 
         bool IsMemberFunction() const override { return false; }
 
-        ReturnType Invoke(Args... args) { return func(std::forward<Args>(args)...); }
+        ReturnType Invoke(Args... args) { return _func(std::forward<Args>(args)...); }
         ReturnType operator()(Args... args) { return Invoke(std::forward<Args>(args)...); }
     };
 }
