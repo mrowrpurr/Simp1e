@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Simp1e/ComponentTypeHashKey.h>
+
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
@@ -10,67 +12,80 @@
 namespace Simp1e {
 
     class EntityEventManager : public IEntityEventManager {
-        std::unordered_map<IFunctionPointer*, std::unique_ptr<IFunctionPointer>> _callbacks;
-        std::unordered_set<IFunctionPointer*>                                    _entityCreatedCallbacks;
-        std::unordered_set<IFunctionPointer*>                                    _entityDestroyingCallbacks;
-        std::unordered_set<IFunctionPointer*>                                    _entityDestroyedCallbacks;
-        std::unordered_set<IFunctionPointer*>                                    _componentAddingCallbacks;
-        std::unordered_set<IFunctionPointer*>                                    _componentAddedCallbacks;
-        std::unordered_set<IFunctionPointer*>                                    _componentRemovingCallbacks;
-        std::unordered_set<IFunctionPointer*>                                    _componentRemovedCallbacks;
-        std::unordered_map<ComponentType, std::unordered_set<IFunctionPointer*>> _componentAddingCallbacksByType;
-        std::unordered_map<ComponentType, std::unordered_set<IFunctionPointer*>> _componentAddedCallbacksByType;
-        std::unordered_map<ComponentType, std::unordered_set<IFunctionPointer*>> _componentRemovingCallbacksByType;
-        std::unordered_map<ComponentType, std::unordered_set<IFunctionPointer*>> _componentRemovedCallbacksByType;
+        std::unordered_map<IFunctionPointer*, std::unique_ptr<IFunctionPointer>>        _callbacks;
+        std::unordered_set<IFunctionPointer*>                                           _entityCreatedCallbacks;
+        std::unordered_set<IFunctionPointer*>                                           _entityDestroyingCallbacks;
+        std::unordered_set<IFunctionPointer*>                                           _entityDestroyedCallbacks;
+        std::unordered_set<IFunctionPointer*>                                           _componentAddingCallbacks;
+        std::unordered_set<IFunctionPointer*>                                           _componentAddedCallbacks;
+        std::unordered_set<IFunctionPointer*>                                           _componentRemovingCallbacks;
+        std::unordered_set<IFunctionPointer*>                                           _componentRemovedCallbacks;
+        std::unordered_map<ComponentTypeHashKey, std::unordered_set<IFunctionPointer*>> _componentAddingCallbacksByType;
+        std::unordered_map<ComponentTypeHashKey, std::unordered_set<IFunctionPointer*>> _componentAddedCallbacksByType;
+        std::unordered_map<ComponentTypeHashKey, std::unordered_set<IFunctionPointer*>>
+            _componentRemovingCallbacksByType;
+        std::unordered_map<ComponentTypeHashKey, std::unordered_set<IFunctionPointer*>>
+            _componentRemovedCallbacksByType;
 
     public:
         virtual ~EntityEventManager() = default;
 
-        void RegisterForEntityCreated(IFunctionPointer* callback) override {
+        IFunctionPointer* RegisterForEntityCreated(IFunctionPointer* callback) override {
             _callbacks[callback] = std::unique_ptr<IFunctionPointer>(callback);
             _entityCreatedCallbacks.insert(callback);
+            return callback;
         }
-        void RegisterForEntityDestroying(IFunctionPointer* callback) override {
+        IFunctionPointer* RegisterForEntityDestroying(IFunctionPointer* callback) override {
             _callbacks[callback] = std::unique_ptr<IFunctionPointer>(callback);
             _entityDestroyingCallbacks.insert(callback);
+            return callback;
         }
-        void RegisterForEntityDestroyed(IFunctionPointer* callback) override {
+        IFunctionPointer* RegisterForEntityDestroyed(IFunctionPointer* callback) override {
             _callbacks[callback] = std::unique_ptr<IFunctionPointer>(callback);
             _entityDestroyedCallbacks.insert(callback);
+            return callback;
         }
 
-        void RegisterForComponentAdding(IFunctionPointer* callback) override {
+        IFunctionPointer* RegisterForAllComponentAdding(IFunctionPointer* callback) override {
             _callbacks[callback] = std::unique_ptr<IFunctionPointer>(callback);
             _componentAddingCallbacks.insert(callback);
+            return callback;
         }
-        void RegisterForComponentAdded(IFunctionPointer* callback) override {
+        IFunctionPointer* RegisterForAllComponentAdded(IFunctionPointer* callback) override {
             _callbacks[callback] = std::unique_ptr<IFunctionPointer>(callback);
             _componentAddedCallbacks.insert(callback);
+            return callback;
         }
-        void RegisterForComponentRemoving(IFunctionPointer* callback) override {
+        IFunctionPointer* RegisterForAllComponentRemoving(IFunctionPointer* callback) override {
             _callbacks[callback] = std::unique_ptr<IFunctionPointer>(callback);
             _componentRemovingCallbacks.insert(callback);
+            return callback;
         }
-        void RegisterForComponentRemoved(IFunctionPointer* callback) override {
+        IFunctionPointer* RegisterForAllComponentRemoved(IFunctionPointer* callback) override {
             _callbacks[callback] = std::unique_ptr<IFunctionPointer>(callback);
             _componentRemovedCallbacks.insert(callback);
+            return callback;
         }
 
-        void RegisterForComponentAdding(IFunctionPointer* callback, ComponentType type) override {
+        IFunctionPointer* RegisterForComponentAdding(ComponentType type, IFunctionPointer* callback) override {
             _callbacks[callback] = std::unique_ptr<IFunctionPointer>(callback);
             _componentAddingCallbacksByType[type].insert(callback);
+            return callback;
         }
-        void RegisterForComponentAdded(IFunctionPointer* callback, ComponentType type) override {
+        IFunctionPointer* RegisterForComponentAdded(ComponentType type, IFunctionPointer* callback) override {
             _callbacks[callback] = std::unique_ptr<IFunctionPointer>(callback);
             _componentAddedCallbacksByType[type].insert(callback);
+            return callback;
         }
-        void RegisterForComponentRemoving(IFunctionPointer* callback, ComponentType type) override {
+        IFunctionPointer* RegisterForComponentRemoving(ComponentType type, IFunctionPointer* callback) override {
             _callbacks[callback] = std::unique_ptr<IFunctionPointer>(callback);
             _componentRemovingCallbacksByType[type].insert(callback);
+            return callback;
         }
-        void RegisterForComponentRemoved(IFunctionPointer* callback, ComponentType type) override {
+        IFunctionPointer* RegisterForComponentRemoved(ComponentType type, IFunctionPointer* callback) override {
             _callbacks[callback] = std::unique_ptr<IFunctionPointer>(callback);
             _componentRemovedCallbacksByType[type].insert(callback);
+            return callback;
         }
 
         void UnregisterForEntityCreated(IFunctionPointer* callback) override {
@@ -86,92 +101,83 @@ namespace Simp1e {
             _entityDestroyedCallbacks.erase(callback);
         }
 
-        void UnregisterForComponentAdding(IFunctionPointer* callback) override {
+        void UnregisterForAllComponentAdding(IFunctionPointer* callback) override {
             _callbacks.erase(callback);
             _componentAddingCallbacks.erase(callback);
         }
-        void UnregisterForComponentAdded(IFunctionPointer* callback) override {
+        void UnregisterForAllComponentAdded(IFunctionPointer* callback) override {
             _callbacks.erase(callback);
             _componentAddedCallbacks.erase(callback);
         }
-        void UnregisterForComponentRemoving(IFunctionPointer* callback) override {
+        void UnregisterForAllComponentRemoving(IFunctionPointer* callback) override {
             _callbacks.erase(callback);
             _componentRemovingCallbacks.erase(callback);
         }
-        void UnregisterForComponentRemoved(IFunctionPointer* callback) override {
+        void UnregisterForAllComponentRemoved(IFunctionPointer* callback) override {
             _callbacks.erase(callback);
             _componentRemovedCallbacks.erase(callback);
         }
 
-        void UnregisterForComponentAdding(IFunctionPointer* callback, ComponentType type) override {
+        void UnregisterForComponentAdding(ComponentType type, IFunctionPointer* callback) override {
             _callbacks.erase(callback);
             _componentAddingCallbacksByType[type].erase(callback);
         }
-        void UnregisterForComponentAdded(IFunctionPointer* callback, ComponentType type) override {
+        void UnregisterForComponentAdded(ComponentType type, IFunctionPointer* callback) override {
             _callbacks.erase(callback);
             _componentAddedCallbacksByType[type].erase(callback);
         }
-        void UnregisterForComponentRemoving(IFunctionPointer* callback, ComponentType type) override {
+        void UnregisterForComponentRemoving(ComponentType type, IFunctionPointer* callback) override {
             _callbacks.erase(callback);
             _componentRemovingCallbacksByType[type].erase(callback);
         }
-        void UnregisterForComponentRemoved(IFunctionPointer* callback, ComponentType type) override {
+        void UnregisterForComponentRemoved(ComponentType type, IFunctionPointer* callback) override {
             _callbacks.erase(callback);
             _componentRemovedCallbacksByType[type].erase(callback);
         }
 
-        // void EntityCreated(Entity entity) override {
-        //     for (auto& baseCallbackPointer : _entityCreatedCallbacks) {
-        //         if (baseCallbackPointer->IsMemberFunction()) {
-        //             if (auto* callbackPointer = dynamic_cast<FunctionPointer<void, Entity>*>(baseCallbackPointer))
-        //                 callbackPointer->Invoke(entity);
-        //         } else {
-        //             // // uh oh....
-        //             // if (auto* callbackPointer = dynamic_cast<MemberFunctionPointer<void>*>(baseCallbackPointer))
-        //             //     callbackPointer->Invoke();
-        //         }
-        //     }
-        // }
+        void EntityCreated(Entity entity) override {
+            for (auto& callback : _entityCreatedCallbacks) FunctionPointer<void, Entity>::InvokeFunc(callback, entity);
+        }
+        void EntityDestroying(Entity entity) override {
+            for (auto& callback : _entityDestroyingCallbacks)
+                FunctionPointer<void, Entity>::InvokeFunc(callback, entity);
+        }
+        void EntityDestroyed(Entity entity) override {
+            for (auto& callback : _entityDestroyedCallbacks)
+                FunctionPointer<void, Entity>::InvokeFunc(callback, entity);
+        }
 
-        // void OnEntityCreated(Entity entity) override {
-        //     for (auto callback : _entityCreatedCallbacks) {
-        //         callback->Invoke(entity);
-        //     }
-        // }
-        // void OnEntityDestroying(Entity entity) override {
-        //     for (auto callback : _entityDestroyingInvokebacks) {
-        //         callback->Invoke(entity);
-        //     }
-        // }
-        // void OnEntityDestroyed(Entity entity) override {
-        //     for (auto callback : _entityDestroyedInvokebacks) {
-        //         callback->Invoke(entity);
-        //     }
-        // }
-
-        // void OnComponentAdding(Entity entity, ComponentType type) override {
-        //     for (auto callback : _componentAddingInvokebacks) {
-        //         callback->Invoke(entity, type);
-        //     }
-        //     for (auto callback : _componentAddingInvokebacksByType[type]) {
-        //         callback->Invoke(entity);
-        //     }
-        // }
-        // void OnComponentAdded(Entity entity, ComponentType type) override {
-        //     for (auto callback : _componentAddedInvokebacks) {
-        //         callback->Invoke(entity, type);
-        //     }
-        //     for (auto callback : _componentAddedInvokebacksByType[type]) {
-        //         callback->Invoke(entity);
-        //     }
-        // }
-        // void OnComponentRemoving(Entity entity, ComponentType type) override {
-        //     for (auto callback : _componentRemovingInvokebacks) {
-        //         callback->Invoke(entity, type);
-        //     }
-        //     for (auto callback : _componentRemovingInvokebacksByType[type]) {
-        //         callback->Invoke(entity);
-        //     }
-        // }
+        void ComponentAdding(Entity entity, ComponentType type) override {
+            for (auto& callback : _componentAddingCallbacks)
+                FunctionPointer<void, Entity, ComponentType>::InvokeFunc(callback, entity, type);
+            auto foundCallbacksByType = _componentAddingCallbacksByType.find(type);
+            if (foundCallbacksByType != _componentAddingCallbacksByType.end())
+                for (auto& callback : foundCallbacksByType->second)
+                    FunctionPointer<void, Entity, ComponentType>::InvokeFunc(callback, entity, type);
+        }
+        void ComponentAdded(Entity entity, ComponentType type) override {
+            for (auto& callback : _componentAddedCallbacks)
+                FunctionPointer<void, Entity, ComponentType>::InvokeFunc(callback, entity, type);
+            auto foundCallbacksByType = _componentAddedCallbacksByType.find(type);
+            if (foundCallbacksByType != _componentAddedCallbacksByType.end())
+                for (auto& callback : foundCallbacksByType->second)
+                    FunctionPointer<void, Entity, ComponentType>::InvokeFunc(callback, entity, type);
+        }
+        void ComponentRemoving(Entity entity, ComponentType type) override {
+            for (auto& callback : _componentRemovingCallbacks)
+                FunctionPointer<void, Entity, ComponentType>::InvokeFunc(callback, entity, type);
+            auto foundCallbacksByType = _componentRemovingCallbacksByType.find(type);
+            if (foundCallbacksByType != _componentRemovingCallbacksByType.end())
+                for (auto& callback : foundCallbacksByType->second)
+                    FunctionPointer<void, Entity, ComponentType>::InvokeFunc(callback, entity, type);
+        }
+        void ComponentRemoved(Entity entity, ComponentType type) override {
+            for (auto& callback : _componentRemovedCallbacks)
+                FunctionPointer<void, Entity, ComponentType>::InvokeFunc(callback, entity, type);
+            auto foundCallbacksByType = _componentRemovedCallbacksByType.find(type);
+            if (foundCallbacksByType != _componentRemovedCallbacksByType.end())
+                for (auto& callback : foundCallbacksByType->second)
+                    FunctionPointer<void, Entity, ComponentType>::InvokeFunc(callback, entity, type);
+        }
     };
 }

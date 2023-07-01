@@ -16,6 +16,7 @@ constexpr auto* ENVIRONMENT_NAME = "Default";
 std::unique_ptr<EntityPointerManagerClient> entityManager;
 
 void CreateEntities() {
+    _Log_("Creating entities");
     auto label1 = entityManager->CreateEntity();
     entityManager->Add<TextComponent>(label1, "Hello from label 1");
     entityManager->Add<LabelComponent>(label1);
@@ -23,17 +24,19 @@ void CreateEntities() {
     auto label2 = entityManager->CreateEntity();
     entityManager->Add<TextComponent>(label2, "Hello from label 2");
     entityManager->Add<LabelComponent>(label2);
+    _Log_("Entities created");
 }
 
 void Initialize(IEnvironment* environment) {
     entityManager = std::make_unique<EntityPointerManagerClient>(environment->GetEntityManager());
-    CreateEntities();
 }
 
 OnSimp1eLoad {
+    _Log_("Load");
     if (auto* environmentManagerService = Simp1eServices->GetService<IEnvironmentManagerService>())
         if (auto* environmentManager = environmentManagerService->GetEnvironmentManager())
             if (auto* environment = environmentManager->GetEnvironment(ENVIRONMENT_NAME)) Initialize(environment);
+    _Log_("Loaded");
 }
 
-OnSimp1eStart {}
+OnSimp1eStart { CreateEntities(); }

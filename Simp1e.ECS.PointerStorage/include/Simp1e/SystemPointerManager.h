@@ -18,8 +18,10 @@ namespace Simp1e {
 
     public:
         void Update(IEnvironment* environment) override {
+            _Log_("SystemPointerManager::Update");
             for (auto& systemTypeHashKey : _insertionOrder) {
                 if (!_enabledSystems[systemTypeHashKey]) continue;
+                _Log_("EXECUTE SYSTEM {}", systemTypeHashKey);
                 _systemPointers[systemTypeHashKey]->Execute(environment);
             }
         }
