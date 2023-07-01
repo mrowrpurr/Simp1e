@@ -7,6 +7,8 @@
 
 #include <memory>
 #include <unordered_map>
+#include <utility>
+
 
 namespace Simp1e {
 
@@ -45,7 +47,7 @@ namespace Simp1e {
         }
 
         template <typename T, typename... Args>
-        T* AddComponent(Entity entity, Args&&... args) {
+        T* Add(Entity entity, Args&&... args) {
             auto* component                              = new T(std::forward<Args>(args)...);
             _componentMap[T::GetComponentType()][entity] = MakeVoidPointer(component);
             _entityManager->AddComponentPointer(entity, T::GetComponentType(), component);

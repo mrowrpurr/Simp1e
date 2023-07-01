@@ -5,6 +5,7 @@
 #include <functional>
 #include <memory>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "ComponentPointer.h"
@@ -41,7 +42,7 @@ namespace Simp1e::ECS {
                 return GetComponent<T>(entity, componentType);
             }
 
-            Events().AddingComponent(entity, componentType);
+            Events().ComponentAdding(entity, componentType);
             _Log_("Adding component {} to entity {}", componentType, entity);
 
             _components[componentType][entity] = MakeComponentPointer(component);

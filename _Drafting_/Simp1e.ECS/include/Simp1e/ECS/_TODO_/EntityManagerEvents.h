@@ -9,42 +9,30 @@
 namespace Simp1e::ECS {
 
     class EntityManagerEvents {
-        std::vector<std::function<void(Entity)>>                       _onEntityCreated;
-        std::vector<std::function<void(Entity)>>                       _onEntityRemoving;
-        std::vector<std::function<void(Entity)>>                       _onEntityRemoved;
-        std::vector<std::function<void(Entity, const ComponentType&)>> _onComponentAdding;
-        std::vector<std::function<void(Entity, const ComponentType&)>> _onComponentAdded;
-        std::vector<std::function<void(Entity, const ComponentType&)>> _onComponentRemoving;
-        std::vector<std::function<void(Entity, const ComponentType&)>> _onComponentRemoved;
-        std::unordered_map<ComponentType, std::vector<std::function<void(Entity)>>>
-            _onComponentAddingByType;
-        std::unordered_map<ComponentType, std::vector<std::function<void(Entity)>>>
-            _onComponentAddedByType;
-        std::unordered_map<ComponentType, std::vector<std::function<void(Entity)>>>
-            _onComponentRemovingByType;
-        std::unordered_map<ComponentType, std::vector<std::function<void(Entity)>>>
-            _onComponentRemovedByType;
+        std::vector<std::function<void(Entity)>>                                    _onEntityCreated;
+        std::vector<std::function<void(Entity)>>                                    _onEntityRemoving;
+        std::vector<std::function<void(Entity)>>                                    _onEntityRemoved;
+        std::vector<std::function<void(Entity, const ComponentType&)>>              _onComponentAdding;
+        std::vector<std::function<void(Entity, const ComponentType&)>>              _onComponentAdded;
+        std::vector<std::function<void(Entity, const ComponentType&)>>              _onComponentRemoving;
+        std::vector<std::function<void(Entity, const ComponentType&)>>              _onComponentRemoved;
+        std::unordered_map<ComponentType, std::vector<std::function<void(Entity)>>> _onComponentAddingByType;
+        std::unordered_map<ComponentType, std::vector<std::function<void(Entity)>>> _onComponentAddedByType;
+        std::unordered_map<ComponentType, std::vector<std::function<void(Entity)>>> _onComponentRemovingByType;
+        std::unordered_map<ComponentType, std::vector<std::function<void(Entity)>>> _onComponentRemovedByType;
 
     public:
-        void OnEntityCreated(std::function<void(Entity)> callback) {
-            _onEntityCreated.push_back(callback);
-        }
+        void OnEntityCreated(std::function<void(Entity)> callback) { _onEntityCreated.push_back(callback); }
 
-        void OnEntityRemoving(std::function<void(Entity)> callback) {
-            _onEntityRemoving.push_back(callback);
-        }
+        void OnEntityRemoving(std::function<void(Entity)> callback) { _onEntityRemoving.push_back(callback); }
 
-        void OnEntityRemoved(std::function<void(Entity)> callback) {
-            _onEntityRemoved.push_back(callback);
-        }
+        void OnEntityRemoved(std::function<void(Entity)> callback) { _onEntityRemoved.push_back(callback); }
 
         void OnComponentAdding(std::function<void(Entity, const ComponentType&)> callback) {
             _onComponentAdding.push_back(callback);
         }
 
-        void OnComponentAdding(
-            const ComponentType&& componentType, std::function<void(Entity)> callback
-        ) {
+        void OnComponentAdding(const ComponentType&& componentType, std::function<void(Entity)> callback) {
             _onComponentAddingByType[componentType].push_back(callback);
         }
 
@@ -57,9 +45,7 @@ namespace Simp1e::ECS {
             _onComponentAdded.push_back(callback);
         }
 
-        void OnComponentAdded(
-            const ComponentType&& componentType, std::function<void(Entity)> callback
-        ) {
+        void OnComponentAdded(const ComponentType&& componentType, std::function<void(Entity)> callback) {
             _onComponentAddedByType[componentType].push_back(callback);
         }
 
@@ -72,9 +58,7 @@ namespace Simp1e::ECS {
             _onComponentRemoving.push_back(callback);
         }
 
-        void OnComponentRemoving(
-            const ComponentType&& componentType, std::function<void(Entity)> callback
-        ) {
+        void OnComponentRemoving(const ComponentType&& componentType, std::function<void(Entity)> callback) {
             _onComponentRemovingByType[componentType].push_back(callback);
         }
 
@@ -87,9 +71,7 @@ namespace Simp1e::ECS {
             _onComponentRemoved.push_back(callback);
         }
 
-        void OnComponentRemoved(
-            const ComponentType&& componentType, std::function<void(Entity)> callback
-        ) {
+        void OnComponentRemoved(const ComponentType&& componentType, std::function<void(Entity)> callback) {
             _onComponentRemovedByType[componentType].push_back(callback);
         }
 
@@ -110,7 +92,7 @@ namespace Simp1e::ECS {
             for (auto& callback : _onEntityRemoved) callback(entity);
         }
 
-        void AddingComponent(Entity entity, const ComponentType& componentType) {
+        void ComponentAdding(Entity entity, const ComponentType& componentType) {
             for (auto& callback : _onComponentAdding) callback(entity, componentType);
             auto found = _onComponentAddingByType.find(componentType);
             if (found != _onComponentAddingByType.end())
@@ -118,8 +100,8 @@ namespace Simp1e::ECS {
         }
 
         template <typename T>
-        void AddingComponent(Entity entity) {
-            AddingComponent(entity, T::GetComponentType());
+        void ComponentAdding(Entity entity) {
+            ComponentAdding(entity, T::GetComponentType());
         }
 
         void AddedComponent(Entity entity, const ComponentType& componentType) {

@@ -1,5 +1,8 @@
 #pragma once
 
+#include <memory>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "IEntityEventManager.h"
@@ -7,55 +10,168 @@
 namespace Simp1e {
 
     class EntityEventManager : public IEntityEventManager {
-        std::vector<void (*)(Entity)>                _entityCreatedCallbacks;
-        std::vector<void (*)(Entity)>                _entityDestroyingCallbacks;
-        std::vector<void (*)(Entity)>                _entityDestroyedCallbacks;
-        std::vector<void (*)(Entity, ComponentType)> _componentAddingCallbacks;
-        std::vector<void (*)(Entity, ComponentType)> _componentAddedCallbacks;
-        std::vector<void (*)(Entity, ComponentType)> _componentRemovingCallbacks;
-        std::vector<void (*)(Entity, ComponentType)> _componentRemovedCallbacks;
+        std::unordered_map<FunctionPointerBase*, std::unique_ptr<FunctionPointerBase>> _callbacks;
+        std::unordered_set<FunctionPointerBase*>                                       _entityCreatedCallbacks;
+        std::unordered_set<FunctionPointerBase*>                                       _entityDestroyingCallbacks;
+        std::unordered_set<FunctionPointerBase*>                                       _entityDestroyedCallbacks;
+        std::unordered_set<FunctionPointerBase*>                                       _componentAddingCallbacks;
+        std::unordered_set<FunctionPointerBase*>                                       _componentAddedCallbacks;
+        std::unordered_set<FunctionPointerBase*>                                       _componentRemovingCallbacks;
+        std::unordered_set<FunctionPointerBase*>                                       _componentRemovedCallbacks;
+        std::unordered_map<ComponentType, std::unordered_set<FunctionPointerBase*>>    _componentAddingCallbacksByType;
+        std::unordered_map<ComponentType, std::unordered_set<FunctionPointerBase*>>    _componentAddedCallbacksByType;
+        std::unordered_map<ComponentType, std::unordered_set<FunctionPointerBase*>> _componentRemovingCallbacksByType;
+        std::unordered_map<ComponentType, std::unordered_set<FunctionPointerBase*>> _componentRemovedCallbacksByType;
 
     public:
         virtual ~EntityEventManager() = default;
 
-        void OnEntityCreated(void (*callback)(Entity)) override { _entityCreatedCallbacks.push_back(callback); }
-        void OnEntityDestroying(void (*callback)(Entity)) override { _entityDestroyingCallbacks.push_back(callback); }
-        void OnEntityDestroyed(void (*callback)(Entity)) override { _entityDestroyedCallbacks.push_back(callback); }
+        void RegisterForEntityCreated(FunctionPointerBase* callback) override {
+            _callbacks[callback] = std::unique_ptr<FunctionPointerBase>(callback);
+            _entityCreatedCallbacks.insert(callback);
+        }
+        void RegisterForEntityDestroying(FunctionPointerBase* callback) override {
+            _callbacks[callback] = std::unique_ptr<FunctionPointerBase>(callback);
+            _entityDestroyingCallbacks.insert(callback);
+        }
+        void RegisterForEntityDestroyed(FunctionPointerBase* callback) override {
+            _callbacks[callback] = std::unique_ptr<FunctionPointerBase>(callback);
+            _entityDestroyedCallbacks.insert(callback);
+        }
 
-        void OnComponentAdding(void (*callback)(Entity, ComponentType)) override {
-            _componentAddingCallbacks.push_back(callback);
+        void RegisterForComponentAdding(FunctionPointerBase* callback) override {
+            _callbacks[callback] = std::unique_ptr<FunctionPointerBase>(callback);
+            _componentAddingCallbacks.insert(callback);
         }
-        void OnComponentAdded(void (*callback)(Entity, ComponentType)) override {
-            _componentAddedCallbacks.push_back(callback);
+        void RegisterForComponentAdded(FunctionPointerBase* callback) override {
+            _callbacks[callback] = std::unique_ptr<FunctionPointerBase>(callback);
+            _componentAddedCallbacks.insert(callback);
         }
-        void OnComponentRemoving(void (*callback)(Entity, ComponentType)) override {
-            _componentRemovingCallbacks.push_back(callback);
+        void RegisterForComponentRemoving(FunctionPointerBase* callback) override {
+            _callbacks[callback] = std::unique_ptr<FunctionPointerBase>(callback);
+            _componentRemovingCallbacks.insert(callback);
         }
-        void OnComponentRemoved(void (*callback)(Entity, ComponentType)) override {
-            _componentRemovedCallbacks.push_back(callback);
+        void RegisterForComponentRemoved(FunctionPointerBase* callback) override {
+            _callbacks[callback] = std::unique_ptr<FunctionPointerBase>(callback);
+            _componentRemovedCallbacks.insert(callback);
+        }
+
+        void RegisterForComponentAdding(FunctionPointerBase* callback, ComponentType type) override {
+            _callbacks[callback] = std::unique_ptr<FunctionPointerBase>(callback);
+            _componentAddingCallbacksByType[type].insert(callback);
+        }
+        void RegisterForComponentAdded(FunctionPointerBase* callback, ComponentType type) override {
+            _callbacks[callback] = std::unique_ptr<FunctionPointerBase>(callback);
+            _componentAddedCallbacksByType[type].insert(callback);
+        }
+        void RegisterForComponentRemoving(FunctionPointerBase* callback, ComponentType type) override {
+            _callbacks[callback] = std::unique_ptr<FunctionPointerBase>(callback);
+            _componentRemovingCallbacksByType[type].insert(callback);
+        }
+        void RegisterForComponentRemoved(FunctionPointerBase* callback, ComponentType type) override {
+            _callbacks[callback] = std::unique_ptr<FunctionPointerBase>(callback);
+            _componentRemovedCallbacksByType[type].insert(callback);
+        }
+
+        void UnregisterForEntityCreated(FunctionPointerBase* callback) override {
+            _callbacks.erase(callback);
+            _entityCreatedCallbacks.erase(callback);
+        }
+        void UnregisterForEntityDestroying(FunctionPointerBase* callback) override {
+            _callbacks.erase(callback);
+            _entityDestroyingCallbacks.erase(callback);
+        }
+        void UnregisterForEntityDestroyed(FunctionPointerBase* callback) override {
+            _callbacks.erase(callback);
+            _entityDestroyedCallbacks.erase(callback);
+        }
+
+        void UnregisterForComponentAdding(FunctionPointerBase* callback) override {
+            _callbacks.erase(callback);
+            _componentAddingCallbacks.erase(callback);
+        }
+        void UnregisterForComponentAdded(FunctionPointerBase* callback) override {
+            _callbacks.erase(callback);
+            _componentAddedCallbacks.erase(callback);
+        }
+        void UnregisterForComponentRemoving(FunctionPointerBase* callback) override {
+            _callbacks.erase(callback);
+            _componentRemovingCallbacks.erase(callback);
+        }
+        void UnregisterForComponentRemoved(FunctionPointerBase* callback) override {
+            _callbacks.erase(callback);
+            _componentRemovedCallbacks.erase(callback);
+        }
+
+        void UnregisterForComponentAdding(FunctionPointerBase* callback, ComponentType type) override {
+            _callbacks.erase(callback);
+            _componentAddingCallbacksByType[type].erase(callback);
+        }
+        void UnregisterForComponentAdded(FunctionPointerBase* callback, ComponentType type) override {
+            _callbacks.erase(callback);
+            _componentAddedCallbacksByType[type].erase(callback);
+        }
+        void UnregisterForComponentRemoving(FunctionPointerBase* callback, ComponentType type) override {
+            _callbacks.erase(callback);
+            _componentRemovingCallbacksByType[type].erase(callback);
+        }
+        void UnregisterForComponentRemoved(FunctionPointerBase* callback, ComponentType type) override {
+            _callbacks.erase(callback);
+            _componentRemovedCallbacksByType[type].erase(callback);
         }
 
         void EntityCreated(Entity entity) override {
-            for (auto& callback : _entityCreatedCallbacks) callback(entity);
-        }
-        void EntityDestroying(Entity entity) override {
-            for (auto& callback : _entityDestroyingCallbacks) callback(entity);
-        }
-        void EntityDestroyed(Entity entity) override {
-            for (auto& callback : _entityDestroyedCallbacks) callback(entity);
+            for (auto& baseCallbackPointer : _entityCreatedCallbacks) {
+                if (baseCallbackPointer->IsMemberFunction()) {
+                    if (auto* callbackPointer = dynamic_cast<FunctionPointer<void, Entity>*>(baseCallbackPointer))
+                        callbackPointer->Invoke(entity);
+                } else {
+                    // // uh oh....
+                    // if (auto* callbackPointer = dynamic_cast<MemberFunctionPointer<void>*>(baseCallbackPointer))
+                    //     callbackPointer->Invoke();
+                }
+            }
         }
 
-        void ComponentAdding(Entity entity, ComponentType componentType) override {
-            for (auto& callback : _componentAddingCallbacks) callback(entity, componentType);
-        }
-        void ComponentAdded(Entity entity, ComponentType componentType) override {
-            for (auto& callback : _componentAddedCallbacks) callback(entity, componentType);
-        }
-        void ComponentRemoving(Entity entity, ComponentType componentType) override {
-            for (auto& callback : _componentRemovingCallbacks) callback(entity, componentType);
-        }
-        void ComponentRemoved(Entity entity, ComponentType componentType) override {
-            for (auto& callback : _componentRemovedCallbacks) callback(entity, componentType);
-        }
+        // void OnEntityCreated(Entity entity) override {
+        //     for (auto callback : _entityCreatedCallbacks) {
+        //         callback->Invoke(entity);
+        //     }
+        // }
+        // void OnEntityDestroying(Entity entity) override {
+        //     for (auto callback : _entityDestroyingInvokebacks) {
+        //         callback->Invoke(entity);
+        //     }
+        // }
+        // void OnEntityDestroyed(Entity entity) override {
+        //     for (auto callback : _entityDestroyedInvokebacks) {
+        //         callback->Invoke(entity);
+        //     }
+        // }
+
+        // void OnComponentAdding(Entity entity, ComponentType type) override {
+        //     for (auto callback : _componentAddingInvokebacks) {
+        //         callback->Invoke(entity, type);
+        //     }
+        //     for (auto callback : _componentAddingInvokebacksByType[type]) {
+        //         callback->Invoke(entity);
+        //     }
+        // }
+        // void OnComponentAdded(Entity entity, ComponentType type) override {
+        //     for (auto callback : _componentAddedInvokebacks) {
+        //         callback->Invoke(entity, type);
+        //     }
+        //     for (auto callback : _componentAddedInvokebacksByType[type]) {
+        //         callback->Invoke(entity);
+        //     }
+        // }
+        // void OnComponentRemoving(Entity entity, ComponentType type) override {
+        //     for (auto callback : _componentRemovingInvokebacks) {
+        //         callback->Invoke(entity, type);
+        //     }
+        //     for (auto callback : _componentRemovingInvokebacksByType[type]) {
+        //         callback->Invoke(entity);
+        //     }
+        // }
     };
 }

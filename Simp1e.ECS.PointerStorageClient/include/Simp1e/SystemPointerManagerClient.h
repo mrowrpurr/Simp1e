@@ -8,6 +8,8 @@
 
 #include <memory>
 #include <unordered_map>
+#include <utility>
+
 
 namespace Simp1e {
 
@@ -32,12 +34,12 @@ namespace Simp1e {
             _systems[systemType]           = MakeVoidPointer(system);
             _systemExecutables[systemType] = std::unique_ptr<IExecutable>(systemExecutable);
             _systemManager->AddSystemPointer(systemType, systemExecutable);
-            _Log_("[SystemPointerManagerCLient] Added System {}", systemType);
+            _Log_("[SystemPointerManagerClient] Added System {}", systemType);
             return system;
         }
 
         template <typename T, typename... Args>
-        T* AddSystem(Args&&... args) {
+        T* Add(Args&&... args) {
             auto* system = new T(std::forward<Args>(args)...);
             AddSystemPointer(T::GetSystemType(), system);
             return system;

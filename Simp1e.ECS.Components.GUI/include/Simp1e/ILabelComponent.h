@@ -1,11 +1,10 @@
 #pragma once
 
-#include <Simp1e/IDirtyTrackingComponentBase.h>
+#include <Simp1e/DefineComponentType.h>
 
 namespace Simp1e {
 
-    struct ILabelComponent : public IDirtyTrackingComponentBase {
-        virtual const char* GetText() const           = 0;
-        virtual void        SetText(const char* text) = 0;
+    struct ILabelComponent {
+        DEFINE_COMPONENT_TYPE("Label")
     };
 }

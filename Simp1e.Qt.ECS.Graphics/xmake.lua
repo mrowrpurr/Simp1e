@@ -1,4 +1,4 @@
-target("Simp1e.Qt.ECS")
+target("Simp1e.Qt.ECS.Graphics")
     set_kind("headeronly")
     add_logging()
     add_deps("Simp1e.Qt", "Simp1e.ECS.Core")

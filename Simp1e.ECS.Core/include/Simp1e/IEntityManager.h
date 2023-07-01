@@ -20,22 +20,22 @@ namespace Simp1e {
         virtual void  ForEachComponent(ComponentType componentType, void (*callback)(Entity, void*)) = 0;
 
         template <typename T>
-        void RemoveComponent(Entity entity) {
+        void Remove(Entity entity) {
             RemoveComponent(entity, T::GetComponentType());
         }
 
         template <typename T>
-        bool HasComponent(Entity entity) const {
+        bool Has(Entity entity) const {
             return HasComponent(entity, T::GetComponentType());
         }
 
         template <typename T>
-        void ForEachComponent(void (*callback)(Entity, void*)) {
+        void ForEach(void (*callback)(Entity, void*)) {
             ForEachComponent(T::GetComponentType(), callback);
         }
 
         template <typename T>
-        T* GetComponent(Entity entity) const {
+        T* Get(Entity entity) const {
             return static_cast<T*>(GetComponentPointer(entity, T::GetComponentType()));
         }
     };
