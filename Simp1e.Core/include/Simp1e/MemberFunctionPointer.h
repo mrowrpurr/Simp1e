@@ -13,11 +13,19 @@ namespace Simp1e {
         T* _instance;
 
         template <std::size_t... I>
-        IValueWrapper* InvokeImpl(std::index_sequence<I...>, IValueWrapper** args) {
+        IValueWrapper* InvokeAndReturnImpl(std::index_sequence<I...>, IValueWrapper** args) {
             return new ValueWrapper<ReturnType>((_instance->*_func)(
                 static_cast<ValueWrapper<typename std::tuple_element<I, std::tuple<Args...>>::type>*>(args[I])
                     ->GetValue()...
             ));
+        }
+
+        template <std::size_t... I>
+        void InvokeImpl(std::index_sequence<I...>, IValueWrapper** args) {
+            (_instance->*_func)(
+                static_cast<ValueWrapper<typename std::tuple_element<I, std::tuple<Args...>>::type>*>(args[I])
+                    ->GetValue()...
+            );
         }
 
     public:
@@ -25,8 +33,9 @@ namespace Simp1e {
 
         bool IsMemberFunction() const override { return true; }
 
-        IValueWrapper* Invoke(IValueWrapper** args) override {
-            return InvokeImpl(std::index_sequence_for<Args...>{}, args);
+        IValueWrapper* InvokeAndReturn(IValueWrapper** args) override {
+            return InvokeAndReturnImpl(std::index_sequence_for<Args...>{}, args);
         }
+        void Invoke(IValueWrapper** args) override { InvokeImpl(std::index_sequence_for<Args...>{}, args); }
     };
 }

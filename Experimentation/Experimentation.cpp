@@ -36,10 +36,8 @@ struct ThisIsAStruct {
 
 void RunCallbacks() {
     for (auto& callback : _callbacks) {
-        IValueWrapper* args[1];
-        args[0]     = new ValueWrapper<int>(69);
-        auto result = static_cast<ValueWrapper<int>*>(callback->Invoke(args))->GetValue();
-        _Log_("result = {}", result);
+        auto result = FunctionPointer<int, int>::InvokeAndReturnFunc(callback.get(), 69);
+        _Log_("simple result = {}", result);
     }
 }
 
