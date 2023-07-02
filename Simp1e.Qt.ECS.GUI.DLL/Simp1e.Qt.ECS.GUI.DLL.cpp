@@ -1,20 +1,3 @@
-// #include <QApplication>
-// #include <QWidget>
-
-// Let's have something that listens for ToolbarButton component creation
-// and adds them to out window.
-
-// Or just Label first...
-
-// OnSimp1eStart {
-//     int          argc;
-//     QApplication a(argc, nullptr);
-//     QWidget      w;
-//     w.setWindowTitle("Hello World!");
-//     w.show();
-//     a.exec();
-// }
-
 #include <_Log_.h>
 _LogToFile_("Simp1e.Qt.ECS.GUI.log");
 
@@ -24,6 +7,7 @@ _LogToFile_("Simp1e.Qt.ECS.GUI.log");
 #include <Simp1e/IEnvironmentManagerService.h>
 #include <Simp1e/LabelComponent.h>
 #include <Simp1e/QMainWindowComponent.h>
+#include <Simp1e/QtGUISystem.h>
 #include <Simp1e/ServiceHostClient.h>
 #include <Simp1e/SystemPointerManagerClient.h>
 #include <Simp1e/TextComponent.h>
@@ -31,6 +15,7 @@ _LogToFile_("Simp1e.Qt.ECS.GUI.log");
 
 #include <QApplication>
 #include <QTimer>
+#include <chrono>
 #include <memory>
 
 using namespace Simp1e;
@@ -44,38 +29,24 @@ IEnvironment*                               _environment;
 std::unique_ptr<SystemPointerManagerClient> systemManager;
 std::unique_ptr<EntityPointerManagerClient> entityManager;
 
-QTimer mainLoopTimer;
-int    mainLoopPerMillisecond = 1000;  // 16;
+QTimer                                                      mainLoopTimer;
+int                                                         mainLoopPerMillisecond = 1000;  // 16;
+std::chrono::time_point<std::chrono::high_resolution_clock> mainLoopLastTime =
+    std::chrono::high_resolution_clock::now();
 
 // TODO: add time delta!!!
 void GameLoop() {
     _Log_("GameLoop");
-    _environment->GetSystemManager()->Update(_environment);
+
+    auto currentTime = std::chrono::high_resolution_clock::now();
+    auto deltaTime   = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - mainLoopLastTime).count();
+    mainLoopLastTime = currentTime;
+    auto seconds     = deltaTime / 1000000.0;
+
+    _environment->GetSystemManager()->Update(_environment, seconds);
+
     _Log_("GameLoop end");
 }
-
-// Experimentation...
-class QtGUISystem {
-    IEnvironment* _environment;
-
-    void OnWindowAdded(Entity entity, ComponentType componentType, void* component) {
-        auto* windowComponent = component_cast<WindowComponent>(component);
-        entityManager->Add<QMainWindowComponent>(entity, windowComponent->GetTitle());
-    }
-
-public:
-    DEFINE_SYSTEM_TYPE("QtGUI")
-
-    QtGUISystem(IEnvironment* environment) : _environment(environment) {
-        auto* entityEvents = environment->GetEntityManager()->GetEventManager();
-        entityEvents->RegisterForComponentAdded<WindowComponent>(this, &QtGUISystem::OnWindowAdded);
-    }
-
-    void Update(IEnvironment* environment) {
-        _Log_("[Update] Getting all LabelComponent...");
-        // environment->GetEntityManager()->ForEach<LabelComponent>(this, &QtGUISystem::UpdateLabel);
-    }
-};
 
 void SetupSystems(IEnvironment* environment) { systemManager->Add<QtGUISystem>(environment); }
 
