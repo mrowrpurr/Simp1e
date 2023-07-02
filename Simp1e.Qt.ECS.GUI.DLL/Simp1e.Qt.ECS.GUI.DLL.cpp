@@ -30,6 +30,7 @@ _LogToFile_("Simp1e.Qt.ECS.GUI.log");
 #include <Simp1e/WindowComponent.h>
 
 #include <QApplication>
+#include <QTimer>
 #include <memory>
 
 using namespace Simp1e;
@@ -42,6 +43,16 @@ constexpr auto* ENVIRONMENT_NAME = "Default";
 IEnvironment*                               _environment;
 std::unique_ptr<SystemPointerManagerClient> systemManager;
 std::unique_ptr<EntityPointerManagerClient> entityManager;
+
+QTimer mainLoopTimer;
+int    mainLoopPerMillisecond = 1000;  // 16;
+
+// TODO: add time delta!!!
+void GameLoop() {
+    _Log_("GameLoop");
+    _environment->GetSystemManager()->Update(_environment);
+    _Log_("GameLoop end");
+}
 
 // Experimentation...
 class QtGUISystem {
@@ -84,11 +95,13 @@ OnSimp1eLoad {
 
 OnSimp1eStart {
     _Log_("Qt ECS GUI start");
-    _Log_("Running 1 update loop");
-    _environment->GetSystemManager()->Update(_environment);
-    // _Log_("Ran update loop");
+
+    QObject::connect(&mainLoopTimer, &QTimer::timeout, &app, GameLoop);
+    mainLoopTimer.start(mainLoopPerMillisecond);
 
     _Log_("Run Qt application");
     app.setStyle("Fusion");
     app.exec();
+
+    _Log_("Qt ECS GUI end");
 }
