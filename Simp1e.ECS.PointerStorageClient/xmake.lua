@@ -1,6 +1,7 @@
 target("Simp1e.ECS.PointerStorageClient")
     set_kind("headeronly")
     add_logging()
+    add_packages("void_pointer", {public = true})
     add_deps("Simp1e.ECS.PointerStorage", "Simp1e.Core")
     add_includedirs("include", {public = true})
     add_headerfiles("include/(**.h)")

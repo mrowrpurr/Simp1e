@@ -2,13 +2,12 @@
 
 #include <Simp1e/ComponentTypeHashKey.h>
 #include <Simp1e/IEntityPointerManager.h>
-#include <Simp1e/VoidPointer.h>
 #include <_Log_.h>
+#include <void_pointer.h>
 
 #include <memory>
 #include <unordered_map>
 #include <utility>
-
 
 namespace Simp1e {
 
@@ -42,14 +41,15 @@ namespace Simp1e {
             return _entityManager->GetComponentPointer(entity, componentType);
         }
 
-        void ForEachComponent(ComponentType componentType, void (*callback)(Entity, void*)) override {
-            _entityManager->ForEachComponent(componentType, callback);
-        }
+        // void ForEachComponentFunctionPtr(ComponentType componentType, void (*callback)(Entity, void*)) override {
+        //     // TODO - use function_pointer
+        //     // _entityManager->ForEachComponentFunctionPtr(componentType, callback);
+        // }
 
         template <typename T, typename... Args>
         T* Add(Entity entity, Args&&... args) {
             auto* component                              = new T(std::forward<Args>(args)...);
-            _componentMap[T::GetComponentType()][entity] = MakeVoidPointer(component);
+            _componentMap[T::GetComponentType()][entity] = void_pointer(component);
             _entityManager->AddComponentPointer(entity, T::GetComponentType(), component);
             return component;
         }

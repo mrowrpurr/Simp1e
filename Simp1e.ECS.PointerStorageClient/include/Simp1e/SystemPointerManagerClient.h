@@ -3,13 +3,12 @@
 #include <Simp1e/Executable.h>
 #include <Simp1e/ISystemPointerManager.h>
 #include <Simp1e/SystemTypeHashKey.h>
-#include <Simp1e/VoidPointer.h>
 #include <_Log_.h>
+#include <void_pointer.h>
 
 #include <memory>
 #include <unordered_map>
 #include <utility>
-
 
 namespace Simp1e {
 
@@ -31,7 +30,7 @@ namespace Simp1e {
                 auto* environment = static_cast<IEnvironment*>(environmentPointer);
                 system->Update(environment);
             });
-            _systems[systemType]           = MakeVoidPointer(system);
+            _systems[systemType]           = void_pointer(system);
             _systemExecutables[systemType] = std::unique_ptr<IExecutable>(systemExecutable);
             _systemManager->AddSystemPointer(systemType, systemExecutable);
             _Log_("[SystemPointerManagerClient] Added System {}", systemType);
