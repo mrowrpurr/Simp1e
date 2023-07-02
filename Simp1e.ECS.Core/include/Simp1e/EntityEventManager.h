@@ -136,48 +136,38 @@ namespace Simp1e {
         }
 
         void EntityCreated(Entity entity) override {
-            for (auto& callback : _entityCreatedCallbacks) FunctionPointer<void, Entity>::InvokeFunc(callback, entity);
+            for (auto& callback : _entityCreatedCallbacks) function_pointer::invoke(callback, entity);
         }
         void EntityDestroying(Entity entity) override {
-            for (auto& callback : _entityDestroyingCallbacks)
-                FunctionPointer<void, Entity>::InvokeFunc(callback, entity);
+            for (auto& callback : _entityDestroyingCallbacks) function_pointer::invoke(callback, entity);
         }
         void EntityDestroyed(Entity entity) override {
-            for (auto& callback : _entityDestroyedCallbacks)
-                FunctionPointer<void, Entity>::InvokeFunc(callback, entity);
+            for (auto& callback : _entityDestroyedCallbacks) function_pointer::invoke(callback, entity);
         }
 
         void ComponentAdding(Entity entity, ComponentType type) override {
-            for (auto& callback : _componentAddingCallbacks)
-                FunctionPointer<void, Entity, ComponentType>::InvokeFunc(callback, entity, type);
+            for (auto& callback : _componentAddingCallbacks) function_pointer::invoke(callback, entity, type);
             auto foundCallbacksByType = _componentAddingCallbacksByType.find(type);
             if (foundCallbacksByType != _componentAddingCallbacksByType.end())
-                for (auto& callback : foundCallbacksByType->second)
-                    FunctionPointer<void, Entity, ComponentType>::InvokeFunc(callback, entity, type);
+                for (auto& callback : foundCallbacksByType->second) function_pointer::invoke(callback, entity, type);
         }
         void ComponentAdded(Entity entity, ComponentType type) override {
-            for (auto& callback : _componentAddedCallbacks)
-                FunctionPointer<void, Entity, ComponentType>::InvokeFunc(callback, entity, type);
+            for (auto& callback : _componentAddedCallbacks) function_pointer::invoke(callback, entity, type);
             auto foundCallbacksByType = _componentAddedCallbacksByType.find(type);
             if (foundCallbacksByType != _componentAddedCallbacksByType.end())
-                for (auto& callback : foundCallbacksByType->second)
-                    FunctionPointer<void, Entity, ComponentType>::InvokeFunc(callback, entity, type);
+                for (auto& callback : foundCallbacksByType->second) function_pointer::invoke(callback, entity, type);
         }
         void ComponentRemoving(Entity entity, ComponentType type) override {
-            for (auto& callback : _componentRemovingCallbacks)
-                FunctionPointer<void, Entity, ComponentType>::InvokeFunc(callback, entity, type);
+            for (auto& callback : _componentRemovingCallbacks) function_pointer::invoke(callback, entity, type);
             auto foundCallbacksByType = _componentRemovingCallbacksByType.find(type);
             if (foundCallbacksByType != _componentRemovingCallbacksByType.end())
-                for (auto& callback : foundCallbacksByType->second)
-                    FunctionPointer<void, Entity, ComponentType>::InvokeFunc(callback, entity, type);
+                for (auto& callback : foundCallbacksByType->second) function_pointer::invoke(callback, entity, type);
         }
         void ComponentRemoved(Entity entity, ComponentType type) override {
-            for (auto& callback : _componentRemovedCallbacks)
-                FunctionPointer<void, Entity, ComponentType>::InvokeFunc(callback, entity, type);
+            for (auto& callback : _componentRemovedCallbacks) function_pointer::invoke(callback, entity, type);
             auto foundCallbacksByType = _componentRemovedCallbacksByType.find(type);
             if (foundCallbacksByType != _componentRemovedCallbacksByType.end())
-                for (auto& callback : foundCallbacksByType->second)
-                    FunctionPointer<void, Entity, ComponentType>::InvokeFunc(callback, entity, type);
+                for (auto& callback : foundCallbacksByType->second) function_pointer::invoke(callback, entity, type);
         }
     };
 }

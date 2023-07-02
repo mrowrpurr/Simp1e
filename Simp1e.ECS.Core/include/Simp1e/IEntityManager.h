@@ -1,7 +1,6 @@
 #pragma once
 
-#include <Simp1e/FunctionPointer.h>
-#include <Simp1e/MemberFunctionPointer.h>
+#include <function_pointer.h>
 
 #include <memory>
 
@@ -36,30 +35,33 @@ namespace Simp1e {
         }
 
         void ForEachComponentOfType(ComponentType componentType, void (*callback)(Entity, void*)) {
-            auto* functionPointer = new FunctionPointer<void, Entity, void*>(callback);
-            ForEachComponentFunctionPtr(componentType, functionPointer);
-            delete functionPointer;
+            // TODO ...
+            // ForEachComponentFunctionPtr(componentType, functionPointer);
+            // delete functionPointer;
         }
 
         template <typename T>
         void ForEachComponentOfType(ComponentType componentType, T* object, void (T::*callback)(Entity, void*)) {
-            auto* functionPointer = new MemberFunctionPointer<T, void, Entity, void*>(object, callback);
-            ForEachComponentFunctionPtr(componentType, functionPointer);
-            delete functionPointer;
+            // TODO ...
+            // auto* functionPointer = function_pointer(object, callback);
+            // ForEachComponentFunctionPtr(componentType, functionPointer);
+            // delete functionPointer;
         }
 
         template <typename ComponentT>
         void ForEach(void (*callback)(Entity, void*)) {
-            auto* functionPointer = new FunctionPointer<void, Entity, void*>(callback);
-            ForEachComponentFunctionPtr(ComponentT::GetComponentType(), functionPointer);
-            delete functionPointer;
+            // TODO ...
+            // auto* functionPointer = function_pointer(callback);
+            // ForEachComponentFunctionPtr(ComponentT::GetComponentType(), functionPointer);
+            // delete functionPointer;
         }
 
         template <typename ComponentT, typename T>
         void ForEach(T* object, void (T::*callback)(Entity, void*)) {
-            auto* functionPointer = new MemberFunctionPointer<T, void, Entity, void*>(object, callback);
-            ForEachComponentFunctionPtr(ComponentT::GetComponentType(), functionPointer);
-            delete functionPointer;
+            // TODO ...
+            // auto* functionPointer = function_pointer(object, callback);
+            // ForEachComponentFunctionPtr(ComponentT::GetComponentType(), functionPointer);
+            // delete functionPointer;
         }
 
         template <typename T>

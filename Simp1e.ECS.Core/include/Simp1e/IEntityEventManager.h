@@ -1,7 +1,6 @@
 #pragma once
 
-#include <Simp1e/FunctionPointer.h>
-#include <Simp1e/MemberFunctionPointer.h>
+#include <function_pointer.h>
 
 #include "ComponentType.h"
 #include "Entity.h"
@@ -52,199 +51,160 @@ namespace Simp1e {
 
         template <typename T>
         IFunctionPointer* RegisterForEntityCreated(T* object, void (T::*method)(Entity)) {
-            return RegisterForEntityCreated(new MemberFunctionPointer<T, void, Entity>(object, method));
+            // return RegisterForEntityCreated(new MemberFunctionPointer<T, void, Entity>(object, method));
+            return RegisterForEntityCreated(new_function_pointer(object, method));
         }
 
         IFunctionPointer* RegisterForEntityCreated(void (*function)(Entity)) {
-            return RegisterForEntityCreated(new FunctionPointer<void, Entity>(function));
+            // return RegisterForEntityCreated(new FunctionPointer<void, Entity>(function));
+            return RegisterForEntityCreated(new_function_pointer(function));
         }
 
         template <typename T>
         IFunctionPointer* RegisterForEntityDestroying(T* object, void (T::*method)(Entity)) {
-            return RegisterForEntityDestroying(new MemberFunctionPointer<T, void, Entity>(object, method));
+            // return RegisterForEntityDestroying(new MemberFunctionPointer<T, void, Entity>(object, method));
+            return RegisterForEntityDestroying(new_function_pointer(object, method));
         }
 
         IFunctionPointer* RegisterForEntityDestroying(void (*function)(Entity)) {
-            return RegisterForEntityDestroying(new FunctionPointer<void, Entity>(function));
+            return RegisterForEntityDestroying(new_function_pointer(function));
         }
 
         template <typename T>
         IFunctionPointer* RegisterForEntityDestroyed(T* object, void (T::*method)(Entity)) {
-            return RegisterForEntityDestroyed(new MemberFunctionPointer<T, void, Entity>(object, method));
+            return RegisterForEntityDestroyed(new_function_pointer(object, method));
         }
 
         IFunctionPointer* RegisterForEntityDestroyed(void (*function)(Entity)) {
-            return RegisterForEntityDestroyed(new FunctionPointer<void, Entity>(function));
+            return RegisterForEntityDestroyed(new_function_pointer(function));
         }
 
         template <typename T>
         IFunctionPointer* RegisterForAllComponentAdding(T* object, void (T::*method)(Entity, ComponentType)) {
-            return RegisterForAllComponentAdding(
-                new MemberFunctionPointer<T, void, Entity, ComponentType>(object, method)
-            );
+            return RegisterForAllComponentAdding(new_function_pointer(object, method));
         }
 
         IFunctionPointer* RegisterForAllComponentAdding(void (*function)(Entity, ComponentType)) {
-            return RegisterForAllComponentAdding(new FunctionPointer<void, Entity, ComponentType>(function));
+            return RegisterForAllComponentAdding(new_function_pointer(function));
         }
 
         template <typename T>
         IFunctionPointer* RegisterForAllComponentAdded(T* object, void (T::*method)(Entity, ComponentType)) {
-            return RegisterForAllComponentAdded(
-                new MemberFunctionPointer<T, void, Entity, ComponentType>(object, method)
-            );
+            return RegisterForAllComponentAdded(new_function_pointer(object, method));
         }
 
         IFunctionPointer* RegisterForAllComponentAdded(void (*function)(Entity, ComponentType)) {
-            return RegisterForAllComponentAdded(new FunctionPointer<void, Entity, ComponentType>(function));
+            return RegisterForAllComponentAdded(new_function_pointer(function));
         }
 
         template <typename T>
         IFunctionPointer* RegisterForAllComponentRemoving(T* object, void (T::*method)(Entity, ComponentType)) {
-            return RegisterForAllComponentRemoving(
-                new MemberFunctionPointer<T, void, Entity, ComponentType>(object, method)
-            );
+            return RegisterForAllComponentRemoving(new_function_pointer(object, method));
         }
 
         IFunctionPointer* RegisterForAllComponentRemoving(void (*function)(Entity, ComponentType)) {
-            return RegisterForAllComponentRemoving(new FunctionPointer<void, Entity, ComponentType>(function));
+            return RegisterForAllComponentRemoving(new_function_pointer(function));
         }
 
         template <typename T>
         IFunctionPointer* RegisterForAllComponentRemoved(T* object, void (T::*method)(Entity, ComponentType)) {
-            return RegisterForAllComponentRemoved(
-                new MemberFunctionPointer<T, void, Entity, ComponentType>(object, method)
-            );
+            return RegisterForAllComponentRemoved(new_function_pointer(object, method));
         }
 
         IFunctionPointer* RegisterForAllComponentRemoved(void (*function)(Entity, ComponentType)) {
-            return RegisterForAllComponentRemoved(new FunctionPointer<void, Entity, ComponentType>(function));
+            return RegisterForAllComponentRemoved(new_function_pointer(function));
         }
 
         template <typename T>
         IFunctionPointer* RegisterForComponentAdding(
             ComponentType componentType, T* object, void (T::*method)(Entity, ComponentType)
         ) {
-            return RegisterForComponentAdding(
-                componentType, new MemberFunctionPointer<T, void, Entity, ComponentType>(object, method)
-            );
+            return RegisterForComponentAdding(componentType, new_function_pointer(object, method));
         }
 
         template <typename ComponentT, typename T>
         IFunctionPointer* RegisterForComponentAdding(T* object, void (T::*method)(Entity, ComponentType)) {
-            return RegisterForComponentAdding(
-                ComponentT::GetComponentType(),
-                new MemberFunctionPointer<T, void, Entity, ComponentType>(object, method)
-            );
+            return RegisterForComponentAdding(ComponentT::GetComponentType(), new_function_pointer(object, method));
         }
 
         IFunctionPointer* RegisterForComponentAdding(
             ComponentType componentType, void (*function)(Entity, ComponentType)
         ) {
-            return RegisterForComponentAdding(
-                componentType, new FunctionPointer<void, Entity, ComponentType>(function)
-            );
+            return RegisterForComponentAdding(componentType, new_function_pointer(function));
         }
 
         template <typename ComponentT>
         IFunctionPointer* RegisterForComponentAdding(void (*function)(Entity, ComponentType)) {
-            return RegisterForComponentAdding(
-                ComponentT::GetComponentType(), new FunctionPointer<void, Entity, ComponentType>(function)
-            );
+            return RegisterForComponentAdding(ComponentT::GetComponentType(), new_function_pointer(function));
         }
 
         template <typename T>
         IFunctionPointer* RegisterForComponentAdded(
             ComponentType componentType, T* object, void (T::*method)(Entity, ComponentType)
         ) {
-            return RegisterForComponentAdded(
-                componentType, new MemberFunctionPointer<T, void, Entity, ComponentType>(object, method)
-            );
+            return RegisterForComponentAdded(componentType, new_function_pointer(object, method));
         }
 
         template <typename ComponentT, typename T>
         IFunctionPointer* RegisterForComponentAdded(T* object, void (T::*method)(Entity, ComponentType)) {
-            return RegisterForComponentAdded(
-                ComponentT::GetComponentType(),
-                new MemberFunctionPointer<T, void, Entity, ComponentType>(object, method)
-            );
+            return RegisterForComponentAdded(ComponentT::GetComponentType(), new_function_pointer(object, method));
         }
 
         IFunctionPointer* RegisterForComponentAdded(
             ComponentType componentType, void (*function)(Entity, ComponentType)
         ) {
-            return RegisterForComponentAdded(componentType, new FunctionPointer<void, Entity, ComponentType>(function));
+            return RegisterForComponentAdded(componentType, new_function_pointer(function));
         }
 
         template <typename ComponentT>
         IFunctionPointer* RegisterForComponentAdded(void (*function)(Entity, ComponentType)) {
-            return RegisterForComponentAdded(
-                ComponentT::GetComponentType(), new FunctionPointer<void, Entity, ComponentType>(function)
-            );
+            return RegisterForComponentAdded(ComponentT::GetComponentType(), new_function_pointer(function));
         }
 
         template <typename T>
         IFunctionPointer* RegisterForComponentRemoving(
             ComponentType componentType, T* object, void (T::*method)(Entity, ComponentType)
         ) {
-            return RegisterForComponentRemoving(
-                componentType, new MemberFunctionPointer<T, void, Entity, ComponentType>(object, method)
-            );
+            return RegisterForComponentRemoving(componentType, new_function_pointer(object, method));
         }
 
         template <typename ComponentT, typename T>
         IFunctionPointer* RegisterForComponentRemoving(T* object, void (T::*method)(Entity, ComponentType)) {
-            return RegisterForComponentRemoving(
-                ComponentT::GetComponentType(),
-                new MemberFunctionPointer<T, void, Entity, ComponentType>(object, method)
-            );
+            return RegisterForComponentRemoving(ComponentT::GetComponentType(), new_function_pointer(object, method));
         }
 
         IFunctionPointer* RegisterForComponentRemoving(
             ComponentType componentType, void (*function)(Entity, ComponentType)
         ) {
-            return RegisterForComponentRemoving(
-                componentType, new FunctionPointer<void, Entity, ComponentType>(function)
-            );
+            return RegisterForComponentRemoving(componentType, new_function_pointer(function));
         }
 
         template <typename ComponentT>
         IFunctionPointer* RegisterForComponentRemoving(void (*function)(Entity, ComponentType)) {
-            return RegisterForComponentRemoving(
-                ComponentT::GetComponentType(), new FunctionPointer<void, Entity, ComponentType>(function)
-            );
+            return RegisterForComponentRemoving(ComponentT::GetComponentType(), new_function_pointer(function));
         }
 
         template <typename T>
         IFunctionPointer* RegisterForComponentRemoved(
             ComponentType componentType, T* object, void (T::*method)(Entity, ComponentType)
         ) {
-            return RegisterForComponentRemoved(
-                componentType, new MemberFunctionPointer<T, void, Entity, ComponentType>(object, method)
-            );
+            return RegisterForComponentRemoved(componentType, new_function_pointer(object, method));
         }
 
         template <typename ComponentT, typename T>
         IFunctionPointer* RegisterForComponentRemoved(T* object, void (T::*method)(Entity, ComponentType)) {
-            return RegisterForComponentRemoved(
-                ComponentT::GetComponentType(),
-                new MemberFunctionPointer<T, void, Entity, ComponentType>(object, method)
-            );
+            return RegisterForComponentRemoved(ComponentT::GetComponentType(), new_function_pointer(object, method));
         }
 
         IFunctionPointer* RegisterForComponentRemoved(
             ComponentType componentType, void (*function)(Entity, ComponentType)
         ) {
-            return RegisterForComponentRemoved(
-                componentType, new FunctionPointer<void, Entity, ComponentType>(function)
-            );
+            return RegisterForComponentRemoved(componentType, new_function_pointer(function));
         }
 
         template <typename ComponentT>
         IFunctionPointer* RegisterForComponentRemoved(void (*function)(Entity, ComponentType)) {
-            return RegisterForComponentRemoved(
-                ComponentT::GetComponentType(), new FunctionPointer<void, Entity, ComponentType>(function)
-            );
+            return RegisterForComponentRemoved(ComponentT::GetComponentType(), new_function_pointer(function));
         }
     };
 }
