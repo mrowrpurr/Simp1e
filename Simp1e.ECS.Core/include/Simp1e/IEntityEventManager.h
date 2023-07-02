@@ -44,10 +44,10 @@ namespace Simp1e {
         virtual void EntityDestroying(Entity entity) = 0;
         virtual void EntityDestroyed(Entity entity)  = 0;
 
-        virtual void ComponentAdding(Entity entity, ComponentType componentType)   = 0;
-        virtual void ComponentAdded(Entity entity, ComponentType componentType)    = 0;
-        virtual void ComponentRemoving(Entity entity, ComponentType componentType) = 0;
-        virtual void ComponentRemoved(Entity entity, ComponentType componentType)  = 0;
+        virtual void ComponentAdding(Entity entity, ComponentType componentType)                    = 0;
+        virtual void ComponentAdded(Entity entity, ComponentType componentType, void* component)    = 0;
+        virtual void ComponentRemoving(Entity entity, ComponentType componentType, void* component) = 0;
+        virtual void ComponentRemoved(Entity entity, ComponentType componentType)                   = 0;
 
         template <typename T>
         IFunctionPointer* RegisterForEntityCreated(T* object, void (T::*method)(Entity)) {
@@ -89,20 +89,20 @@ namespace Simp1e {
         }
 
         template <typename T>
-        IFunctionPointer* RegisterForAllComponentAdded(T* object, void (T::*method)(Entity, ComponentType)) {
+        IFunctionPointer* RegisterForAllComponentAdded(T* object, void (T::*method)(Entity, ComponentType, void*)) {
             return RegisterForAllComponentAdded(new_function_pointer(object, method));
         }
 
-        IFunctionPointer* RegisterForAllComponentAdded(void (*function)(Entity, ComponentType)) {
+        IFunctionPointer* RegisterForAllComponentAdded(void (*function)(Entity, ComponentType, void*)) {
             return RegisterForAllComponentAdded(new_function_pointer(function));
         }
 
         template <typename T>
-        IFunctionPointer* RegisterForAllComponentRemoving(T* object, void (T::*method)(Entity, ComponentType)) {
+        IFunctionPointer* RegisterForAllComponentRemoving(T* object, void (T::*method)(Entity, ComponentType, void*)) {
             return RegisterForAllComponentRemoving(new_function_pointer(object, method));
         }
 
-        IFunctionPointer* RegisterForAllComponentRemoving(void (*function)(Entity, ComponentType)) {
+        IFunctionPointer* RegisterForAllComponentRemoving(void (*function)(Entity, ComponentType, void())) {
             return RegisterForAllComponentRemoving(new_function_pointer(function));
         }
 
@@ -140,47 +140,47 @@ namespace Simp1e {
 
         template <typename T>
         IFunctionPointer* RegisterForComponentAdded(
-            ComponentType componentType, T* object, void (T::*method)(Entity, ComponentType)
+            ComponentType componentType, T* object, void (T::*method)(Entity, ComponentType, void*)
         ) {
             return RegisterForComponentAdded(componentType, new_function_pointer(object, method));
         }
 
         template <typename ComponentT, typename T>
-        IFunctionPointer* RegisterForComponentAdded(T* object, void (T::*method)(Entity, ComponentType)) {
+        IFunctionPointer* RegisterForComponentAdded(T* object, void (T::*method)(Entity, ComponentType, void*)) {
             return RegisterForComponentAdded(ComponentT::GetComponentType(), new_function_pointer(object, method));
         }
 
         IFunctionPointer* RegisterForComponentAdded(
-            ComponentType componentType, void (*function)(Entity, ComponentType)
+            ComponentType componentType, void (*function)(Entity, ComponentType, void*)
         ) {
             return RegisterForComponentAdded(componentType, new_function_pointer(function));
         }
 
         template <typename ComponentT>
-        IFunctionPointer* RegisterForComponentAdded(void (*function)(Entity, ComponentType)) {
+        IFunctionPointer* RegisterForComponentAdded(void (*function)(Entity, ComponentType, void*)) {
             return RegisterForComponentAdded(ComponentT::GetComponentType(), new_function_pointer(function));
         }
 
         template <typename T>
         IFunctionPointer* RegisterForComponentRemoving(
-            ComponentType componentType, T* object, void (T::*method)(Entity, ComponentType)
+            ComponentType componentType, T* object, void (T::*method)(Entity, ComponentType, void*)
         ) {
             return RegisterForComponentRemoving(componentType, new_function_pointer(object, method));
         }
 
         template <typename ComponentT, typename T>
-        IFunctionPointer* RegisterForComponentRemoving(T* object, void (T::*method)(Entity, ComponentType)) {
+        IFunctionPointer* RegisterForComponentRemoving(T* object, void (T::*method)(Entity, ComponentType, void*)) {
             return RegisterForComponentRemoving(ComponentT::GetComponentType(), new_function_pointer(object, method));
         }
 
         IFunctionPointer* RegisterForComponentRemoving(
-            ComponentType componentType, void (*function)(Entity, ComponentType)
+            ComponentType componentType, void (*function)(Entity, ComponentType, void*)
         ) {
             return RegisterForComponentRemoving(componentType, new_function_pointer(function));
         }
 
         template <typename ComponentT>
-        IFunctionPointer* RegisterForComponentRemoving(void (*function)(Entity, ComponentType)) {
+        IFunctionPointer* RegisterForComponentRemoving(void (*function)(Entity, ComponentType, void*)) {
             return RegisterForComponentRemoving(ComponentT::GetComponentType(), new_function_pointer(function));
         }
 

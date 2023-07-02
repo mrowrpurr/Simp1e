@@ -1,11 +1,13 @@
 #include <_Log_.h>
 _LogToFile_("Simp1e.Editor.log");
 
+#include <Simp1e/ApplicationComponent.h>
 #include <Simp1e/EntityPointerManagerClient.h>
 #include <Simp1e/IEnvironmentManagerService.h>
 #include <Simp1e/LabelComponent.h>
 #include <Simp1e/ServiceHostClient.h>
 #include <Simp1e/TextComponent.h>
+#include <Simp1e/WindowComponent.h>
 
 #include <memory>
 
@@ -17,14 +19,10 @@ std::unique_ptr<EntityPointerManagerClient> entityManager;
 
 void CreateEntities() {
     _Log_("Creating entities");
-    auto label1 = entityManager->CreateEntity();
-    entityManager->Add<TextComponent>(label1, "Hello from label 1");
-    entityManager->Add<LabelComponent>(label1);
+    //
 
-    auto label2 = entityManager->CreateEntity();
-    entityManager->Add<TextComponent>(label2, "Hello from label 2");
-    entityManager->Add<LabelComponent>(label2);
-    _Log_("Entities created");
+    auto windowEntity = entityManager->CreateEntity();
+    entityManager->Add<WindowComponent>(windowEntity, "Simp1e Editor");
 }
 
 void Initialize(IEnvironment* environment) {

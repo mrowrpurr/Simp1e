@@ -37,7 +37,7 @@ namespace Simp1e {
             for (auto& [componentType, componentMap] : _componentPointers) {
                 auto found = componentMap.find(entity);
                 if (found == componentMap.end()) continue;
-                _eventManager.ComponentRemoving(entity, ComponentTypeFromHashKey(componentType));
+                _eventManager.ComponentRemoving(entity, ComponentTypeFromHashKey(componentType), found->second);
                 componentMap.erase(found);
                 _eventManager.ComponentRemoved(entity, ComponentTypeFromHashKey(componentType));
             }
@@ -47,7 +47,9 @@ namespace Simp1e {
         bool EntityExists(Entity entity) override { return _entities.find(entity) != _entities.end(); }
 
         void RemoveComponent(Entity entity, ComponentType componentType) override {
-            _eventManager.ComponentRemoving(entity, componentType);
+            auto foundComponent = _entities[entity].find(componentType);
+            if (foundComponent == _entities[entity].end()) return;
+            _eventManager.ComponentRemoving(entity, componentType, foundComponent->second);
             _componentPointers[componentType].erase(entity);
             _entities[entity].erase(componentType);
             _eventManager.ComponentRemoved(entity, componentType);
@@ -81,7 +83,7 @@ namespace Simp1e {
             _eventManager.ComponentAdding(entity, componentType);
             _componentPointers[componentType][entity] = component;
             _entities[entity][componentType]          = component;
-            _eventManager.ComponentAdded(entity, componentType);
+            _eventManager.ComponentAdded(entity, componentType, component);
         }
     };
 }

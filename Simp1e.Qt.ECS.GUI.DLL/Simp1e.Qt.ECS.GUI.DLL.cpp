@@ -20,42 +20,36 @@ _LogToFile_("Simp1e.Qt.ECS.GUI.log");
 
 #include <Simp1e/ComponentCast.h>
 #include <Simp1e/DefineSystemType.h>
+#include <Simp1e/EntityPointerManagerClient.h>
 #include <Simp1e/IEnvironmentManagerService.h>
 #include <Simp1e/LabelComponent.h>
+#include <Simp1e/QMainWindowComponent.h>
 #include <Simp1e/ServiceHostClient.h>
 #include <Simp1e/SystemPointerManagerClient.h>
 #include <Simp1e/TextComponent.h>
+#include <Simp1e/WindowComponent.h>
 
+#include <QApplication>
 #include <memory>
 
 using namespace Simp1e;
+
+int          argc = 0;
+QApplication app{argc, nullptr};
 
 constexpr auto* ENVIRONMENT_NAME = "Default";
 
 IEnvironment*                               _environment;
 std::unique_ptr<SystemPointerManagerClient> systemManager;
+std::unique_ptr<EntityPointerManagerClient> entityManager;
 
 // Experimentation...
 class QtGUISystem {
     IEnvironment* _environment;
 
-    void OnLabelCreated(Entity entity, ComponentType componentType) {
-        _Log_("QtGUI System says: Label created! - {}", componentType);
-    }
-    void OnAnythingCreated(Entity entity, ComponentType componentType) {
-        _Log_("QtGUI System says: Something created! {}", componentType);
-    }
-
-    void UpdateLabel(Entity entity, void* component) {
-        _Log_("UpdateLabel({})", entity);
-
-        auto* labelComponent = component_cast<LabelComponent>(component);
-        if (!labelComponent) return;
-
-        auto* textComponent = _environment->GetEntityManager()->Get<TextComponent>(entity);
-        if (!textComponent) return;
-
-        _Log_("Label for entity {} will have text '{}'", entity, textComponent->GetText());
+    void OnWindowAdded(Entity entity, ComponentType componentType, void* component) {
+        auto* windowComponent = component_cast<WindowComponent>(component);
+        entityManager->Add<QMainWindowComponent>(entity, windowComponent->GetTitle());
     }
 
 public:
@@ -63,13 +57,12 @@ public:
 
     QtGUISystem(IEnvironment* environment) : _environment(environment) {
         auto* entityEvents = environment->GetEntityManager()->GetEventManager();
-        entityEvents->RegisterForAllComponentAdded(this, &QtGUISystem::OnAnythingCreated);
-        entityEvents->RegisterForComponentAdded<LabelComponent, QtGUISystem>(this, &QtGUISystem::OnLabelCreated);
+        entityEvents->RegisterForComponentAdded<WindowComponent>(this, &QtGUISystem::OnWindowAdded);
     }
 
     void Update(IEnvironment* environment) {
         _Log_("[Update] Getting all LabelComponent...");
-        environment->GetEntityManager()->ForEach<LabelComponent>(this, &QtGUISystem::UpdateLabel);
+        // environment->GetEntityManager()->ForEach<LabelComponent>(this, &QtGUISystem::UpdateLabel);
     }
 };
 
@@ -78,6 +71,7 @@ void SetupSystems(IEnvironment* environment) { systemManager->Add<QtGUISystem>(e
 void Initialize(IEnvironment* environment) {
     _environment  = environment;
     systemManager = std::make_unique<SystemPointerManagerClient>(environment->GetSystemManager());
+    entityManager = std::make_unique<EntityPointerManagerClient>(environment->GetEntityManager());
     SetupSystems(environment);
 }
 
@@ -92,5 +86,9 @@ OnSimp1eStart {
     _Log_("Qt ECS GUI start");
     _Log_("Running 1 update loop");
     _environment->GetSystemManager()->Update(_environment);
-    _Log_("Ran update loop");
+    // _Log_("Ran update loop");
+
+    _Log_("Run Qt application");
+    app.setStyle("Fusion");
+    app.exec();
 }
