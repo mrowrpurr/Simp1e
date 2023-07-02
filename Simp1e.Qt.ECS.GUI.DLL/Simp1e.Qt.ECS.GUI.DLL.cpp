@@ -68,6 +68,7 @@ public:
     }
 
     void Update(IEnvironment* environment) {
+        _Log_("[Update] Getting all LabelComponent...");
         environment->GetEntityManager()->ForEach<LabelComponent>(this, &QtGUISystem::UpdateLabel);
     }
 };

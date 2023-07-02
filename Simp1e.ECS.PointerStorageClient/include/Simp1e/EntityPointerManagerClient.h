@@ -41,13 +41,14 @@ namespace Simp1e {
             return _entityManager->GetComponentPointer(entity, componentType);
         }
 
-        // void ForEachComponentFunctionPtr(ComponentType componentType, void (*callback)(Entity, void*)) override {
-        //     // TODO - use function_pointer
-        //     // _entityManager->ForEachComponentFunctionPtr(componentType, callback);
-        // }
+        void ForEachComponentFunction(ComponentType componentType, IFunctionPointer* callback) override {
+            _Log_("[EntityPointerManagerClient] ForEachComponentFunction");
+            _entityManager->ForEachComponentFunction(componentType, callback);
+        }
 
         template <typename T, typename... Args>
         T* Add(Entity entity, Args&&... args) {
+            _Log_("[EntityPointerManagerClient] Add component of type {} to {}", T::GetComponentType(), entity);
             auto* component                              = new T(std::forward<Args>(args)...);
             _componentMap[T::GetComponentType()][entity] = void_pointer(component);
             _entityManager->AddComponentPointer(entity, T::GetComponentType(), component);

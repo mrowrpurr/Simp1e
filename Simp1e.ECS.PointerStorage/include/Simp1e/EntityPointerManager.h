@@ -68,13 +68,12 @@ namespace Simp1e {
             return found->second;
         }
 
-        void ForEachComponentFunctionPtr(ComponentType componentType, IFunctionPointer* functionPointer) override {
-            // TODO ...
-            // _Log_("[EntityPointerManager] ForEachComponent of type {}", componentType);
-            // auto componentMap = _componentPointers.find(componentType);
-            // if (componentMap == _componentPointers.end()) return;
-            // for (auto& [entity, component] : componentMap->second)
-            //     FunctionPointer<void, Entity, void*>::InvokeFunc(functionPointer, entity, component);
+        void ForEachComponentFunction(ComponentType componentType, IFunctionPointer* functionPointer) override {
+            _Log_("[EntityPointerManager] ForEachComponent of type {}", componentType);
+            auto componentMap = _componentPointers.find(componentType);
+            if (componentMap == _componentPointers.end()) return;
+            for (auto& [entity, component] : componentMap->second)
+                function_pointer::invoke(functionPointer, entity, component);
         }
 
         void AddComponentPointer(Entity entity, ComponentType componentType, void* component) override {
