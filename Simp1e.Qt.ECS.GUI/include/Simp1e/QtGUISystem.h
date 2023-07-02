@@ -7,6 +7,8 @@
 #include <Simp1e/QMainWindowComponent.h>
 #include <Simp1e/WindowComponent.h>
 
+#include <QStatusBar>
+
 namespace Simp1e {
 
     class QtGUISystem {
@@ -16,6 +18,14 @@ namespace Simp1e {
         void OnWindowAdded(Entity entity, ComponentType componentType, void* component) {
             auto* windowComponent = component_cast<WindowComponent>(component);
             _entityManager->Add<QMainWindowComponent>(entity, windowComponent->GetTitle());
+        }
+
+        void UpdateWindow(Entity entity, void* component) {
+            auto windowComponent = component_cast<WindowComponent>(component);
+            if (!windowComponent->IsDirtyFlagSet(WindowComponent::Fields::StatusBarText)) return;
+            auto* qMainWindowComponent = _environment->GetEntityManager()->Get<QMainWindowComponent>(entity);
+            qMainWindowComponent->GetQMainWindow()->statusBar()->showMessage(windowComponent->GetStatusBarText());
+            windowComponent->RemoveDirtyFlag(WindowComponent::Fields::StatusBarText);
         }
 
     public:
@@ -29,9 +39,9 @@ namespace Simp1e {
 
         void Update(IEnvironment* environment, double deltaTime) {
             _Log_("QtGUI Update deltaTime:{}", deltaTime);
-            // Update stuff...
-            // _Log_("[Update] Getting all LabelComponent...");
-            // environment->GetEntityManager()->ForEach<LabelComponent>(this, &QtGUISystem::UpdateLabel);
+
+            // Let's try updating the status bar text...
+            environment->GetEntityManager()->ForEach<WindowComponent>(this, &QtGUISystem::UpdateWindow);
         }
     };
 }

@@ -34,7 +34,6 @@ int                                                         mainLoopPerMilliseco
 std::chrono::time_point<std::chrono::high_resolution_clock> mainLoopLastTime =
     std::chrono::high_resolution_clock::now();
 
-// TODO: add time delta!!!
 void GameLoop() {
     _Log_("GameLoop");
 

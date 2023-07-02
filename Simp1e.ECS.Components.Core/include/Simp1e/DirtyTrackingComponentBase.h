@@ -1,14 +1,31 @@
 #pragma once
 
-#include "IDirtyTrackingComponentBase.h"
-
 namespace Simp1e {
 
-    class DirtyTrackingComponentBase : public IDirtyTrackingComponentBase {
-        bool _dirty = false;
+    class DirtyTrackingComponentBase {
+        int _dirtyFlags = 0;
 
     public:
-        void SetDirty(bool dirty) override { _dirty = dirty; }
-        bool IsDirty() const override { return _dirty; }
+        void AddDirtyFlag(int flag) { _dirtyFlags |= flag; }
+        void RemoveDirtyFlag(int flag) { _dirtyFlags &= ~flag; }
+        bool IsDirtyFlagSet(int flag) const { return (_dirtyFlags & flag) != 0; }
+        bool IsDirty() const { return _dirtyFlags != 0; }
+        void SetDirty(bool dirty) { _dirtyFlags = dirty ? 1 : 0; }
+        void ClearDirty() { _dirtyFlags = 0; }
+
+        template <typename T>
+        void AddDirtyFlag(T flag) {
+            AddDirtyFlag((int)flag);
+        }
+
+        template <typename T>
+        void RemoveDirtyFlag(T flag) {
+            RemoveDirtyFlag((int)flag);
+        }
+
+        template <typename T>
+        bool IsDirtyFlagSet(T flag) const {
+            return IsDirtyFlagSet((int)flag);
+        }
     };
 }

@@ -1,8 +1,11 @@
 #pragma once
 
-#include "ILabelComponent.h"
+#include <Simp1e/DefineComponentType.h>
 
 namespace Simp1e {
 
-    class LabelComponent : public ILabelComponent {};
+    class LabelComponent {
+    public:
+        DEFINE_COMPONENT_TYPE("Label");
+    };
 }
