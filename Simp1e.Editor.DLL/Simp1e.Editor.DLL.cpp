@@ -5,6 +5,7 @@ _LogToFile_("Simp1e.Editor.log");
 #include <Simp1e/EntityPointerManagerClient.h>
 #include <Simp1e/IEnvironmentManagerService.h>
 #include <Simp1e/LabelComponent.h>
+// #include <Simp1e/MenuComponent.h>
 #include <Simp1e/ServiceHostClient.h>
 #include <Simp1e/SystemPointerManagerClient.h>
 #include <Simp1e/TextComponent.h>
@@ -25,7 +26,7 @@ class UpdateWindowStatusBarSystem {
     double _totalTime;
 
     void UpdateWindow(Entity entity, void* component) {
-        auto* windowComponent = component_cast<WindowComponent>(component);
+        auto* windowComponent = component_cast<IWindowComponent>(component);
         windowComponent->SetStatusBarText(string_format("Time: {}", _totalTime).c_str());
     }
 
@@ -34,15 +35,13 @@ public:
 
     void Update(IEnvironment* environment, double deltaTime) {
         _totalTime += deltaTime;
-        environment->GetEntityManager()->ForEach<WindowComponent>(this, &UpdateWindowStatusBarSystem::UpdateWindow);
+        environment->GetEntityManager()->ForEach<IWindowComponent>(this, &UpdateWindowStatusBarSystem::UpdateWindow);
     }
 };
 
 void CreateEntities() {
     auto windowEntity = entityManager->CreateEntity();
     entityManager->Add<WindowComponent>(windowEntity, "Simp1e Editor");
-
-    // Status bar text ... of window?
 
     // Menu items
 
