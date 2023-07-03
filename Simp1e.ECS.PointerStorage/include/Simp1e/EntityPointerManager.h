@@ -79,7 +79,7 @@ namespace Simp1e {
         }
 
         void AddComponentPointer(Entity entity, ComponentType componentType, void* component) override {
-            _Log_("[EntityPointerManager] AddComponentPointer of type {}", componentType);
+            _Log_("[EntityPointerManager] AddComponentPointer of type {} of entity {}", componentType, entity);
             _eventManager.ComponentAdding(entity, componentType);
             _componentPointers[componentType][entity] = component;
             _entities[entity][componentType]          = component;

@@ -4,7 +4,6 @@
 
 #include "IWindowComponent.h"
 
-
 namespace Simp1e {
 
     class WindowComponent : public IWindowComponent {
@@ -12,8 +11,6 @@ namespace Simp1e {
         std::string _statusBarText;
 
     public:
-        DEFINE_COMPONENT_TYPE("Window");
-
         WindowComponent() = default;
         WindowComponent(const char* title) : _title(title) {}
 
@@ -22,12 +19,12 @@ namespace Simp1e {
 
         void SetTitle(const char* title) override {
             _title = title;
-            AddDirtyFlag(Fields::Title);
+            SetDirtyFlag(Fields::Title);
         }
 
         void SetStatusBarText(const char* text) override {
             _statusBarText = text;
-            AddDirtyFlag(Fields::StatusBarText);
+            SetDirtyFlag(Fields::StatusBarText);
         }
     };
 }

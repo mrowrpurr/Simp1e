@@ -5,11 +5,12 @@ _LogToFile_("Simp1e.Editor.log");
 #include <Simp1e/EntityPointerManagerClient.h>
 #include <Simp1e/IEnvironmentManagerService.h>
 #include <Simp1e/LabelComponent.h>
-// #include <Simp1e/MenuComponent.h>
 #include <Simp1e/ServiceHostClient.h>
 #include <Simp1e/SystemPointerManagerClient.h>
 #include <Simp1e/TextComponent.h>
 #include <Simp1e/WindowComponent.h>
+#include <Simp1e/WindowMenuComponent.h>
+#include <Simp1e/WindowMenuItemComponent.h>
 #include <string_format.h>
 
 #include <memory>
@@ -44,6 +45,13 @@ void CreateEntities() {
     entityManager->Add<WindowComponent>(windowEntity, "Simp1e Editor");
 
     // Menu items
+    auto fileMenuEntity = entityManager->CreateEntity();
+    entityManager->Add<WindowMenuComponent>(fileMenuEntity, windowEntity, "File");
+
+    auto aboutMenuItemEntity = entityManager->CreateEntity();
+    entityManager->Add<WindowMenuItemComponent>(aboutMenuItemEntity, fileMenuEntity, "About");
+
+    // TODO: ADD an OnClick for the MenuItem <--
 
     // Toolbar items
 }

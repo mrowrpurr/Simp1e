@@ -1,17 +1,12 @@
 #include <_Log_.h>
 _LogToFile_("Simp1e.Qt.ECS.GUI.log");
 
-#include <Simp1e/ComponentCast.h>
-#include <Simp1e/DefineSystemType.h>
 #include <Simp1e/EntityPointerManagerClient.h>
 #include <Simp1e/IEnvironmentManagerService.h>
-#include <Simp1e/LabelComponent.h>
-#include <Simp1e/QMainWindowComponent.h>
+
 #include <Simp1e/QtGUISystem.h>
 #include <Simp1e/ServiceHostClient.h>
 #include <Simp1e/SystemPointerManagerClient.h>
-#include <Simp1e/TextComponent.h>
-#include <Simp1e/WindowComponent.h>
 
 #include <QApplication>
 #include <QTimer>

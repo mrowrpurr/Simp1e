@@ -1,22 +1,19 @@
 #pragma once
 
-#include <Simp1e/DefineComponentType.h>
-#include <Simp1e/Entity.h>
-
 #include <string>
+
+#include "IWindowMenuComponent.h"
 
 namespace Simp1e {
 
-    class WindowMenuComponent {
+    class WindowMenuComponent : public IWindowMenuComponent {
         Entity      _windowEntity;
         std::string _text;
 
     public:
-        DEFINE_COMPONENT_TYPE("Menu");
-
         WindowMenuComponent(Entity windowEntity, const char* text) : _windowEntity(windowEntity), _text(text) {}
 
-        Entity      GetWindowEntity() const { return _windowEntity; }
-        const char* GetText() const { return _text.c_str(); }
+        Entity      GetWindowEntity() const override { return _windowEntity; }
+        const char* GetText() const override { return _text.c_str(); }
     };
 }
