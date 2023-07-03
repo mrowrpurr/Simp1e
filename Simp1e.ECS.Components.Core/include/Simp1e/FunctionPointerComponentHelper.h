@@ -5,18 +5,19 @@
 namespace Simp1e {
 
     class FunctionPointerComponentHelper {
-        FunctionPointer _functionPointer = nullptr;
+    protected:
+        FunctionPointer _uniqueFunctionPointer = nullptr;
 
     protected:
         FunctionPointerComponentHelper() = default;
         FunctionPointerComponentHelper(FunctionPointer functionPointer)
-            : _functionPointer(std::move(functionPointer)) {}
+            : _uniqueFunctionPointer(std::move(functionPointer)) {}
 
         virtual ~FunctionPointerComponentHelper() = default;
 
-        virtual IFunctionPointer* GetUniqueFunctionPointer() const { return _functionPointer.get(); }
+        virtual IFunctionPointer* GetUniqueFunctionPointer() const { return _uniqueFunctionPointer.get(); }
         virtual void              SetUniqueFunctionPointer(FunctionPointer functionPointer) {
-            _functionPointer = std::move(functionPointer);
+            _uniqueFunctionPointer = std::move(functionPointer);
         }
     };
 }

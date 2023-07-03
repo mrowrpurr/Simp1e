@@ -55,8 +55,6 @@ void CreateEntities() {
                                              _Log_("About was clicked!!!");
                                          }));
 
-    // TODO: ADD an OnClick for the MenuItem <--
-
     // Toolbar items
 }
 

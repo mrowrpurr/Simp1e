@@ -23,9 +23,12 @@ namespace Simp1e {
         EntityPointerManagerClient* _entityManager;
 
         void OnWindowMenuItemClicked(Entity entity, IWindowMenuItemComponent* windowMenuItemComponent) {
-            _Log_("---> WindowMenuItem clicked!!!");
             auto* onClickComponent = _entityManager->Get<IOnClickComponent>(entity);
-            onClickComponent->GetFunctionPointer()->Invoke();
+            if (onClickComponent) {
+                auto* functionPtr = onClickComponent->GetFunctionPointer();
+                if (functionPtr) functionPtr->Invoke();
+                else _Log_("No function pointer found!");
+            } else _Log_("No OnClickComponent found!");
         }
 
         void OnWindowAdded(Entity entity, ComponentType componentType, void* component) {
@@ -58,7 +61,6 @@ namespace Simp1e {
             QObject::connect(qAction, &QAction::triggered, [this, entity, windowMenuItemComponent]() {
                 OnWindowMenuItemClicked(entity, windowMenuItemComponent);
             });
-            _Log_("Connected QAction::triggered to OnWindowMenuItemClicked");
         }
 
         void UpdateWindow(Entity entity, void* component) {

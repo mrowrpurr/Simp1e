@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Simp1e/ComponentTypeHashKey.h>
+#include <_Log_.h>
 
 #include <memory>
 #include <unordered_map>
@@ -28,6 +29,8 @@ namespace Simp1e {
             _componentRemovedCallbacksByType;
 
     public:
+        EntityEventManager() { _Log_("EntityEventManager constructor here"); }
+
         virtual ~EntityEventManager() = default;
 
         IFunctionPointer* RegisterForEntityCreated(IFunctionPointer* callback) override {

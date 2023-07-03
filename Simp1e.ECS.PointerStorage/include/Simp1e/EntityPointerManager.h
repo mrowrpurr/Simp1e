@@ -20,7 +20,12 @@ namespace Simp1e {
         EntityEventManager                                                          _eventManager;
 
     public:
-        IEntityEventManager* GetEventManager() override { return &_eventManager; }
+        EntityPointerManager() { _Log_("EntityPointerManager constructor here"); }
+
+        IEntityEventManager* GetEventManager() override {
+            _Log_("[EntityPointerManager] GetEventManager");
+            return &_eventManager;
+        }
 
         Entity CreateEntity() override {
             _Log_("[EntityPointerManager] CreateEntity");
