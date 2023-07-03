@@ -23,12 +23,8 @@ namespace Simp1e {
         EntityPointerManagerClient* _entityManager;
 
         void OnWindowMenuItemClicked(Entity entity, IWindowMenuItemComponent* windowMenuItemComponent) {
-            auto* onClickComponent = _entityManager->Get<IOnClickComponent>(entity);
-            if (onClickComponent) {
-                auto* functionPtr = onClickComponent->GetFunctionPointer();
-                if (functionPtr) functionPtr->Invoke();
-                else _Log_("No function pointer found!");
-            } else _Log_("No OnClickComponent found!");
+            auto* clickFunction = windowMenuItemComponent->GetClickFunction();
+            if (clickFunction) clickFunction->Invoke();
         }
 
         void OnWindowAdded(Entity entity, ComponentType componentType, void* component) {

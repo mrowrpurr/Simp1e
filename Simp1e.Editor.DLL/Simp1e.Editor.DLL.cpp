@@ -48,22 +48,21 @@ void CreateEntities() {
     auto fileMenu = entityManager->CreateEntity();
     entityManager->Add<WindowMenuComponent>(fileMenu, window, "File");
 
-    auto quitItem = entityManager->CreateEntity();
-    entityManager->Add<WindowMenuItemComponent>(quitItem, fileMenu, "Quit");
-    entityManager->Add<OnClickComponent>(quitItem, function_pointer([]() {
-                                             // TODO ask the Qt application to close. For now, just exit the process:
-                                             exit(0);
-                                         }));
+    auto  quitItem = entityManager->CreateEntity();
+    auto* quitItemComponent =
+        entityManager->Add<WindowMenuItemComponent>(quitItem, fileMenu, "Quit", function_pointer([]() {
+                                                        _Log_("File > Exit (quitting)");
+                                                        // TODO ask the Qt application to close. For now, just exit the
+                                                        // process:
+                                                        exit(0);
+                                                        // ^ maybe using CommandSystem
+                                                    }));
 
     auto helpMenu = entityManager->CreateEntity();
     entityManager->Add<WindowMenuComponent>(helpMenu, window, "Help");
 
     auto aboutItem = entityManager->CreateEntity();
     entityManager->Add<WindowMenuItemComponent>(aboutItem, helpMenu, "About");
-    entityManager->Add<OnClickComponent>(aboutItem, function_pointer([]() {
-                                             // TODO show a dialog with information about the application
-                                             _Log_("TODO: show a dialog with information about the application");
-                                         }));
 }
 
 void Initialize(IEnvironment* environment) {
