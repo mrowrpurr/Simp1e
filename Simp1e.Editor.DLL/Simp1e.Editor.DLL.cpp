@@ -2,6 +2,7 @@
 _LogToFile_("Simp1e.Editor.log");
 
 #include <Simp1e/ComponentCast.h>
+#include <Simp1e/DockedComponent.h>
 #include <Simp1e/EntityPointerManagerClient.h>
 #include <Simp1e/IEnvironmentManagerService.h>
 #include <Simp1e/LabelComponent.h>
@@ -63,6 +64,10 @@ void CreateEntities() {
 
     auto aboutItem = entityManager->CreateEntity();
     entityManager->Add<WindowMenuItemComponent>(aboutItem, helpMenu, "About");
+
+    // TODO: Make a LabelComponent + DockedComponent(Top)
+
+    // TODO: Make a ButtonComponent + DockedComponent(Bottom)
 }
 
 void Initialize(IEnvironment* environment) {
