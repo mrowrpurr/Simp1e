@@ -42,20 +42,28 @@ public:
 };
 
 void CreateEntities() {
-    auto windowEntity = entityManager->CreateEntity();
-    entityManager->Add<WindowComponent>(windowEntity, "Simp1e Editor");
+    auto window = entityManager->CreateEntity();
+    entityManager->Add<WindowComponent>(window, "Simp1e Editor");
 
-    // Menu items
-    auto fileMenuEntity = entityManager->CreateEntity();
-    entityManager->Add<WindowMenuComponent>(fileMenuEntity, windowEntity, "File");
+    auto fileMenu = entityManager->CreateEntity();
+    entityManager->Add<WindowMenuComponent>(fileMenu, window, "File");
 
-    auto aboutMenuItemEntity = entityManager->CreateEntity();
-    entityManager->Add<WindowMenuItemComponent>(aboutMenuItemEntity, fileMenuEntity, "About");
-    entityManager->Add<OnClickComponent>(aboutMenuItemEntity, function_pointer([]() {
-                                             _Log_("About was clicked!!!");
+    auto quitItem = entityManager->CreateEntity();
+    entityManager->Add<WindowMenuItemComponent>(quitItem, fileMenu, "Quit");
+    entityManager->Add<OnClickComponent>(quitItem, function_pointer([]() {
+                                             // TODO ask the Qt application to close. For now, just exit the process:
+                                             exit(0);
                                          }));
 
-    // Toolbar items
+    auto helpMenu = entityManager->CreateEntity();
+    entityManager->Add<WindowMenuComponent>(helpMenu, window, "Help");
+
+    auto aboutItem = entityManager->CreateEntity();
+    entityManager->Add<WindowMenuItemComponent>(aboutItem, helpMenu, "About");
+    entityManager->Add<OnClickComponent>(aboutItem, function_pointer([]() {
+                                             // TODO show a dialog with information about the application
+                                             _Log_("TODO: show a dialog with information about the application");
+                                         }));
 }
 
 void Initialize(IEnvironment* environment) {
