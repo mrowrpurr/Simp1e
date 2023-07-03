@@ -5,6 +5,7 @@ _LogToFile_("Simp1e.Editor.log");
 #include <Simp1e/EntityPointerManagerClient.h>
 #include <Simp1e/IEnvironmentManagerService.h>
 #include <Simp1e/LabelComponent.h>
+#include <Simp1e/OnClickComponent.h>
 #include <Simp1e/ServiceHostClient.h>
 #include <Simp1e/SystemPointerManagerClient.h>
 #include <Simp1e/TextComponent.h>
@@ -50,6 +51,9 @@ void CreateEntities() {
 
     auto aboutMenuItemEntity = entityManager->CreateEntity();
     entityManager->Add<WindowMenuItemComponent>(aboutMenuItemEntity, fileMenuEntity, "About");
+    entityManager->Add<OnClickComponent>(aboutMenuItemEntity, function_pointer([]() {
+                                             _Log_("About was clicked!!!");
+                                         }));
 
     // TODO: ADD an OnClick for the MenuItem <--
 

@@ -6,6 +6,8 @@ namespace Simp1e {
         int _dirtyFlags = 0;
 
     public:
+        virtual ~DirtyTrackingComponentBase() = default;
+
         void SetDirtyFlag(int flag) { _dirtyFlags |= flag; }
         void UnsetDirtyFlag(int flag) { _dirtyFlags &= ~flag; }
         bool IsDirtyFlagSet(int flag) const { return (_dirtyFlags & flag) != 0; }
