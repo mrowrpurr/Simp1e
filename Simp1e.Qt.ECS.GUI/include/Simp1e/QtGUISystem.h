@@ -31,6 +31,10 @@ namespace Simp1e {
             return qWidgetComponent->GetQWidget();
         }
 
+        QLayout* GetParentLayout(Entity parentEntity) {
+            if (auto* parentWidget = GetParentWidget(parentEntity)) return parentWidget->layout();
+        }
+
         void OnWindowMenuItemClicked(Entity entity, IWindowMenuItemComponent* windowMenuItemComponent) {
             auto* clickFunction = windowMenuItemComponent->GetClickFunction();
             if (clickFunction) clickFunction->Invoke();
@@ -72,14 +76,10 @@ namespace Simp1e {
         void LabelAdded(Entity entity, ComponentType componentType, void* component) {
             _Log_("-> LabelAdded");
             auto* labelComponent = component_cast<ILabelComponent>(component);
-            if (auto* parentWidget = GetParentWidget(labelComponent->GetParentEntity())) {
-                _Log_("ADDING LABEL");
+            if (auto* layout = GetParentLayout(labelComponent->GetParentEntity())) {
                 auto* qLabel = new QLabel();
                 qLabel->setText(labelComponent->GetText());
-                parentWidget->layout()->addWidget(qLabel);
-                // _entityManager->Add<QLabelComponent>(entity, qLabel);
-            } else {
-                _Log_("PARENT WIDGET NOT FOUND");
+                layout->addWidget(qLabel);
             }
         }
 
