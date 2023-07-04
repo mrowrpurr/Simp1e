@@ -10,6 +10,8 @@ namespace Simp1e {
     struct IEngine {
         virtual ~IEngine() = default;
 
+        virtual void RunMainLoopCycle() = 0;
+
         virtual IEntityManager*  GetEntityManager()  = 0;
         virtual IEventManager*   GetEventManager()   = 0;
         virtual ICommandManager* GetCommandManager() = 0;

@@ -2,7 +2,6 @@
 
 #include <Simp1e/ComponentCast.h>
 #include <Simp1e/DefineSystemType.h>
-#include <Simp1e/EntityPointerManagerClient.h>
 #include <Simp1e/IEngine.h>
 #include <Simp1e/ILabelComponent.h>
 #include <Simp1e/IOnClickComponent.h>
@@ -21,12 +20,13 @@
 
 namespace Simp1e {
 
-    class QtGUISystem {
-        IEngine*                    _environment;
-        EntityPointerManagerClient* _entityManager;
+    class QtGuiSystem {
+        IEngine* _engine;
+
+        IEntityManager* entityManager() const { return _engine->GetEntityManager(); }
 
         QWidget* GetParentWidget(Entity parentEntity) {
-            auto* qWidgetComponent = _entityManager->Get<QWidgetComponent>(parentEntity);
+            auto* qWidgetComponent = entityManager()->Get<QWidgetComponent>(parentEntity);
             if (!qWidgetComponent) return nullptr;
             return qWidgetComponent->GetQWidget();
         }
@@ -42,32 +42,32 @@ namespace Simp1e {
 
         void OnWindowAdded(Entity entity, ComponentType componentType, void* component) {
             _Log_("-> OnWindowAdded");
-            auto* windowComponent      = component_cast<IWindowComponent>(component);
-            auto* qMainWindowComponent = _entityManager->Add<QMainWindowComponent>(entity, windowComponent->GetTitle());
-            _entityManager->Add<QWidgetComponent>(entity, qMainWindowComponent->GetCentralQWidget());
+            auto* windowComponent = component_cast<IWindowComponent>(component);
+            auto* qMainWindowComponent =
+                entityManager()->Add<QMainWindowComponent>(entity, windowComponent->GetTitle());
+            entityManager()->Add<QWidgetComponent>(entity, qMainWindowComponent->GetCentralQWidget());
         }
 
         void OnWindowMenuAdded(Entity entity, ComponentType componentType, void* component) {
             _Log_("-> OnWindowMenuAdded");
             auto* windowMenuComponent = component_cast<IWindowMenuComponent>(component);
             auto* qMainIWindowComponent =
-                _environment->GetEntityManager()->Get<QMainWindowComponent>(windowMenuComponent->GetWindowEntity());
+                _engine->GetEntityManager()->Get<QMainWindowComponent>(windowMenuComponent->GetWindowEntity());
             auto* qMenu = qMainIWindowComponent->GetQMainWindow()->menuBar()->addMenu(windowMenuComponent->GetText());
-            _entityManager->Add<QMenuComponent>(entity, qMenu);
+            entityManager()->Add<QMenuComponent>(entity, qMenu);
         }
 
         void OnWindowMenuItemAdded(Entity entity, ComponentType componentType, void* component) {
             _Log_("-> OnWindowMenuItemAdded");
             auto* windowMenuItemComponent = component_cast<IWindowMenuItemComponent>(component);
-            auto* windowMenuComponent     = _environment->GetEntityManager()->Get<IWindowMenuComponent>(
-                windowMenuItemComponent->GetWindowMenuEntity()
-            );
+            auto* windowMenuComponent =
+                _engine->GetEntityManager()->Get<IWindowMenuComponent>(windowMenuItemComponent->GetWindowMenuEntity());
             auto* qMainIWindowComponent =
-                _environment->GetEntityManager()->Get<QMainWindowComponent>(windowMenuComponent->GetWindowEntity());
+                _engine->GetEntityManager()->Get<QMainWindowComponent>(windowMenuComponent->GetWindowEntity());
             auto* qMenuComponent =
-                _environment->GetEntityManager()->Get<QMenuComponent>(windowMenuItemComponent->GetWindowMenuEntity());
+                _engine->GetEntityManager()->Get<QMenuComponent>(windowMenuItemComponent->GetWindowMenuEntity());
             auto* qAction = qMenuComponent->GetQMenu()->addAction(windowMenuItemComponent->GetText());
-            _entityManager->Add<QActionComponent>(entity, qAction);
+            entityManager()->Add<QActionComponent>(entity, qAction);
             QObject::connect(qAction, &QAction::triggered, [this, entity, windowMenuItemComponent]() {
                 OnWindowMenuItemClicked(entity, windowMenuItemComponent);
             });
@@ -86,7 +86,7 @@ namespace Simp1e {
         void UpdateWindow(Entity entity, void* component) {
             auto windowComponent = component_cast<IWindowComponent>(component);
             if (!windowComponent->IsDirtyFlagSet(IWindowComponent::Fields::StatusBarText)) return;
-            auto* qMainIWindowComponent = _environment->GetEntityManager()->Get<QMainWindowComponent>(entity);
+            auto* qMainIWindowComponent = _engine->GetEntityManager()->Get<QMainWindowComponent>(entity);
             qMainIWindowComponent->GetQMainWindow()->statusBar()->showMessage(windowComponent->GetStatusBarText());
             windowComponent->UnsetDirtyFlag(IWindowComponent::Fields::StatusBarText);
         }
@@ -94,22 +94,23 @@ namespace Simp1e {
     public:
         DEFINE_SYSTEM_TYPE("QtGUI")
 
-        QtGUISystem(IEngine* environment) : _environment(environment) {
-            _entityManager     = new EntityPointerManagerClient(environment->GetEntityManager());
-            auto* entityEvents = environment->GetEntityManager()->GetEventManager();
-            entityEvents->RegisterForComponentAdded<IWindowComponent>(this, &QtGUISystem::OnWindowAdded);
-            entityEvents->RegisterForComponentAdded<IWindowMenuComponent>(this, &QtGUISystem::OnWindowMenuAdded);
+        QtGuiSystem(IEngine* environment) : _engine(environment) {
+            auto* entityEvents = entityManager()->GetEventManager();
+            entityEvents->RegisterForComponentAdded<IWindowComponent>(this, &QtGuiSystem::OnWindowAdded);
+            entityEvents->RegisterForComponentAdded<IWindowMenuComponent>(this, &QtGuiSystem::OnWindowMenuAdded);
             entityEvents->RegisterForComponentAdded<IWindowMenuItemComponent>(
-                this, &QtGUISystem::OnWindowMenuItemAdded
+                this, &QtGuiSystem::OnWindowMenuItemAdded
             );
-            entityEvents->RegisterForComponentAdded<ILabelComponent>(this, &QtGUISystem::LabelAdded);
+            entityEvents->RegisterForComponentAdded<ILabelComponent>(this, &QtGuiSystem::LabelAdded);
         }
 
         void Update(IEngine* environment, double deltaTime) {
             _Log_("QtGUI Update deltaTime:{}", deltaTime);
 
             // Let's try updating the status bar text...
-            environment->GetEntityManager()->ForEach<IWindowComponent>(this, &QtGUISystem::UpdateWindow);
+            environment->GetEntityManager()->ForEach<IWindowComponent>(
+                function_pointer(this, &QtGuiSystem::UpdateWindow).get()
+            );
         }
     };
 }

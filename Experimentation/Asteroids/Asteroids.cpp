@@ -1,8 +1,11 @@
 #include <Simp1e/LocalEngine.h>
-#include <_Log_.h>
 
-using namespace Simp1e;
+#include "Asteroids/Game.h"
 
-LocalEngine engine;
+Simp1e::LocalEngine engine;
+Asteroids::Game     game{&engine};
 
-int main(int argc, char* argv[]) {}
+int main(int argc, char* argv[]) {
+    game.Run();
+    return 0;
+}

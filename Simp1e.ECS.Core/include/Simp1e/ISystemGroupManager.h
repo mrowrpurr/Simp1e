@@ -1,7 +1,10 @@
 #pragma once
 
 #include <Simp1e/SystemTypeFromType.h>
+#include <function_pointer.h>
+#include <void_pointer.h>
 
+#include "IMemoryManagedEngineContainerClass.h"
 #include "ISystem.h"
 #include "SystemType.h"
 
@@ -9,19 +12,33 @@ namespace Simp1e {
 
     struct IEngine;
 
-    struct ISystemGroupManager {
+    struct ISystemGroupManager : public IMemoryManagedEngineContainerClass {
         virtual ~ISystemGroupManager() = default;
 
         virtual void Update(IEngine* environment, double deltaTime) = 0;
 
-        virtual ISystem* GetSystemPointer(SystemType systemType) = 0;
-        virtual bool     RemoveSystem(SystemType systemType)     = 0;
-        virtual bool     HasSystem(SystemType systemType)        = 0;
+        virtual bool OwnsSystemMemoryManagement() const = 0;
+        bool         ManagesEngineItemMemory() const override { return OwnsSystemMemoryManagement(); }
 
-        // Add SetSystenEnabled
-        virtual bool EnableSystem(SystemType systemType)    = 0;
-        virtual bool DisableSystem(SystemType systemType)   = 0;
-        virtual bool IsSystemEnabled(SystemType systemType) = 0;
+        virtual VoidPointer* AddSystemPointer(SystemType systemType, VoidPointer* systemPointer) = 0;
+        virtual ISystem*     GetSystemPointer(SystemType systemType)                             = 0;
+        virtual bool         RemoveSystem(SystemType systemType)                                 = 0;
+        virtual bool         HasSystem(SystemType systemType)                                    = 0;
+
+        virtual bool SetSystemEnabled(SystemType systemType, bool enabled) = 0;
+        virtual bool EnableSystem(SystemType systemType)                   = 0;
+        virtual bool DisableSystem(SystemType systemType)                  = 0;
+        virtual bool IsSystemEnabled(SystemType systemType)                = 0;
+
+        virtual void ForEachSystem(IFunctionPointer* function) = 0;
+
+        template <typename T, typename... Args>
+        T* Add(Args&&... args) {
+            auto* system      = new T(std::forward<Args>(args)...);
+            auto* voidPointer = AddSystemPointer(SystemTypeFromType<T>(), void_pointer(system));
+            if (!OwnsSystemMemoryManagement()) voidPointer->get()->disable_destruct_on_delete();
+            return static_cast<T*>(system);
+        }
 
         template <typename T>
         T* Get() {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include "IEngine.h"
 #include "IEntityManager.h"
 #include "IEventManager.h"
@@ -16,7 +18,18 @@ namespace Simp1e {
         EventManagerT   _eventManager;
         CommandManagerT _commandManager;
 
+        std::chrono::high_resolution_clock::time_point _mainLoopLastTime = std::chrono::high_resolution_clock::now();
+
     public:
+        void RunMainLoopCycle() override {
+            auto currentTime = std::chrono::high_resolution_clock::now();
+            auto deltaTime =
+                std::chrono::duration_cast<std::chrono::microseconds>(currentTime - _mainLoopLastTime).count();
+            _mainLoopLastTime = currentTime;
+            auto seconds      = deltaTime / 1000000.0;
+            _systemManager.Update(this, seconds);
+        }
+
         IEntityManager*  GetEntityManager() override { return &_entityManager; }
         ISystemManager*  GetSystemManager() override { return &_systemManager; }
         IEventManager*   GetEventManager() override { return &_eventManager; }

@@ -1,34 +1,39 @@
 #pragma once
 
+#include <Simp1e/ISystemManager.h>
+
 #include <unordered_map>
 #include <vector>
 
-#include "ILocalSystemManager.h"
-
 namespace Simp1e {
 
-    class LocalSystemManager : public ILocalSystemManager {
-        std::unordered_map<SystemGroupType, std::unique_ptr<ISystemGroupManager>> _systemGroups;
-        std::unordered_map<SystemGroupType, bool>                                 _enabledSystemGroups;
-        std::vector<SystemGroupType>                                              _systemGroupOrder;
+    class LocalSystemManager : public ISystemManager {
+        std::unordered_map<SystemGroupType, VoidPointer> _systemGroups;
+        std::unordered_map<SystemGroupType, bool>        _enabledSystemGroups;
+        std::vector<SystemGroupType>                     _systemGroupOrder;
 
     public:
-        ISystemGroupManager* AddGroup(
-            SystemGroupType systemGroupType, std::unique_ptr<ISystemGroupManager> systemGroupManager
-        ) override {
-            _systemGroups[systemGroupType] = std::move(systemGroupManager);
+        bool OwnsSystemGroupMemoryManagement() const override { return true; }
+
+        VoidPointer* AddGroupPointer(SystemGroupType systemGroupType, VoidPointer systemGroupPointer) override {
+            auto insertResult = _systemGroups.insert({systemGroupType, std::move(systemGroupPointer)});
+            if (!insertResult.second) return nullptr;
+            if (!OwnsSystemGroupMemoryManagement()) insertResult.first->second.get()->disable_destruct_on_delete();
+            _enabledSystemGroups[systemGroupType] = true;
             _systemGroupOrder.push_back(systemGroupType);
-            return _systemGroups[systemGroupType].get();
+            return &insertResult.first->second;
         }
 
         void Update(IEngine* environment, double deltaTime) override {
             for (auto& systemGroupType : _systemGroupOrder)
                 if (_enabledSystemGroups[systemGroupType])
-                    _systemGroups[systemGroupType]->Update(environment, deltaTime);
+                    _systemGroups[systemGroupType]->as<ISystemGroupManager>()->Update(environment, deltaTime);
         }
 
         ISystemGroupManager* GetGroup(SystemGroupType systemGroupType) override {
-            return _systemGroups[systemGroupType].get();
+            auto found = _systemGroups.find(systemGroupType);
+            if (found == _systemGroups.end()) return nullptr;
+            return found->second.get()->as<ISystemGroupManager>();
         }
         bool RemoveGroup(SystemGroupType systemGroupType) override { return _systemGroups.erase(systemGroupType) > 0; }
         bool HasGroup(SystemGroupType systemGroupType) override {

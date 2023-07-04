@@ -46,13 +46,14 @@ namespace Simp1e {
             _entityManager->ForEachComponentFunction(componentType, callback);
         }
 
-        template <typename T, typename... Args>
-        T* Add(Entity entity, Args&&... args) {
-            _Log_("[EntityPointerManagerClient] Add component of type {} to {}", T::GetComponentType(), entity);
-            auto* component                              = new T(std::forward<Args>(args)...);
-            _componentMap[T::GetComponentType()][entity] = void_pointer(component);
-            _entityManager->AddComponentPointer(entity, T::GetComponentType(), component);
-            return component;
-        }
+        // TODO FIX ME
+        // template <typename T, typename... Args>
+        // T* Add(Entity entity, Args&&... args) {
+        //     _Log_("[EntityPointerManagerClient] Add component of type {} to {}", T::GetComponentType(), entity);
+        //     auto* component                              = new T(std::forward<Args>(args)...);
+        //     _componentMap[T::GetComponentType()][entity] = void_pointer(component);
+        //     _entityManager->AddComponentPointer(entity, T::GetComponentType(), component);
+        //     return component;
+        // }
     };
 }

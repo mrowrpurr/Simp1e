@@ -3,7 +3,7 @@ _LogToFile_("Simp1e.Qt.ECS.log");
 
 #include <Simp1e/EntityPointerManagerClient.h>
 #include <Simp1e/IEngineManagerService.h>
-#include <Simp1e/QtGUISystem.h>
+#include <Simp1e/QtGuiSystem.h>
 #include <Simp1e/ServiceHostClient.h>
 #include <Simp1e/SystemPointerManagerClient.h>
 
@@ -41,7 +41,7 @@ void GameLoop() {
     _Log_("GameLoop end");
 }
 
-void SetupSystems(IEngine* environment) { systemManager->Add<QtGUISystem>(environment); }
+void SetupSystems(IEngine* environment) { systemManager->Add<QtGuiSystem>(environment); }
 
 void Initialize(IEngine* environment) {
     _environment  = environment;
