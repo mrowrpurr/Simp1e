@@ -5,6 +5,8 @@
 #include "IEventManager.h"
 #include "ISystemManager.h"
 
+// TODO - Add a JobManager
+
 namespace Simp1e {
 
     template <typename EntityManagerT, typename SystemManagerT, typename EventManagerT, typename CommandManagerT>

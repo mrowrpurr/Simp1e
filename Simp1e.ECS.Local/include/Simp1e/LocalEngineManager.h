@@ -8,7 +8,7 @@
 
 namespace Simp1e {
 
-    class EngineManager : public IEngineManager {
+    class LocalEngineManager : public IEngineManager {
         std::unordered_map<std::string, IEngine*> _environments;
 
     public:

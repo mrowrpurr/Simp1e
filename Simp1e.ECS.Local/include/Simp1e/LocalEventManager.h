@@ -4,5 +4,5 @@
 
 namespace Simp1e {
 
-    class EventManager : public IEventManager {};
+    class LocalEventManager : public IEventManager {};
 }

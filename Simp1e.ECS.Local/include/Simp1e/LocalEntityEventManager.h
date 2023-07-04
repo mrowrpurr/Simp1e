@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Simp1e/ComponentTypeHashKey.h>
+#include <Simp1e/IEntityEventManager.h>
 #include <_Log_.h>
 
 #include <memory>
@@ -8,11 +9,9 @@
 #include <unordered_set>
 #include <vector>
 
-#include "IEntityEventManager.h"
-
 namespace Simp1e {
 
-    class EntityEventManager : public IEntityEventManager {
+    class LocalEntityEventManager : public IEntityEventManager {
         std::unordered_map<IFunctionPointer*, std::unique_ptr<IFunctionPointer>>        _callbacks;
         std::unordered_set<IFunctionPointer*>                                           _entityCreatedCallbacks;
         std::unordered_set<IFunctionPointer*>                                           _entityDestroyingCallbacks;
@@ -29,9 +28,9 @@ namespace Simp1e {
             _componentRemovedCallbacksByType;
 
     public:
-        EntityEventManager() { _Log_("EntityEventManager constructor here"); }
+        LocalEntityEventManager() { _Log_("EntityEventManager constructor here"); }
 
-        virtual ~EntityEventManager() = default;
+        virtual ~LocalEntityEventManager() = default;
 
         IFunctionPointer* RegisterForEntityCreated(IFunctionPointer* callback) override {
             _callbacks[callback] = std::unique_ptr<IFunctionPointer>(callback);

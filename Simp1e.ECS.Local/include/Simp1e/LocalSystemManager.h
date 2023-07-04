@@ -4,5 +4,5 @@
 
 namespace Simp1e {
 
-    class SystemManager : public ISystemManager {};
+    class LocalSystemManager : public ISystemManager {};
 }

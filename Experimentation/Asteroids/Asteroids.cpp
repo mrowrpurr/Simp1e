@@ -1,9 +1,6 @@
-#include <QApplication>
-#include <QWidget>
+#include <Simp1e/LocalEngine.h>
+#include <_Log_.h>
 
-int main(int argc, char* argv[]) {
-    QApplication a(argc, argv);
-    QWidget      w;
-    w.show();
-    return a.exec();
-}
+using namespace Simp1e;
+
+int main(int argc, char* argv[]) {}

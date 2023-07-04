@@ -1,5 +1,5 @@
 #include <_Log_.h>
-_LogToFile_("Simp1e.Qt.ECS.GUI.log");
+_LogToFile_("Simp1e.Qt.ECS.log");
 
 #include <Simp1e/EntityPointerManagerClient.h>
 #include <Simp1e/IEngineManagerService.h>

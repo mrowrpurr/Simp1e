@@ -1,5 +1,6 @@
 #pragma once
 
+#include <_Log_.h>
 #include <function_pointer.h>
 
 #include <memory>

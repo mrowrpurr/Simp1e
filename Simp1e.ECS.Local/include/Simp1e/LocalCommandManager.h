@@ -4,5 +4,5 @@
 
 namespace Simp1e {
 
-    class CommandManager : public ICommandManager {};
+    class LocalCommandManager : public ICommandManager {};
 }

@@ -1,6 +1,6 @@
 target("Simp1e.ECS.PointerStorage")
     set_kind("headeronly")
     add_logging()
-    add_deps("Simp1e.ECS.Core")
+    add_deps("Simp1e.ECS.Core", "Simp1e.ECS.Local")
     add_includedirs("include", {public = true})
     add_headerfiles("include/(**.h)")
