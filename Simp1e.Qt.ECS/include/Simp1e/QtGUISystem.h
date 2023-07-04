@@ -2,6 +2,7 @@
 
 #include <Simp1e/ComponentCast.h>
 #include <Simp1e/DefineSystemType.h>
+#include <Simp1e/ICanvasComponent.h>
 #include <Simp1e/IEngine.h>
 #include <Simp1e/ILabelComponent.h>
 #include <Simp1e/IOnClickComponent.h>
@@ -11,12 +12,17 @@
 #include <Simp1e/QActionComponent.h>
 #include <Simp1e/QMainWindowComponent.h>
 #include <Simp1e/QMenuComponent.h>
+#include <Simp1e/QSimp1eGraphicsScene.h>
+#include <Simp1e/QSimp1eGraphicsView.h>
 #include <Simp1e/QWidgetComponent.h>
 #include <_Log_.h>
 
 #include <QLabel>
 #include <QMenuBar>
 #include <QStatusBar>
+
+// quick test
+#include <QGraphicsRectItem>
 
 namespace Simp1e {
 
@@ -73,13 +79,29 @@ namespace Simp1e {
             });
         }
 
-        void LabelAdded(Entity entity, ComponentType componentType, void* component) {
+        void OnLabelAdded(Entity entity, ComponentType componentType, void* component) {
             _Log_("-> LabelAdded");
             auto* labelComponent = component_cast<ILabelComponent>(component);
             if (auto* layout = GetParentLayout(labelComponent->GetParentEntity())) {
                 auto* qLabel = new QLabel();
                 qLabel->setText(labelComponent->GetText());
                 layout->addWidget(qLabel);
+            }
+        }
+
+        void OnCanvasAdded(Entity entity, ComponentType componentType, void* component) {
+            _Log_("-> CanvasAdded");
+            auto* canvasComponent = component_cast<ICanvasComponent>(component);
+            if (auto* layout = GetParentLayout(canvasComponent->GetParentEntity())) {
+                auto* view  = new QSimp1eGraphicsView();
+                auto* scene = new QSimp1eGraphicsScene();
+                view->setScene(scene);
+                layout->addWidget(view);
+
+                // Test that it works...
+                auto* rect = new QGraphicsRectItem(0, 0, 100, 100);
+                rect->setBrush(QBrush(Qt::red));
+                scene->addItem(rect);
             }
         }
 
@@ -94,21 +116,19 @@ namespace Simp1e {
     public:
         DEFINE_SYSTEM_TYPE("QtGUI")
 
-        QtGuiSystem(IEngine* environment) : _engine(environment) {
+        QtGuiSystem(IEngine* engine) : _engine(engine) {
             auto* entityEvents = entityManager()->GetEventManager();
             entityEvents->RegisterForComponentAdded<IWindowComponent>(this, &QtGuiSystem::OnWindowAdded);
             entityEvents->RegisterForComponentAdded<IWindowMenuComponent>(this, &QtGuiSystem::OnWindowMenuAdded);
             entityEvents->RegisterForComponentAdded<IWindowMenuItemComponent>(
                 this, &QtGuiSystem::OnWindowMenuItemAdded
             );
-            entityEvents->RegisterForComponentAdded<ILabelComponent>(this, &QtGuiSystem::LabelAdded);
+            entityEvents->RegisterForComponentAdded<ILabelComponent>(this, &QtGuiSystem::OnLabelAdded);
+            entityEvents->RegisterForComponentAdded<ICanvasComponent>(this, &QtGuiSystem::OnCanvasAdded);
         }
 
-        void Update(IEngine* environment, double deltaTime) {
-            _Log_("QtGUI Update deltaTime:{}", deltaTime);
-
-            // Let's try updating the status bar text...
-            environment->GetEntityManager()->ForEach<IWindowComponent>(
+        void Update(IEngine* engine, double deltaTime) {
+            engine->GetEntityManager()->ForEach<IWindowComponent>(
                 function_pointer(this, &QtGuiSystem::UpdateWindow).get()
             );
         }

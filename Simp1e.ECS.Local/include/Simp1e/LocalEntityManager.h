@@ -75,7 +75,6 @@ namespace Simp1e {
         }
 
         void ForEachComponent(ComponentType componentType, IFunctionPointer* functionPointer) override {
-            _Log_("[LocalEntityManager] ForEachComponent of type {}", componentType);
             auto componentMap = _componentPointers.find(componentType);
             if (componentMap == _componentPointers.end()) return;
             for (auto& [entity, component] : componentMap->second)

@@ -1,10 +1,10 @@
 #pragma once
 
+#include <Simp1e/ISystemGroupManager.h>
 #include <Simp1e/SystemTypeHashKey.h>
 #include <Simp1e/SystemTypeToHashKey.h>
 #include <_Log_.h>
 
-#include <"ILocalSystemGroupManager.hS">
 #include <memory>
 #include <unordered_map>
 
@@ -12,27 +12,28 @@
 
 namespace Simp1e {
 
-    class LocalSystemGroupManager : public ILocalSystemGroupManager {
+    class LocalSystemGroupManager : public ISystemGroupManager {
         std::unordered_map<SystemTypeHashKey, std::unique_ptr<ISystem>> _systems;
         std::unordered_map<SystemTypeHashKey, bool>                     _enabledSystems;
         std::vector<SystemTypeHashKey>                                  _insertionOrder;
 
     public:
+        bool OwnsSystemMemoryManagement() const override { return true; }
+
         void Update(IEngine* environment, double deltaTime) override {
-            _Log_("[LocalSystemManager] Update");
             for (auto& systemTypeHashKey : _insertionOrder) {
                 if (!_enabledSystems[systemTypeHashKey]) continue;
                 _systems[systemTypeHashKey]->Update(environment, deltaTime);
             }
         }
 
-        virtual ISystem* GetSystemPointer(SystemType systemType) override {
+        ISystem* GetSystemPointer(SystemType systemType) override {
             auto found = _systems.find(SystemTypeToHashKey(systemType));
             if (found == _systems.end()) return nullptr;
             return found->second.get();
         }
 
-        virtual bool RemoveSystem(SystemType systemType) override {
+        bool RemoveSystem(SystemType systemType) override {
             auto key   = SystemTypeToHashKey(systemType);
             auto found = _systems.find(key);
             if (found == _systems.end()) return false;
@@ -45,11 +46,20 @@ namespace Simp1e {
             return true;
         }
 
-        virtual bool HasSystem(SystemType systemType) override {
+        bool HasSystem(SystemType systemType) override {
             return _systems.find(SystemTypeToHashKey(systemType)) != _systems.end();
         }
 
-        virtual bool EnableSystem(SystemType systemType) override {
+        bool SetSystemEnabled(SystemType systemType, bool enabled) override {
+            auto key   = SystemTypeToHashKey(systemType);
+            auto found = _systems.find(key);
+            if (found == _systems.end()) return false;
+            _enabledSystems[key] = enabled;
+            _Log_("[LocalSystemManager] Set system {} enabled: {}", systemType, enabled);
+            return true;
+        }
+
+        bool EnableSystem(SystemType systemType) override {
             auto key   = SystemTypeToHashKey(systemType);
             auto found = _systems.find(key);
             if (found == _systems.end()) return false;
@@ -58,7 +68,7 @@ namespace Simp1e {
             return true;
         }
 
-        virtual bool DisableSystem(SystemType systemType) override {
+        bool DisableSystem(SystemType systemType) override {
             auto key   = SystemTypeToHashKey(systemType);
             auto found = _systems.find(key);
             if (found == _systems.end()) return false;
@@ -67,14 +77,14 @@ namespace Simp1e {
             return true;
         }
 
-        virtual bool IsSystemEnabled(SystemType systemType) override {
+        bool IsSystemEnabled(SystemType systemType) override {
             auto key   = SystemTypeToHashKey(systemType);
             auto found = _systems.find(key);
             if (found == _systems.end()) return false;
             return _enabledSystems[key];
         }
 
-        void* AddSystemPointer(
+        ISystem* AddSystemPointer(
             SystemType systemType, VoidPointer systemPointer, FunctionPointer systemUpdateFunctionPointer
         ) override {
             auto key = SystemTypeToHashKey(systemType);
@@ -87,7 +97,14 @@ namespace Simp1e {
             _enabledSystems[key] = true;
             _insertionOrder.push_back(key);
             _Log_("[LocalSystemManager] Added system {}", systemType);
-            return system->GetSystemPointer();
+            return system;
+        }
+
+        virtual void ForEachSystem(IFunctionPointer* function) override {
+            for (auto& systemTypeHashKey : _insertionOrder) {
+                if (!_enabledSystems[systemTypeHashKey]) continue;
+                function_pointer::invoke(function, _systems[systemTypeHashKey].get());
+            }
         }
     };
 }

@@ -1,9 +1,6 @@
-#include <Simp1e/LocalEngine.h>
-
 #include "Asteroids/Game.h"
 
-Simp1e::LocalEngine engine;
-Asteroids::Game     game{&engine};
+Asteroids::Game game;
 
 int main(int argc, char* argv[]) {
     game.Run();

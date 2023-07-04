@@ -2,6 +2,7 @@
 
 #include <Simp1e/IEngine.h>
 #include <Simp1e/ISystem.h>
+#include <function_pointer.h>
 #include <void_pointer.h>
 
 #include <memory>
@@ -19,8 +20,8 @@ namespace Simp1e {
         LocalSystem(VoidPointer system, FunctionPointer updateFunction)
             : _system(std::move(system)), _updateFunction(std::move(updateFunction)) {}
 
-        void* GetSystemPointer() const override { return _system->void_ptr(); }
-        void  Update(IEngine* engine, double deltaTime) override {
+        VoidPointer* GetSystemPointer() const override { return const_cast<VoidPointer*>(&_system); }
+        void         Update(IEngine* engine, double deltaTime) override {
             function_pointer::invoke(_updateFunction, engine, deltaTime);
         }
     };

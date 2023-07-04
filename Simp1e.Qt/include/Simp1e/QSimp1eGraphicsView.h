@@ -1,8 +1,11 @@
 #pragma once
 
-#include <QApplication>
+#include <QGraphicsView>
 
 namespace Simp1e {
 
-    class QSimp1eApp : public QApplication {};
+    class QSimp1eGraphicsView : public QGraphicsView {
+    public:
+        QSimp1eGraphicsView(QWidget* parent = nullptr) : QGraphicsView(parent) {}
+    };
 }

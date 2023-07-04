@@ -2,6 +2,7 @@
 
 #include <chrono>
 
+#include "DefaultSystemGroupTypes.h"
 #include "IEngine.h"
 #include "IEntityManager.h"
 #include "IEventManager.h"

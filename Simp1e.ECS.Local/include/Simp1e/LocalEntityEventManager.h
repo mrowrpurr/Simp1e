@@ -28,8 +28,6 @@ namespace Simp1e {
             _componentRemovedCallbacksByType;
 
     public:
-        LocalEntityEventManager() { _Log_("EntityEventManager constructor here"); }
-
         virtual ~LocalEntityEventManager() = default;
 
         IFunctionPointer* RegisterForEntityCreated(IFunctionPointer* callback) override {

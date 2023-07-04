@@ -5,6 +5,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "LocalSystemGroupManager.h"
+
 namespace Simp1e {
 
     class LocalSystemManager : public ISystemManager {
@@ -14,6 +16,13 @@ namespace Simp1e {
 
     public:
         bool OwnsSystemGroupMemoryManagement() const override { return true; }
+
+        ISystemGroupManager* AddGroup(SystemGroupType groupName) {
+            auto* systemGroupManager = new LocalSystemGroupManager();
+            auto* voidPointer        = AddGroupPointer(groupName, void_pointer(systemGroupManager));
+            if (!OwnsSystemGroupMemoryManagement()) voidPointer->get()->disable_destruct_on_delete();
+            return systemGroupManager;
+        }
 
         VoidPointer* AddGroupPointer(SystemGroupType systemGroupType, VoidPointer systemGroupPointer) override {
             auto insertResult = _systemGroups.insert({systemGroupType, std::move(systemGroupPointer)});

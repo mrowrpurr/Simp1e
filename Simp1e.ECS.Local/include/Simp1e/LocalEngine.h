@@ -10,5 +10,11 @@
 namespace Simp1e {
 
     class LocalEngine : public Engine<LocalEntityManager, LocalSystemManager, LocalEventManager, LocalCommandManager> {
+    public:
+        void AddDefaultSystemGroups() {
+            GetSystemManagerInstance().AddGroup(DefaultSystemGroupTypes::InitializationGroup);
+            GetSystemManagerInstance().AddGroup(DefaultSystemGroupTypes::SimulationGroup);
+            GetSystemManagerInstance().AddGroup(DefaultSystemGroupTypes::PresentationGroup);
+        }
     };
 }

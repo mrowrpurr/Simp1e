@@ -20,10 +20,12 @@ namespace Simp1e {
         virtual bool OwnsSystemMemoryManagement() const = 0;
         bool         ManagesEngineItemMemory() const override { return OwnsSystemMemoryManagement(); }
 
-        virtual VoidPointer* AddSystemPointer(SystemType systemType, VoidPointer* systemPointer) = 0;
-        virtual ISystem*     GetSystemPointer(SystemType systemType)                             = 0;
-        virtual bool         RemoveSystem(SystemType systemType)                                 = 0;
-        virtual bool         HasSystem(SystemType systemType)                                    = 0;
+        virtual ISystem* AddSystemPointer(
+            SystemType systemType, VoidPointer systemPointer, FunctionPointer systemUpdateFunction
+        )                                                        = 0;
+        virtual ISystem* GetSystemPointer(SystemType systemType) = 0;
+        virtual bool     RemoveSystem(SystemType systemType)     = 0;
+        virtual bool     HasSystem(SystemType systemType)        = 0;
 
         virtual bool SetSystemEnabled(SystemType systemType, bool enabled) = 0;
         virtual bool EnableSystem(SystemType systemType)                   = 0;
@@ -34,9 +36,12 @@ namespace Simp1e {
 
         template <typename T, typename... Args>
         T* Add(Args&&... args) {
-            auto* system      = new T(std::forward<Args>(args)...);
-            auto* voidPointer = AddSystemPointer(SystemTypeFromType<T>(), void_pointer(system));
-            if (!OwnsSystemMemoryManagement()) voidPointer->get()->disable_destruct_on_delete();
+            auto* system        = new T(std::forward<Args>(args)...);
+            auto* systemPointer = AddSystemPointer(
+                SystemTypeFromType<T>(), void_pointer(system),
+                function_pointer([system](IEngine* engine, double deltaTime) { system->Update(engine, deltaTime); })
+            );
+            if (!OwnsSystemMemoryManagement()) systemPointer->GetSystemPointer()->get()->disable_destruct_on_delete();
             return static_cast<T*>(system);
         }
 
