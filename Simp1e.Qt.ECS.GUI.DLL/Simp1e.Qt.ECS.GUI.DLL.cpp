@@ -2,8 +2,7 @@
 _LogToFile_("Simp1e.Qt.ECS.GUI.log");
 
 #include <Simp1e/EntityPointerManagerClient.h>
-#include <Simp1e/IEnvironmentManagerService.h>
-
+#include <Simp1e/IEngineManagerService.h>
 #include <Simp1e/QtGUISystem.h>
 #include <Simp1e/ServiceHostClient.h>
 #include <Simp1e/SystemPointerManagerClient.h>
@@ -20,7 +19,7 @@ QApplication app{argc, nullptr};
 
 constexpr auto* ENVIRONMENT_NAME = "Default";
 
-IEnvironment*                               _environment;
+IEngine*                                    _environment;
 std::unique_ptr<SystemPointerManagerClient> systemManager;
 std::unique_ptr<EntityPointerManagerClient> entityManager;
 
@@ -42,9 +41,9 @@ void GameLoop() {
     _Log_("GameLoop end");
 }
 
-void SetupSystems(IEnvironment* environment) { systemManager->Add<QtGUISystem>(environment); }
+void SetupSystems(IEngine* environment) { systemManager->Add<QtGUISystem>(environment); }
 
-void Initialize(IEnvironment* environment) {
+void Initialize(IEngine* environment) {
     _environment  = environment;
     systemManager = std::make_unique<SystemPointerManagerClient>(environment->GetSystemManager());
     entityManager = std::make_unique<EntityPointerManagerClient>(environment->GetEntityManager());
@@ -53,9 +52,9 @@ void Initialize(IEnvironment* environment) {
 
 OnSimp1eLoad {
     _Log_("Init");
-    if (auto* environmentManagerService = Simp1eServices->GetService<IEnvironmentManagerService>())
-        if (auto* environmentManager = environmentManagerService->GetEnvironmentManager())
-            if (auto* environment = environmentManager->GetEnvironment(ENVIRONMENT_NAME)) Initialize(environment);
+    if (auto* environmentManagerService = Simp1eServices->GetService<IEngineManagerService>())
+        if (auto* environmentManager = environmentManagerService->GetEngineManager())
+            if (auto* environment = environmentManager->GetEngine(ENVIRONMENT_NAME)) Initialize(environment);
 }
 
 OnSimp1eStart {

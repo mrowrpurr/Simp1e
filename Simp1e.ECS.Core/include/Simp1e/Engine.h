@@ -1,14 +1,14 @@
 #pragma once
 
+#include "IEngine.h"
 #include "IEntityManager.h"
-#include "IEnvironment.h"
 #include "IEventManager.h"
 #include "ISystemManager.h"
 
 namespace Simp1e {
 
     template <typename EntityManagerT, typename SystemManagerT, typename EventManagerT, typename CommandManagerT>
-    class Environment : public IEnvironment {
+    class Engine : public IEngine {
         EntityManagerT  _entityManager;
         SystemManagerT  _systemManager;
         EventManagerT   _eventManager;

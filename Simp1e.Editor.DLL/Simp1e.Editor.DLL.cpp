@@ -4,7 +4,7 @@ _LogToFile_("Simp1e.Editor.log");
 #include <Simp1e/ComponentCast.h>
 #include <Simp1e/DockedComponent.h>
 #include <Simp1e/EntityPointerManagerClient.h>
-#include <Simp1e/IEnvironmentManagerService.h>
+#include <Simp1e/IEngineManagerService.h>
 #include <Simp1e/LabelComponent.h>
 #include <Simp1e/OnClickComponent.h>
 #include <Simp1e/ServiceHostClient.h>
@@ -36,7 +36,7 @@ class UpdateWindowStatusBarSystem {
 public:
     DEFINE_SYSTEM_TYPE("UpdateWindowStatusBar");
 
-    void Update(IEnvironment* environment, double deltaTime) {
+    void Update(IEngine* environment, double deltaTime) {
         _totalTime += deltaTime;
         environment->GetEntityManager()->ForEach<IWindowComponent>(this, &UpdateWindowStatusBarSystem::UpdateWindow);
     }
@@ -76,7 +76,7 @@ void CreateEntities() {
     // TODO: Draw a DIFFERENT ECS environment of entity/components on/in the GraphicsScene/View
 }
 
-void Initialize(IEnvironment* environment) {
+void Initialize(IEngine* environment) {
     entityManager = std::make_unique<EntityPointerManagerClient>(environment->GetEntityManager());
     systemManager = std::make_unique<SystemPointerManagerClient>(environment->GetSystemManager());
     systemManager->Add<UpdateWindowStatusBarSystem>();
@@ -84,9 +84,9 @@ void Initialize(IEnvironment* environment) {
 
 OnSimp1eLoad {
     _Log_("Load");
-    if (auto* environmentManagerService = Simp1eServices->GetService<IEnvironmentManagerService>())
-        if (auto* environmentManager = environmentManagerService->GetEnvironmentManager())
-            if (auto* environment = environmentManager->GetEnvironment(ENVIRONMENT_NAME)) Initialize(environment);
+    if (auto* environmentManagerService = Simp1eServices->GetService<IEngineManagerService>())
+        if (auto* environmentManager = environmentManagerService->GetEngineManager())
+            if (auto* environment = environmentManager->GetEngine(ENVIRONMENT_NAME)) Initialize(environment);
     _Log_("Loaded");
 }
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Simp1e/IEnvironment.h>
+#include <Simp1e/IEngine.h>
 #include <Simp1e/SystemTypeToHashKey.h>
 #include <_Log_.h>
 
@@ -17,7 +17,7 @@ namespace Simp1e {
         std::vector<SystemTypeHashKey>                      _insertionOrder;
 
     public:
-        void Update(IEnvironment* environment, double deltaTime) override {
+        void Update(IEngine* environment, double deltaTime) override {
             _Log_("SystemPointerManager::Update");
             for (auto& systemTypeHashKey : _insertionOrder) {
                 if (!_enabledSystems[systemTypeHashKey]) continue;

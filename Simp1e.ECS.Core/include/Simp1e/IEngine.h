@@ -7,8 +7,8 @@
 
 namespace Simp1e {
 
-    struct IEnvironment {
-        virtual ~IEnvironment() = default;
+    struct IEngine {
+        virtual ~IEngine() = default;
 
         virtual IEntityManager*  GetEntityManager()  = 0;
         virtual IEventManager*   GetEventManager()   = 0;

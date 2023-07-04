@@ -1,18 +1,18 @@
 #include <_Log_.h>
 _LogToFile_("Simp1e.Editor2.log");
 
-#include <Simp1e/IEnvironmentManagerService.h>
+#include <Simp1e/IEngineManagerService.h>
 #include <Simp1e/ServiceHostClient.h>
 
 constexpr auto* ENVIRONMENT_NAME = "Simp1e.Editor";
 
-Simp1e::IEnvironment* environment = nullptr;
+Simp1e::IEngine* environment = nullptr;
 
 OnSimp1eLoad {
     _Log_("Simp1e.Editor2 loaded");
-    if (auto* service = Simp1eServices->GetService<Simp1e::IEnvironmentManagerService>())
-        environment = service->GetEnvironmentManager()->CreateEnvironment(ENVIRONMENT_NAME);
-    else _Log_("Failed to get EnvironmentManagerService");
+    if (auto* service = Simp1eServices->GetService<Simp1e::IEngineManagerService>())
+        environment = service->GetEngineManager()->CreateEngine(ENVIRONMENT_NAME);
+    else _Log_("Failed to get EngineManagerService");
 }
 
 OnSimp1eStart {

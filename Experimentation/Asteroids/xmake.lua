@@ -1,0 +1,6 @@
+target("Asteroids")
+    set_kind_qt_console_application()
+    add_logging_runtime()
+    add_string_formatting()
+    add_files("Asteroids.cpp")
+    add_includedirs("include")

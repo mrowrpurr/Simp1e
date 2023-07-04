@@ -6,12 +6,12 @@
 
 namespace Simp1e {
 
-    struct IEnvironment;
+    struct IEngine;
 
     struct ISystemManager {
         virtual ~ISystemManager() = default;
 
-        virtual void Update(IEnvironment* environment, double deltaTime) = 0;
+        virtual void Update(IEngine* environment, double deltaTime) = 0;
 
         virtual IExecutable* GetSystemPointer(SystemType systemType) = 0;
         virtual bool         RemoveSystem(SystemType systemType)     = 0;

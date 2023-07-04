@@ -3,7 +3,7 @@
 #include <Simp1e/ComponentCast.h>
 #include <Simp1e/DefineSystemType.h>
 #include <Simp1e/EntityPointerManagerClient.h>
-#include <Simp1e/IEnvironment.h>
+#include <Simp1e/IEngine.h>
 #include <Simp1e/ILabelComponent.h>
 #include <Simp1e/IOnClickComponent.h>
 #include <Simp1e/IWindowComponent.h>
@@ -22,7 +22,7 @@
 namespace Simp1e {
 
     class QtGUISystem {
-        IEnvironment*               _environment;
+        IEngine*                    _environment;
         EntityPointerManagerClient* _entityManager;
 
         QWidget* GetParentWidget(Entity parentEntity) {
@@ -94,7 +94,7 @@ namespace Simp1e {
     public:
         DEFINE_SYSTEM_TYPE("QtGUI")
 
-        QtGUISystem(IEnvironment* environment) : _environment(environment) {
+        QtGUISystem(IEngine* environment) : _environment(environment) {
             _entityManager     = new EntityPointerManagerClient(environment->GetEntityManager());
             auto* entityEvents = environment->GetEntityManager()->GetEventManager();
             entityEvents->RegisterForComponentAdded<IWindowComponent>(this, &QtGUISystem::OnWindowAdded);
@@ -105,7 +105,7 @@ namespace Simp1e {
             entityEvents->RegisterForComponentAdded<ILabelComponent>(this, &QtGUISystem::LabelAdded);
         }
 
-        void Update(IEnvironment* environment, double deltaTime) {
+        void Update(IEngine* environment, double deltaTime) {
             _Log_("QtGUI Update deltaTime:{}", deltaTime);
 
             // Let's try updating the status bar text...
