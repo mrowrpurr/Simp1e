@@ -1,12 +1,10 @@
 #pragma once
 
+#include "Vec2.h"
 #include "sreal.h"
 
 namespace Simp1e {
-    class Size {
-        sreal _width  = 0;
-        sreal _height = 0;
-
+    class Size : public Vec2<sreal> {
     public:
         struct Params {
             sreal width;
@@ -14,18 +12,15 @@ namespace Simp1e {
         };
 
         Size() = default;
-        Size(sreal width, sreal height) : _width(width), _height(height) {}
-        Size(const Params& params) : _width(params.width), _height(params.height) {}
+        Size(sreal width, sreal height) : Vec2(width, height) {}
+        Size(const Params& params) : Vec2(params.width, params.height) {}
 
-        sreal& width() { return _width; }
-        sreal& height() { return _height; }
+        virtual sreal width() const { return one(); }
+        virtual sreal height() const { return two(); }
 
-        void SetWidth(sreal width) { _width = width; }
-        void SetHeight(sreal height) { _height = height; }
+        void SetWidth(sreal width) { SetOne(width); }
+        void SetHeight(sreal height) { SetTwo(height); }
 
-        const sreal& width() const { return _width; }
-        const sreal& height() const { return _height; }
-
-        bool isNull() const { return _width == 0 && _height == 0; }
+        bool IsNull() const { return width() == 0 && height() == 0; }
     };
 }

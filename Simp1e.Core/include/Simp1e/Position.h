@@ -1,9 +1,10 @@
 #pragma once
 
 #include "Vec3.h"
+#include "sreal.h"
 
 namespace Simp1e {
-    class Position : public Vec3 {
+    class Position : public Vec3<sreal> {
     public:
         struct Params {
             sreal x;

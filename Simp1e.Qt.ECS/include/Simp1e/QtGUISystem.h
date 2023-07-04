@@ -4,14 +4,20 @@
 #include <Simp1e/DefineSystemType.h>
 #include <Simp1e/ICanvasComponent.h>
 #include <Simp1e/IEngine.h>
+#include <Simp1e/IFillColorComponent.h>
 #include <Simp1e/ILabelComponent.h>
 #include <Simp1e/IOnClickComponent.h>
+#include <Simp1e/IPositionComponent.h>
+#include <Simp1e/IRectangleComponent.h>
+#include <Simp1e/ISizeComponent.h>
 #include <Simp1e/IWindowComponent.h>
 #include <Simp1e/IWindowMenuComponent.h>
 #include <Simp1e/IWindowMenuItemComponent.h>
 #include <Simp1e/QActionComponent.h>
 #include <Simp1e/QMainWindowComponent.h>
 #include <Simp1e/QMenuComponent.h>
+#include <Simp1e/QSimp1eGraphicsItem.h>
+#include <Simp1e/QSimp1eGraphicsItemComponent.h>
 #include <Simp1e/QSimp1eGraphicsScene.h>
 #include <Simp1e/QSimp1eGraphicsView.h>
 #include <Simp1e/QWidgetComponent.h>
@@ -24,7 +30,8 @@
 namespace Simp1e {
 
     class QtGuiSystem {
-        IEngine* _engine;
+        IEngine*              _engine;
+        QSimp1eGraphicsScene* _canvasScene;
 
         IEntityManager* entityManager() const { return _engine->GetEntityManager(); }
 
@@ -95,7 +102,20 @@ namespace Simp1e {
                 auto* scene = new QSimp1eGraphicsScene();
                 view->setScene(scene);
                 layout->addWidget(view);
+                // Save for graphical components to render on:
+                _canvasScene = scene;
             }
+        }
+
+        void OnRectangleAdded(Entity entity, ComponentType componentType, void* component) {
+            _Log_("-> RectangleAdded");
+            if (!_canvasScene) return;
+            auto* rectangleComponent = component_cast<IRectangleComponent>(component);
+            auto* graphicsItem       = new QSimp1eGraphicsItem();
+            entityManager()->Add<QSimp1eGraphicsItemComponent>(entity, graphicsItem);
+            _canvasScene->addItem(graphicsItem);
+
+            // TODO - the item needs to like... you know... be updated and know how to render and stuff...
         }
 
         void UpdateWindow(Entity entity, void* component) {
@@ -121,6 +141,7 @@ namespace Simp1e {
         }
 
         void Update(IEngine* engine, double deltaTime) {
+            // TODO cache FunctionPointer instead of constructing new ones every frame!
             engine->GetEntityManager()->ForEach<IWindowComponent>(
                 function_pointer(this, &QtGuiSystem::UpdateWindow).get()
             );

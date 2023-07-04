@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Simp1e/DirtyTrackingComponentBase.h>
-
 #include "IPositionComponent.h"
 
 namespace Simp1e {
@@ -12,6 +10,7 @@ namespace Simp1e {
     public:
         PositionComponent() = default;
         PositionComponent(const Position& position) : _position(position) {}
+        PositionComponent(sreal x, sreal y, sreal z = 0) : _position(x, y, z) {}
 
         sreal x() const override { return _position.x(); }
         sreal y() const override { return _position.y(); }
