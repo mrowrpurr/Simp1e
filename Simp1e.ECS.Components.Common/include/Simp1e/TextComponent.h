@@ -17,7 +17,7 @@ namespace Simp1e {
 
         void SetText(const char* text) override {
             _text = text;
-            SetDirty(true);
+            SetDirtyFlag(Fields::Text);
         }
     };
 }

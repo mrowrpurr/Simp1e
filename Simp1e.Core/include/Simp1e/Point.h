@@ -1,12 +1,9 @@
 #pragma once
 
-#include "sreal.h"
+#include "Vec2.h"
 
 namespace Simp1e {
-    class Point {
-        sreal _x = 0;
-        sreal _y = 0;
-
+    class Point : public Vec2 {
     public:
         struct Params {
             sreal x;
@@ -14,15 +11,15 @@ namespace Simp1e {
         };
 
         Point() = default;
-        Point(sreal x, sreal y) : _x(x), _y(y) {}
-        Point(const Params& params) : _x(params.x), _y(params.y) {}
+        Point(sreal x, sreal y) : Vec2(x, y) {}
+        Point(const Params& params) : Vec2(params.x, params.y) {}
 
-        virtual sreal& x() { return _x; }
-        virtual sreal& y() { return _y; }
+        virtual sreal x() const { return one(); }
+        virtual sreal y() const { return two(); }
 
-        virtual const sreal& x() const { return _x; }
-        virtual const sreal& y() const { return _y; }
+        virtual void SetX(sreal x) { SetOne(x); }
+        virtual void SetY(sreal y) { SetTwo(y); }
 
-        bool operator==(const Point& other) const { return _x == other._x && _y == other._y; }
+        bool operator==(const Point& other) const { return one() == other.one() && two() == other.two(); }
     };
 }

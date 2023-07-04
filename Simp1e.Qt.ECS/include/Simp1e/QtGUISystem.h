@@ -21,9 +21,6 @@
 #include <QMenuBar>
 #include <QStatusBar>
 
-// quick test
-#include <QGraphicsRectItem>
-
 namespace Simp1e {
 
     class QtGuiSystem {
@@ -39,6 +36,7 @@ namespace Simp1e {
 
         QLayout* GetParentLayout(Entity parentEntity) {
             if (auto* parentWidget = GetParentWidget(parentEntity)) return parentWidget->layout();
+            return nullptr;
         }
 
         void OnWindowMenuItemClicked(Entity entity, IWindowMenuItemComponent* windowMenuItemComponent) {
@@ -97,11 +95,6 @@ namespace Simp1e {
                 auto* scene = new QSimp1eGraphicsScene();
                 view->setScene(scene);
                 layout->addWidget(view);
-
-                // Test that it works...
-                auto* rect = new QGraphicsRectItem(0, 0, 100, 100);
-                rect->setBrush(QBrush(Qt::red));
-                scene->addItem(rect);
             }
         }
 

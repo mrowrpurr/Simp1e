@@ -20,6 +20,12 @@ namespace Simp1e {
             SetDirtyFlag((int)flag);
         }
 
+        template <typename... Args>
+        void SetDirtyFlags(Args... args) {
+            int flags[] = {static_cast<int>(args)...};
+            for (auto flag : flags) SetDirtyFlag(flag);
+        }
+
         template <typename T>
         void UnsetDirtyFlag(T flag) {
             UnsetDirtyFlag((int)flag);

@@ -17,7 +17,7 @@ namespace Simp1e {
 
         void SetName(const char* name) override {
             _name = name;
-            SetDirty(true);
+            SetDirtyFlag(Fields::Name);
         }
     };
 }

@@ -1,39 +1,30 @@
 #pragma once
 
-#include "Point.h"
+#include "Vec3.h"
 
 namespace Simp1e {
-    class Position : public Point {
-        Point _point;
-        sreal _z     = 0;
-        sreal _angle = 0;
-
+    class Position : public Vec3 {
     public:
         struct Params {
-            Point::Params point;
-            sreal         z;
-            sreal         angle;
+            sreal x;
+            sreal y;
+            sreal z;
         };
 
         Position() = default;
-        Position(sreal x, sreal y, sreal z = 0, sreal angle = 0) : _point(x, y), _z(z), _angle(angle) {}
-        Position(const Params& params) : _point(params.point), _z(params.z), _angle(params.angle) {}
+        Position(sreal x, sreal y, sreal z) : Vec3(x, y, z) {}
+        Position(const Params& params) : Vec3(params.x, params.y, params.z) {}
 
-        virtual Point& point() { return _point; }
-        virtual sreal& z() { return _z; }
-        virtual sreal& angle() { return _angle; }
+        virtual sreal x() const { return one(); }
+        virtual sreal y() const { return two(); }
+        virtual sreal z() const { return three(); }
 
-        virtual const Point& point() const { return _point; }
-        virtual const sreal& z() const { return _z; }
-        virtual const sreal& angle() const { return _angle; }
-
-        sreal&       x() override { return _point.x(); }
-        sreal&       y() override { return _point.y(); }
-        const sreal& x() const override { return _point.x(); }
-        const sreal& y() const override { return _point.y(); }
+        virtual void SetX(sreal x) { SetOne(x); }
+        virtual void SetY(sreal y) { SetTwo(y); }
+        virtual void SetZ(sreal z) { SetThree(z); }
 
         bool operator==(const Position& other) const {
-            return _point == other._point && _z == other._z && _angle == other._angle;
+            return x() == other.x() && y() == other.y() && z() == other.z();
         }
     };
 }
