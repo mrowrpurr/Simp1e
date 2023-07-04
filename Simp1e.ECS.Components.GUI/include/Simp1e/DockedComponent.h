@@ -4,7 +4,6 @@
 
 #include "IDockedComponent.h"
 
-
 namespace Simp1e {
 
     class DockedComponent : public IDockedComponent {
@@ -18,13 +17,13 @@ namespace Simp1e {
         const char* GetTitle() const override { return _title.c_str(); }
         void        SetTitle(const char* title) override {
             _title = title;
-            SetDirty(Fields::Title);
+            SetDirtyFlag(Fields::Title);
         }
 
         DockedLocation GetDefaultDockedLocation() const override { return _defaultDockedLocation; }
         void           SetDefaultDockedLocation(DockedLocation location) override {
             _defaultDockedLocation = location;
-            SetDirty(Fields::DefaultDockedLocation);
+            SetDirtyFlag(Fields::DefaultDockedLocation);
         }
     };
 }

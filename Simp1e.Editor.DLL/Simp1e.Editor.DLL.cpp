@@ -66,8 +66,14 @@ void CreateEntities() {
     entityManager->Add<WindowMenuItemComponent>(aboutItem, helpMenu, "About");
 
     // TODO: Make a LabelComponent + DockedComponent(Top)
+    auto label = entityManager->CreateEntity();
+    entityManager->Add<LabelComponent>(label, window, "Hello, World!");
 
     // TODO: Make a ButtonComponent + DockedComponent(Bottom)
+
+    // TODO: Make a centrally docked GraphicsScene/View
+
+    // TODO: Draw a DIFFERENT ECS environment of entity/components on/in the GraphicsScene/View
 }
 
 void Initialize(IEnvironment* environment) {

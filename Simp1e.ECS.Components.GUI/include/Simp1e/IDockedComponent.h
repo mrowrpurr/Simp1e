@@ -16,7 +16,8 @@ namespace Simp1e {
         };
 
         enum class Fields : int {
-            Title = 1 << 0,
+            Title                 = 1 << 0,
+            DefaultDockedLocation = 1 << 1,
         };
 
         virtual const char* GetTitle() const            = 0;

@@ -4,6 +4,7 @@
 #include <Simp1e/DefineSystemType.h>
 #include <Simp1e/EntityPointerManagerClient.h>
 #include <Simp1e/IEnvironment.h>
+#include <Simp1e/ILabelComponent.h>
 #include <Simp1e/IOnClickComponent.h>
 #include <Simp1e/IWindowComponent.h>
 #include <Simp1e/IWindowMenuComponent.h>
@@ -11,8 +12,10 @@
 #include <Simp1e/QActionComponent.h>
 #include <Simp1e/QMainWindowComponent.h>
 #include <Simp1e/QMenuComponent.h>
+#include <Simp1e/QWidgetComponent.h>
 #include <_Log_.h>
 
+#include <QLabel>
 #include <QMenuBar>
 #include <QStatusBar>
 
@@ -22,6 +25,12 @@ namespace Simp1e {
         IEnvironment*               _environment;
         EntityPointerManagerClient* _entityManager;
 
+        QWidget* GetParentWidget(Entity parentEntity) {
+            auto* qWidgetComponent = _entityManager->Get<QWidgetComponent>(parentEntity);
+            if (!qWidgetComponent) return nullptr;
+            return qWidgetComponent->GetQWidget();
+        }
+
         void OnWindowMenuItemClicked(Entity entity, IWindowMenuItemComponent* windowMenuItemComponent) {
             auto* clickFunction = windowMenuItemComponent->GetClickFunction();
             if (clickFunction) clickFunction->Invoke();
@@ -29,8 +38,9 @@ namespace Simp1e {
 
         void OnWindowAdded(Entity entity, ComponentType componentType, void* component) {
             _Log_("-> OnWindowAdded");
-            auto* windowComponent = component_cast<IWindowComponent>(component);
-            _entityManager->Add<QMainWindowComponent>(entity, windowComponent->GetTitle());
+            auto* windowComponent      = component_cast<IWindowComponent>(component);
+            auto* qMainWindowComponent = _entityManager->Add<QMainWindowComponent>(entity, windowComponent->GetTitle());
+            _entityManager->Add<QWidgetComponent>(entity, qMainWindowComponent->GetCentralQWidget());
         }
 
         void OnWindowMenuAdded(Entity entity, ComponentType componentType, void* component) {
@@ -59,6 +69,20 @@ namespace Simp1e {
             });
         }
 
+        void LabelAdded(Entity entity, ComponentType componentType, void* component) {
+            _Log_("-> LabelAdded");
+            auto* labelComponent = component_cast<ILabelComponent>(component);
+            if (auto* parentWidget = GetParentWidget(labelComponent->GetParentEntity())) {
+                _Log_("ADDING LABEL");
+                auto* qLabel = new QLabel();
+                qLabel->setText(labelComponent->GetText());
+                parentWidget->layout()->addWidget(qLabel);
+                // _entityManager->Add<QLabelComponent>(entity, qLabel);
+            } else {
+                _Log_("PARENT WIDGET NOT FOUND");
+            }
+        }
+
         void UpdateWindow(Entity entity, void* component) {
             auto windowComponent = component_cast<IWindowComponent>(component);
             if (!windowComponent->IsDirtyFlagSet(IWindowComponent::Fields::StatusBarText)) return;
@@ -78,6 +102,7 @@ namespace Simp1e {
             entityEvents->RegisterForComponentAdded<IWindowMenuItemComponent>(
                 this, &QtGUISystem::OnWindowMenuItemAdded
             );
+            entityEvents->RegisterForComponentAdded<ILabelComponent>(this, &QtGUISystem::LabelAdded);
         }
 
         void Update(IEnvironment* environment, double deltaTime) {
