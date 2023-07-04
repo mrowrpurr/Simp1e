@@ -1,7 +1,8 @@
 #pragma once
 
-#include <Simp1e/IExecutable.h>
+#include <Simp1e/SystemTypeFromType.h>
 
+#include "ISystem.h"
 #include "SystemType.h"
 
 namespace Simp1e {
@@ -13,9 +14,9 @@ namespace Simp1e {
 
         virtual void Update(IEngine* environment, double deltaTime) = 0;
 
-        virtual IExecutable* GetSystemPointer(SystemType systemType) = 0;
-        virtual bool         RemoveSystem(SystemType systemType)     = 0;
-        virtual bool         HasSystem(SystemType systemType)        = 0;
+        virtual ISystem* GetSystemPointer(SystemType systemType) = 0;
+        virtual bool     RemoveSystem(SystemType systemType)     = 0;
+        virtual bool     HasSystem(SystemType systemType)        = 0;
 
         virtual bool EnableSystem(SystemType systemType)    = 0;
         virtual bool DisableSystem(SystemType systemType)   = 0;
@@ -23,32 +24,32 @@ namespace Simp1e {
 
         template <typename T>
         T* Get() {
-            return static_cast<T*>(GetSystemPointer(T::GetSystemType()));
+            return static_cast<T*>(GetSystemPointer(SystemTypeFromType<T>()));
         }
 
         template <typename T>
         bool Remove() {
-            return RemoveSystem(T::GetSystemType());
+            return RemoveSystem(SystemTypeFromType<T>());
         }
 
         template <typename T>
         bool Has() {
-            return HasSystem(T::GetSystemType());
+            return HasSystem(SystemTypeFromType<T>());
         }
 
         template <typename T>
         bool Enable() {
-            return EnableSystem(T::GetSystemType());
+            return EnableSystem(SystemTypeFromType<T>());
         }
 
         template <typename T>
         bool Disable() {
-            return DisableSystem(T::GetSystemType());
+            return DisableSystem(SystemTypeFromType<T>());
         }
 
         template <typename T>
         bool IsEnabled() {
-            return IsSystemEnabled(T::GetSystemType());
+            return IsSystemEnabled(SystemTypeFromType<T>());
         }
     };
 }

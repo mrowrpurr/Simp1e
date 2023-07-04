@@ -2,6 +2,7 @@
 
 namespace Simp1e {
 
+    // TODO - stop using me
     struct IExecutable {
         virtual ~IExecutable()               = default;
         virtual void* operator()(void* data) = 0;

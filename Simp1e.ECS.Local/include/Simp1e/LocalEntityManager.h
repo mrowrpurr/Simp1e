@@ -37,7 +37,7 @@ namespace Simp1e {
                 auto found = componentMap.find(entity);
                 if (found == componentMap.end()) continue;
                 _eventManager.ComponentRemoving(
-                    entity, ComponentTypeFromHashKey(componentType), found->second->pointer()
+                    entity, ComponentTypeFromHashKey(componentType), found->second->void_ptr()
                 );
                 componentMap.erase(found);
                 _eventManager.ComponentRemoved(entity, ComponentTypeFromHashKey(componentType));
@@ -50,7 +50,7 @@ namespace Simp1e {
         void RemoveComponent(Entity entity, ComponentType componentType) override {
             auto foundComponent = _entities[entity].find(componentType);
             if (foundComponent == _entities[entity].end()) return;
-            _eventManager.ComponentRemoving(entity, componentType, (*foundComponent->second)->pointer());
+            _eventManager.ComponentRemoving(entity, componentType, (*foundComponent->second)->void_ptr());
             _componentPointers[componentType].erase(entity);
             _entities[entity].erase(componentType);
             _eventManager.ComponentRemoved(entity, componentType);
@@ -68,7 +68,7 @@ namespace Simp1e {
             if (entityMap == _entities.end()) return nullptr;
             auto found = entityMap->second.find(componentType);
             if (found == entityMap->second.end()) return nullptr;
-            return (*found->second)->pointer();
+            return (*found->second)->void_ptr();
         }
 
         void ForEachComponentFunction(ComponentType componentType, IFunctionPointer* functionPointer) override {
@@ -76,7 +76,7 @@ namespace Simp1e {
             auto componentMap = _componentPointers.find(componentType);
             if (componentMap == _componentPointers.end()) return;
             for (auto& [entity, component] : componentMap->second)
-                function_pointer::invoke(functionPointer, entity, component->pointer());
+                function_pointer::invoke(functionPointer, entity, component->void_ptr());
         }
 
         void AddComponentPointer(Entity entity, ComponentType componentType, VoidPointer component) override {
@@ -85,7 +85,7 @@ namespace Simp1e {
             auto insertResult = _componentPointers[componentType].insert({entity, std::move(component)});
             if (insertResult.second) {
                 _entities[entity][componentType] = &insertResult.first->second;
-                _eventManager.ComponentAdded(entity, componentType, insertResult.first->second->pointer());
+                _eventManager.ComponentAdded(entity, componentType, insertResult.first->second->void_ptr());
             }
         }
     };
