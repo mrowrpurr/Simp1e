@@ -1,95 +1,78 @@
 #pragma once
 
-#include <Simp1e/SystemTypeHashKey.h>
-#include <Simp1e/SystemTypeToHashKey.h>
-#include <_Log_.h>
-
-#include <memory>
 #include <unordered_map>
+#include <vector>
 
 #include "ILocalSystemManager.h"
-#include "LocalSystem.h"
 
 namespace Simp1e {
 
-    // TODO - SYSTEM GROUPS !!!! TODO TODO
-
     class LocalSystemManager : public ILocalSystemManager {
-        std::unordered_map<SystemTypeHashKey, std::unique_ptr<ISystem>> _systems;
-        std::unordered_map<SystemTypeHashKey, bool>                     _enabledSystems;
-        std::vector<SystemTypeHashKey>                                  _insertionOrder;
+        std::unordered_map<SystemGroupType, std::unique_ptr<ISystemGroupManager>> _systemGroups;
+        std::unordered_map<SystemGroupType, bool>                                 _enabledSystemGroups;
+        std::vector<SystemGroupType>                                              _systemGroupOrder;
 
     public:
-        void Update(IEngine* environment, double deltaTime) override {
-            _Log_("[LocalSystemManager] Update");
-            for (auto& systemTypeHashKey : _insertionOrder) {
-                if (!_enabledSystems[systemTypeHashKey]) continue;
-                _systems[systemTypeHashKey]->Update(environment, deltaTime);
-            }
-        }
-
-        virtual ISystem* GetSystemPointer(SystemType systemType) override {
-            auto found = _systems.find(SystemTypeToHashKey(systemType));
-            if (found == _systems.end()) return nullptr;
-            return found->second.get();
-        }
-
-        virtual bool RemoveSystem(SystemType systemType) override {
-            auto key   = SystemTypeToHashKey(systemType);
-            auto found = _systems.find(key);
-            if (found == _systems.end()) return false;
-            _systems.erase(key);
-            _enabledSystems.erase(key);
-            _insertionOrder.erase(
-                std::remove(_insertionOrder.begin(), _insertionOrder.end(), key), _insertionOrder.end()
-            );
-            _Log_("[LocalSystemManager] Removed system {}", systemType);
-            return true;
-        }
-
-        virtual bool HasSystem(SystemType systemType) override {
-            return _systems.find(SystemTypeToHashKey(systemType)) != _systems.end();
-        }
-
-        virtual bool EnableSystem(SystemType systemType) override {
-            auto key   = SystemTypeToHashKey(systemType);
-            auto found = _systems.find(key);
-            if (found == _systems.end()) return false;
-            _enabledSystems[key] = true;
-            _Log_("[LocalSystemManager] Enabled system {}", systemType);
-            return true;
-        }
-
-        virtual bool DisableSystem(SystemType systemType) override {
-            auto key   = SystemTypeToHashKey(systemType);
-            auto found = _systems.find(key);
-            if (found == _systems.end()) return false;
-            _enabledSystems[key] = false;
-            _Log_("[LocalSystemManager] Disabled system {}", systemType);
-            return true;
-        }
-
-        virtual bool IsSystemEnabled(SystemType systemType) override {
-            auto key   = SystemTypeToHashKey(systemType);
-            auto found = _systems.find(key);
-            if (found == _systems.end()) return false;
-            return _enabledSystems[key];
-        }
-
-        void* AddSystemPointer(
-            SystemType systemType, VoidPointer systemPointer, FunctionPointer systemUpdateFunctionPointer
+        ISystemGroupManager* AddGroup(
+            SystemGroupType systemGroupType, std::unique_ptr<ISystemGroupManager> systemGroupManager
         ) override {
-            auto key = SystemTypeToHashKey(systemType);
-            if (_systems.find(key) != _systems.end()) {
-                _Log_("[LocalSystemManager] System {} already exists", systemType);
-                return nullptr;
-            }
-            auto system          = new LocalSystem(std::move(systemPointer), std::move(systemUpdateFunctionPointer));
-            _systems[key]        = std::unique_ptr<ISystem>(system);
-            _enabledSystems[key] = true;
-            _insertionOrder.push_back(key);
-            _Log_("[LocalSystemManager] Added system {}", systemType);
-            return system->GetSystemPointer();
+            _systemGroups[systemGroupType] = std::move(systemGroupManager);
+            _systemGroupOrder.push_back(systemGroupType);
+            return _systemGroups[systemGroupType].get();
+        }
+
+        void Update(IEngine* environment, double deltaTime) override {
+            for (auto& systemGroupType : _systemGroupOrder)
+                if (_enabledSystemGroups[systemGroupType])
+                    _systemGroups[systemGroupType]->Update(environment, deltaTime);
+        }
+
+        ISystemGroupManager* GetGroup(SystemGroupType systemGroupType) override {
+            return _systemGroups[systemGroupType].get();
+        }
+        bool RemoveGroup(SystemGroupType systemGroupType) override { return _systemGroups.erase(systemGroupType) > 0; }
+        bool HasGroup(SystemGroupType systemGroupType) override {
+            return _systemGroups.find(systemGroupType) != _systemGroups.end();
+        }
+
+        bool MoveGroupAfterGroup(SystemGroupType systemGroupType, SystemGroupType afterSystemGroupType) override {
+            auto it = std::find(_systemGroupOrder.begin(), _systemGroupOrder.end(), systemGroupType);
+            if (it == _systemGroupOrder.end()) return false;
+            auto itAfter = std::find(_systemGroupOrder.begin(), _systemGroupOrder.end(), afterSystemGroupType);
+            if (itAfter == _systemGroupOrder.end()) return false;
+            _systemGroupOrder.erase(it);
+            _systemGroupOrder.insert(itAfter + 1, systemGroupType);
+            return true;
+        }
+        bool MoveGroupBeforeGroup(SystemGroupType systemGroupType, SystemGroupType beforeSystemGroupType) override {
+            auto it = std::find(_systemGroupOrder.begin(), _systemGroupOrder.end(), systemGroupType);
+            if (it == _systemGroupOrder.end()) return false;
+            auto itBefore = std::find(_systemGroupOrder.begin(), _systemGroupOrder.end(), beforeSystemGroupType);
+            if (itBefore == _systemGroupOrder.end()) return false;
+            _systemGroupOrder.erase(it);
+            _systemGroupOrder.insert(itBefore, systemGroupType);
+            return true;
+        }
+
+        bool SetGroupEnabled(SystemGroupType systemGroupType, bool enabled) override {
+            _enabledSystemGroups[systemGroupType] = enabled;
+            return true;
+        }
+        bool EnableGroup(SystemGroupType systemGroupType) override {
+            _enabledSystemGroups[systemGroupType] = true;
+            return true;
+        }
+        bool DisableGroup(SystemGroupType systemGroupType) override {
+            _enabledSystemGroups[systemGroupType] = false;
+            return true;
+        }
+        bool IsSystemGrouEnabled(SystemGroupType systemGroupType) override {
+            return _enabledSystemGroups[systemGroupType];
+        }
+
+        void ForEachSystemGroupManager(IFunctionPointer* function) override {
+            for (auto& systemGroupType : _systemGroupOrder)
+                function_pointer::invoke(function, _systemGroups[systemGroupType].get());
         }
     };
 }

@@ -1,9 +1,9 @@
 #pragma once
 
-#include <Simp1e/SystemTypeFromType.h>
+#include <function_pointer.h>
 
-#include "ISystem.h"
-#include "SystemType.h"
+#include "ISystemGroupManager.h"
+#include "SystemGroupType.h"
 
 namespace Simp1e {
 
@@ -14,42 +14,18 @@ namespace Simp1e {
 
         virtual void Update(IEngine* environment, double deltaTime) = 0;
 
-        virtual ISystem* GetSystemPointer(SystemType systemType) = 0;
-        virtual bool     RemoveSystem(SystemType systemType)     = 0;
-        virtual bool     HasSystem(SystemType systemType)        = 0;
+        virtual ISystemGroupManager* GetGroup(SystemGroupType systemGroupType)    = 0;
+        virtual bool                 RemoveGroup(SystemGroupType systemGroupType) = 0;
+        virtual bool                 HasGroup(SystemGroupType systemGroupType)    = 0;
 
-        virtual bool EnableSystem(SystemType systemType)    = 0;
-        virtual bool DisableSystem(SystemType systemType)   = 0;
-        virtual bool IsSystemEnabled(SystemType systemType) = 0;
+        virtual bool MoveGroupAfterGroup(SystemGroupType systemGroupType, SystemGroupType afterSystemGroupType)   = 0;
+        virtual bool MoveGroupBeforeGroup(SystemGroupType systemGroupType, SystemGroupType beforeSystemGroupType) = 0;
 
-        template <typename T>
-        T* Get() {
-            return static_cast<T*>(GetSystemPointer(SystemTypeFromType<T>()));
-        }
+        virtual bool SetGroupEnabled(SystemGroupType systemGroupType, bool enabled) = 0;
+        virtual bool EnableGroup(SystemGroupType systemGroupType)                   = 0;
+        virtual bool DisableGroup(SystemGroupType systemGroupType)                  = 0;
+        virtual bool IsSystemGrouEnabled(SystemGroupType systemGroupType)           = 0;
 
-        template <typename T>
-        bool Remove() {
-            return RemoveSystem(SystemTypeFromType<T>());
-        }
-
-        template <typename T>
-        bool Has() {
-            return HasSystem(SystemTypeFromType<T>());
-        }
-
-        template <typename T>
-        bool Enable() {
-            return EnableSystem(SystemTypeFromType<T>());
-        }
-
-        template <typename T>
-        bool Disable() {
-            return DisableSystem(SystemTypeFromType<T>());
-        }
-
-        template <typename T>
-        bool IsEnabled() {
-            return IsSystemEnabled(SystemTypeFromType<T>());
-        }
+        virtual void ForEachSystemGroupManager(IFunctionPointer* function) = 0;
     };
 }

@@ -3,4 +3,6 @@
 
 using namespace Simp1e;
 
+LocalEngine engine;
+
 int main(int argc, char* argv[]) {}

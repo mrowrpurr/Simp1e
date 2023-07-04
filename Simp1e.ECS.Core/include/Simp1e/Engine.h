@@ -21,5 +21,10 @@ namespace Simp1e {
         ISystemManager*  GetSystemManager() override { return &_systemManager; }
         IEventManager*   GetEventManager() override { return &_eventManager; }
         ICommandManager* GetCommandManager() override { return &_commandManager; }
+
+        EntityManagerT&  GetEntityManagerInstance() { return _entityManager; }
+        SystemManagerT&  GetSystemManagerInstance() { return _systemManager; }
+        EventManagerT&   GetEventManagerInstance() { return _eventManager; }
+        CommandManagerT& GetCommandManagerInstance() { return _commandManager; }
     };
 }

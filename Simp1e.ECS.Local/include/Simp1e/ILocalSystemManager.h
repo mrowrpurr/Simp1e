@@ -1,25 +1,21 @@
 #pragma once
 
 #include <Simp1e/ISystemManager.h>
-#include <Simp1e/SystemTypeFromType.h>
-#include <function_pointer.h>
-#include <void_pointer.h>
 
-#include <utility>
+#include <memory>
 
 namespace Simp1e {
 
-    class ILocalSystemManager : public ISystemManager {
-        virtual void* AddSystemPointer(
-            SystemType systemType, VoidPointer systemPointer, FunctionPointer systemUpdateFunctionPointer
+    struct ILocalSystemManager : public ISystemManager {
+        virtual ISystemGroupManager* AddGroup(
+            SystemGroupType systemGroupType, std::unique_ptr<ISystemGroupManager> systemGroupManager
         ) = 0;
-
-        template <typename T, typename... Args>
-        T* Add(Args&&... args) {
-            auto* system       = new T(std::forward<Args>(args)...);
-            auto  systemUpdate = [system](IEngine* engine, double deltaTime) { system->Update(engine, deltaTime); };
-            AddSystemPointer(SystemTypeFromType<T>(), void_pointer(system), function_pointer(systemUpdate));
-            return static_cast<T*>(system);
-        }
     };
+
+    template <typename T, typename... Args>
+    T* Add(SystemGroupType systemGroupType, Args&&... args) {
+        auto* systemGroupManager = new T(std::forward<Args>(args)...);
+        AddSystemGroupManager(systemGroupType, std::unique_ptr<ISystemGroupManager>(systemGroupManager));
+        return static_cast<T*>(systemGroupManager);
+    }
 }
