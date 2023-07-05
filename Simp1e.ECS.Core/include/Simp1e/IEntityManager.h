@@ -8,6 +8,7 @@
 
 #include "ComponentType.h"
 #include "ComponentTypeFromType.h"
+#include "IEntityComponentCollection.h"
 #include "IEntityEventManager.h"
 #include "IMemoryManagedEngineContainerClass.h"
 
@@ -16,9 +17,10 @@ namespace Simp1e {
     struct IEntityManager : public IMemoryManagedEngineContainerClass {
         virtual IEntityEventManager* GetEventManager() = 0;
 
-        virtual Entity CreateEntity()               = 0;
-        virtual void   DestroyEntity(Entity entity) = 0;
-        virtual bool   EntityExists(Entity entity)  = 0;
+        virtual Entity                      CreateEntity()               = 0;
+        virtual void                        DestroyEntity(Entity entity) = 0;
+        virtual bool                        EntityExists(Entity entity)  = 0;
+        virtual IEntityComponentCollection* GetEntity(Entity entity)     = 0;
 
         virtual bool OwnsEntityMemoryManagement() const = 0;
         bool         ManagesEngineItemMemory() const override { return OwnsEntityMemoryManagement(); }

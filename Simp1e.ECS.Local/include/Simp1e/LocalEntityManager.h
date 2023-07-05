@@ -6,17 +6,19 @@
 #include <_Log_.h>
 
 #include <atomic>
+#include <memory>
 #include <unordered_map>
 
+#include "LocalEntityComponentCollection.h"
 #include "LocalEntityEventManager.h"
 
 namespace Simp1e {
 
     class LocalEntityManager : public IEntityManager {
-        std::atomic<Entity>                                                                _nextEntityId = 0;
-        std::unordered_map<ComponentTypeHashKey, std::unordered_map<Entity, VoidPointer>>  _componentPointers;
-        std::unordered_map<Entity, std::unordered_map<ComponentTypeHashKey, VoidPointer*>> _entities;
-        LocalEntityEventManager                                                            _eventManager;
+        std::atomic<Entity>                                                               _nextEntityId = 0;
+        std::unordered_map<ComponentTypeHashKey, std::unordered_map<Entity, VoidPointer>> _componentPointers;
+        std::unordered_map<Entity, std::unique_ptr<LocalEntityComponentCollection>>       _entityComponentsByEntity;
+        LocalEntityEventManager                                                           _eventManager;
 
     public:
         bool OwnsEntityMemoryManagement() const override { return true; }
@@ -25,8 +27,8 @@ namespace Simp1e {
 
         Entity CreateEntity() override {
             _Log_("[LocalEntityManager] CreateEntity");
-            auto entity       = _nextEntityId++;
-            _entities[entity] = {};
+            auto entity                       = _nextEntityId++;
+            _entityComponentsByEntity[entity] = std::make_unique<LocalEntityComponentCollection>();
             _eventManager.EntityCreated(entity);
             return entity;
         }
@@ -34,7 +36,7 @@ namespace Simp1e {
         void DestroyEntity(Entity entity) override {
             _Log_("[LocalEntityManager] DestroyEntity");
             _eventManager.EntityDestroying(entity);
-            _entities.erase(entity);
+            _entityComponentsByEntity.erase(entity);
             for (auto& [componentType, componentMap] : _componentPointers) {
                 auto found = componentMap.find(entity);
                 if (found == componentMap.end()) continue;
@@ -47,31 +49,47 @@ namespace Simp1e {
             _eventManager.EntityDestroyed(entity);
         }
 
-        bool EntityExists(Entity entity) override { return _entities.find(entity) != _entities.end(); }
+        bool EntityExists(Entity entity) override {
+            return _entityComponentsByEntity.find(entity) != _entityComponentsByEntity.end();
+        }
+
+        IEntityComponentCollection* GetEntity(Entity entity) override {
+            auto found = _entityComponentsByEntity.find(entity);
+            if (found == _entityComponentsByEntity.end()) return nullptr;
+            return found->second.get();
+        }
 
         bool RemoveComponent(Entity entity, ComponentType componentType) override {
-            auto foundComponent = _entities[entity].find(componentType);
-            if (foundComponent == _entities[entity].end()) return false;
-            _eventManager.ComponentRemoving(entity, componentType, (*foundComponent->second)->void_ptr());
-            _componentPointers[componentType].erase(entity);
-            _entities[entity].erase(componentType);
+            auto foundComponent = _componentPointers.find(componentType);
+            if (foundComponent == _componentPointers.end()) return false;
+
+            auto foundEntity = _entityComponentsByEntity.find(entity);
+            if (foundEntity == _entityComponentsByEntity.end()) return false;
+
+            _eventManager.ComponentRemoving(
+                entity, componentType, foundEntity->second->GetComponentPointer(componentType)
+            );
+
+            foundComponent->second.erase(entity);
+            foundEntity->second->RemoveComponent(componentType);
+
             _eventManager.ComponentRemoved(entity, componentType);
             return true;
         }
 
         bool HasComponent(Entity entity, ComponentType componentType) const override {
-            auto entityMap = _entities.find(entity);
-            if (entityMap == _entities.end()) return false;
-            return entityMap->second.find(componentType) != entityMap->second.end();
+            auto entityMap = _entityComponentsByEntity.find(entity);
+            if (entityMap == _entityComponentsByEntity.end()) return false;
+            return entityMap->second->HasComponent(componentType);
         }
 
         void* GetComponentPointer(Entity entity, ComponentType componentType) const override {
             _Log_("[LocalEntityManager] GetComponentPointer of type {}", componentType);
-            auto entityMap = _entities.find(entity);
-            if (entityMap == _entities.end()) return nullptr;
-            auto found = entityMap->second.find(componentType);
-            if (found == entityMap->second.end()) return nullptr;
-            return (*found->second)->void_ptr();
+
+            auto entityComponentCollection = _entityComponentsByEntity.find(entity);
+            if (entityComponentCollection == _entityComponentsByEntity.end()) return nullptr;
+
+            return entityComponentCollection->second->GetComponentPointer(componentType);
         }
 
         void ForEachComponent(ComponentType componentType, IFunctionPointer* functionPointer) override {
@@ -86,7 +104,7 @@ namespace Simp1e {
             _eventManager.ComponentAdding(entity, componentType);
             auto insertResult = _componentPointers[componentType].insert({entity, std::move(component)});
             if (insertResult.second) {
-                _entities[entity][componentType] = &insertResult.first->second;
+                _entityComponentsByEntity[entity]->AddComponentPointer(componentType, &insertResult.first->second);
                 _eventManager.ComponentAdded(entity, componentType, insertResult.first->second->void_ptr());
                 return &insertResult.first->second;
             }
