@@ -1,6 +1,8 @@
 #pragma once
 
 #include <Simp1e/ComponentCast.h>
+#include <Simp1e/ComponentTypeFromType.h>
+#include <Simp1e/ComponentTypeHashKey.h>
 #include <Simp1e/DefineSystemType.h>
 #include <Simp1e/ICanvasComponent.h>
 #include <Simp1e/IEngine.h>
@@ -26,11 +28,21 @@
 #include <QLabel>
 #include <QMenuBar>
 #include <QStatusBar>
+#include <memory>
+#include <unordered_map>
+
+#include "IQtComponentPainter.h"
+#include "IQtComponentUpdateHandler.h"
 
 namespace Simp1e {
 
     class QtGuiSystem {
-        IEngine*              _engine;
+        IEngine* _engine;
+
+        std::unordered_map<ComponentTypeHashKey, std::unique_ptr<IQtComponentPainter>>       _componentPainters;
+        std::unordered_map<ComponentTypeHashKey, std::unique_ptr<IQtComponentUpdateHandler>> _componentUpdateHandlers;
+
+        ///////
         QSimp1eGraphicsScene* _canvasScene;
 
         IEntityManager* entityManager() const { return _engine->GetEntityManager(); }
@@ -126,6 +138,10 @@ namespace Simp1e {
             windowComponent->UnsetDirtyFlag(IWindowComponent::Fields::StatusBarText);
         }
 
+        void OnUpdateComponentWithUpdateHandler(Entity entity, void* component) {
+            //
+        }
+
     public:
         DEFINE_SYSTEM_TYPE("QtGUI")
 
@@ -140,11 +156,43 @@ namespace Simp1e {
             entityEvents->RegisterForComponentAdded<ICanvasComponent>(this, &QtGuiSystem::OnCanvasAdded);
         }
 
+        void RegisterComponentPainter(ComponentTypeHashKey componentTypeHashKey, IQtComponentPainter* painter) {
+            _componentPainters[componentTypeHashKey] = std::unique_ptr<IQtComponentPainter>(painter);
+        }
+
+        template <typename TComponent>
+        void RegisterComponentPainter(IQtComponentPainter* painter) {
+            RegisterComponentPainter(ComponentTypeFromType<TComponent>(), painter);
+        }
+
+        template <typename TComponent, typename... TArgs>
+        void RegisterComponentPainter(TArgs&&... args) {
+            RegisterComponentPainter<TComponent>(new TComponent(std::forward<TArgs>(args)...));
+        }
+
+        void RegisterComponentUpdateHandler(
+            ComponentTypeHashKey componentTypeHashKey, IQtComponentUpdateHandler* updateHandler
+        ) {
+            _componentUpdateHandlers[componentTypeHashKey] = std::unique_ptr<IQtComponentUpdateHandler>(updateHandler);
+        }
+
+        template <typename TComponent>
+        void RegisterComponentUpdateHandler(IQtComponentUpdateHandler* updateHandler) {
+            RegisterComponentUpdateHandler(ComponentTypeFromType<TComponent>(), updateHandler);
+        }
+
+        template <typename TComponent, typename... TArgs>
+        void RegisterComponentUpdateHandler(TArgs&&... args) {
+            RegisterComponentUpdateHandler<TComponent>(new TComponent(std::forward<TArgs>(args)...));
+        }
+
         void Update(IEngine* engine, double deltaTime) {
-            // TODO cache FunctionPointer instead of constructing new ones every frame!
-            engine->GetEntityManager()->ForEach<IWindowComponent>(
-                function_pointer(this, &QtGuiSystem::UpdateWindow).get()
-            );
+            for (auto& [componentType, componentUpdateHandler] : _componentUpdateHandlers) {
+                //
+            }
+            // auto entities = entityManager()->ForEachComponentType(
+            //     componentType, this, &QtGuiSystem::OnUpdateComponentWithUpdateHandler
+            // )
         }
     };
 }

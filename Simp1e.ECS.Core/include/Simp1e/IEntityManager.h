@@ -53,9 +53,30 @@ namespace Simp1e {
             return HasComponent(entity, ComponentTypeFromType<T>());
         }
 
+        void ForEachComponentType(ComponentType componentType, void (*function)(Entity, void*)) {
+            ForEachComponent(componentType, new_function_pointer(function));
+        }
+
+        template <typename ClassT>
+        void ForEachComponentType(
+            ComponentType componentType, ClassT* instance, void (ClassT::*function)(Entity, void*)
+        ) {
+            ForEachComponent(componentType, new_function_pointer(instance, function));
+        }
+
         template <typename T>
         void ForEach(IFunctionPointer* callback) {
             ForEachComponent(ComponentTypeFromType<T>(), callback);
+        }
+
+        template <typename ComponentT>
+        void ForEach(void (*function)(Entity, void*)) {
+            ForEachComponent(ComponentTypeFromType<ComponentT>(), new_function_pointer(function));
+        }
+
+        template <typename ComponentT, typename ClassT>
+        void ForEach(ClassT* instance, void (ClassT::*function)(Entity, void*)) {
+            ForEachComponent(ComponentTypeFromType<ComponentT>(), new_function_pointer(instance, function));
         }
 
         template <typename T>

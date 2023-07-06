@@ -14,11 +14,18 @@
 
 namespace Simp1e {
 
+    // TODO rename things. LocalEntityComponentCollection -->LocalComponentPointerCollection because it's just
+    // components
+    // TODO and change std::unordered_map<Entity, VoidPointer> over to something actually called a
+    // LocalEntityComponentCollection
+
     class LocalEntityManager : public IEntityManager {
-        std::atomic<Entity>                                                               _nextEntityId = 0;
+        std::atomic<Entity>     _nextEntityId = 0;
+        LocalEntityEventManager _eventManager;
+
+        // TODO: make a comtainer for these. Should accept type for VoidPointer or void* or other
         std::unordered_map<ComponentTypeHashKey, std::unordered_map<Entity, VoidPointer>> _componentPointers;
         std::unordered_map<Entity, std::unique_ptr<LocalEntityComponentCollection>>       _entityComponentsByEntity;
-        LocalEntityEventManager                                                           _eventManager;
 
     public:
         bool OwnsEntityMemoryManagement() const override { return true; }
