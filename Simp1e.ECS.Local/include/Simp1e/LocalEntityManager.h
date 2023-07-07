@@ -103,7 +103,7 @@ namespace Simp1e {
             auto componentMap = _componentPointers.find(componentType);
             if (componentMap == _componentPointers.end()) return;
             for (auto& [entity, component] : componentMap->second)
-                function_pointer::invoke(functionPointer, entity, component->void_ptr());
+                function_pointer::invoke(functionPointer, entity, componentType, component->void_ptr());
         }
 
         VoidPointer* AddComponentPointer(Entity entity, ComponentType componentType, VoidPointer component) override {

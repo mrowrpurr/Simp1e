@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Simp1e/ComponentCast.h>
+#include <Simp1e/ComponentTypeFromHashKey.h>
 #include <Simp1e/ComponentTypeFromType.h>
 #include <Simp1e/ComponentTypeHashKey.h>
 #include <Simp1e/DefineSystemType.h>
@@ -138,8 +139,8 @@ namespace Simp1e {
             windowComponent->UnsetDirtyFlag(IWindowComponent::Fields::StatusBarText);
         }
 
-        void OnUpdateComponentWithUpdateHandler(Entity entity, void* component) {
-            //
+        void OnUpdateComponentWithUpdateHandler(Entity entity, ComponentType componentType, void* component) {
+            _Log_("-> OnUpdateComponentWithUpdateHandler {} {}", entity, componentType);
         }
 
     public:
@@ -187,12 +188,10 @@ namespace Simp1e {
         }
 
         void Update(IEngine* engine, double deltaTime) {
-            for (auto& [componentType, componentUpdateHandler] : _componentUpdateHandlers) {
-                //
-            }
-            // auto entities = entityManager()->ForEachComponentType(
-            //     componentType, this, &QtGuiSystem::OnUpdateComponentWithUpdateHandler
-            // )
+            for (auto& [componentTypeKey, componentUpdateHandler] : _componentUpdateHandlers)
+                entityManager()->ForEachComponentType(
+                    ComponentTypeFromHashKey(componentTypeKey), this, &QtGuiSystem::OnUpdateComponentWithUpdateHandler
+                );
         }
     };
 }

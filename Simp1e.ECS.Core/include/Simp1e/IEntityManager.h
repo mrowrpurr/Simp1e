@@ -32,6 +32,7 @@ namespace Simp1e {
         virtual bool  HasComponent(Entity entity, ComponentType componentType) const        = 0;
         virtual void* GetComponentPointer(Entity entity, ComponentType componentType) const = 0;
 
+        // TODO: update to use C function pointer
         virtual void ForEachComponent(ComponentType componentType, IFunctionPointer* callback) = 0;
 
         template <typename T, typename... Args>
@@ -53,13 +54,13 @@ namespace Simp1e {
             return HasComponent(entity, ComponentTypeFromType<T>());
         }
 
-        void ForEachComponentType(ComponentType componentType, void (*function)(Entity, void*)) {
+        virtual void ForEachComponentType(ComponentType componentType, void (*function)(Entity, ComponentType, void*)) {
             ForEachComponent(componentType, new_function_pointer(function));
         }
 
         template <typename ClassT>
         void ForEachComponentType(
-            ComponentType componentType, ClassT* instance, void (ClassT::*function)(Entity, void*)
+            ComponentType componentType, ClassT* instance, void (ClassT::*function)(Entity, ComponentType, void*)
         ) {
             ForEachComponent(componentType, new_function_pointer(instance, function));
         }
@@ -70,12 +71,12 @@ namespace Simp1e {
         }
 
         template <typename ComponentT>
-        void ForEach(void (*function)(Entity, void*)) {
+        void ForEach(void (*function)(Entity, ComponentType, void*)) {
             ForEachComponent(ComponentTypeFromType<ComponentT>(), new_function_pointer(function));
         }
 
         template <typename ComponentT, typename ClassT>
-        void ForEach(ClassT* instance, void (ClassT::*function)(Entity, void*)) {
+        void ForEach(ClassT* instance, void (ClassT::*function)(Entity, ComponentType, void*)) {
             ForEachComponent(ComponentTypeFromType<ComponentT>(), new_function_pointer(instance, function));
         }
 

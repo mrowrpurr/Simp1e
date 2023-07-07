@@ -19,7 +19,6 @@ namespace Simp1e {
 
     public:
         QtEngine(IEngine* engine) : _engine(engine), _gameLoop(std::make_unique<QtGameLoop>(engine)) {
-            // Add the QtRenderGroup (before the default PresentationGroup)
             auto* qtGroup =
                 _engine->GetSystemManager()->Add<LocalSystemGroupManager>(QtSystemGroupTypes::QtRenderGroup);
             _engine->GetSystemManager()->MoveGroupBeforeGroup(

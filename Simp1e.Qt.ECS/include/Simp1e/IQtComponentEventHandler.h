@@ -16,6 +16,6 @@ namespace Simp1e {
         virtual void OnComponentRemoved(Entity entity, ComponentType componentType) {}
 
         // Entity entity, ComponentType componentType, void* component
-        void OnComponentAddingCallback()...
+        // void OnComponentAddingCallback()...
     };
 }
