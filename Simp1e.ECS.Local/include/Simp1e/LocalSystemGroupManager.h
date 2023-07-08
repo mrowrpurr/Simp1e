@@ -85,7 +85,8 @@ namespace Simp1e {
         }
 
         ISystem* AddSystemPointer(
-            SystemType systemType, VoidPointer systemPointer, FunctionPointer systemUpdateFunctionPointer
+            SystemType systemType, VoidPointer systemPointer,
+            std::unique_ptr<IFunctionPointer> systemUpdateFunctionPointer
         ) override {
             auto key = SystemTypeToHashKey(systemType);
             if (_systems.find(key) != _systems.end()) {

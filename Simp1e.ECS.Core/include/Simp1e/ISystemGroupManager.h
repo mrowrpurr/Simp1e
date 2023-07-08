@@ -21,7 +21,7 @@ namespace Simp1e {
         bool         ManagesEngineItemMemory() const override { return OwnsSystemMemoryManagement(); }
 
         virtual ISystem* AddSystemPointer(
-            SystemType systemType, VoidPointer systemPointer, FunctionPointer systemUpdateFunction
+            SystemType systemType, VoidPointer systemPointer, IFunctionPointer systemUpdateFunction
         )                                                        = 0;
         virtual ISystem* GetSystemPointer(SystemType systemType) = 0;
         virtual bool     RemoveSystem(SystemType systemType)     = 0;

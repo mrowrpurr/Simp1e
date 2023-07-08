@@ -41,6 +41,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets SvgWidgets)
 # add_subdirectory("Simp1e.ECS")
 # add_subdirectory("Simp1e.QT")
 # add_subdirectory("Simp1e.QT.ECS")
+add_subdirectory("Experimentation")
 
 # Update to support multiple or... just... hmm.
 function(qt_project target_name main_cpp_file)
@@ -61,5 +62,5 @@ function(qt_project target_name main_cpp_file)
     qt_finalize_executable(${target_name})
 endfunction()
 
-qt_project(Simp1e_Editor_EXE "Simp1e.Editor.Exe/Simp1e.Editor.cpp")
+# qt_project(Simp1e_Editor_EXE "Simp1e.Editor.Exe/Simp1e.Editor.cpp")
 # qt6_add_resources(Side_Scroller_Simpler "Prototyping/Games/Side Scroller - Simpler/SideScroller.qrc")

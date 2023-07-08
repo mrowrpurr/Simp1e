@@ -10,19 +10,17 @@
 namespace Simp1e {
 
     class LocalSystem : public ISystem {
-        VoidPointer     _system;
-        FunctionPointer _updateFunction;
+        VoidPointer                                              _system;
+        std::unique_ptr<FunctionPointer<void(IEngine*, double)>> _updateFunction;
 
         LocalSystem(const LocalSystem&)            = delete;
         LocalSystem& operator=(const LocalSystem&) = delete;
 
     public:
-        LocalSystem(VoidPointer system, FunctionPointer updateFunction)
-            : _system(std::move(system)), _updateFunction(std::move(updateFunction)) {}
+        LocalSystem(VoidPointer system, FunctionPointer<void(IEngine*, double)>* updateFunction)
+            : _system(std::move(system)), _updateFunction(updateFunction) {}
 
         VoidPointer* GetSystemPointer() const override { return const_cast<VoidPointer*>(&_system); }
-        void         Update(IEngine* engine, double deltaTime) override {
-            function_pointer::invoke(_updateFunction, engine, deltaTime);
-        }
+        void         Update(IEngine* engine, double deltaTime) override { _updateFunction->invoke(engine, deltaTime); }
     };
 }
