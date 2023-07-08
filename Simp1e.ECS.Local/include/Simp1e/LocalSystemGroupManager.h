@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Simp1e/ISystemGroupManager.h>
+#include <Simp1e/SystemTypeFromHashKey.h>
 #include <Simp1e/SystemTypeHashKey.h>
 #include <Simp1e/SystemTypeToHashKey.h>
 #include <_Log_.h>
@@ -12,13 +13,27 @@
 
 namespace Simp1e {
 
-    class LocalSystemGroupManager : public ISystemGroupManager {
+    class LocalSystemGroupManager : ISystemGroupManager {
         std::unordered_map<SystemTypeHashKey, std::unique_ptr<ISystem>> _systems;
         std::unordered_map<SystemTypeHashKey, bool>                     _enabledSystems;
         std::vector<SystemTypeHashKey>                                  _insertionOrder;
 
     public:
-        bool OwnsSystemMemoryManagement() const override { return true; }
+        template <typename T, typename... Args>
+        T* AddSystem(Args&&... args) {
+            auto systemType = SystemTypeFromType<T>();
+            if (_systems.find(systemType) != _systems.end()) {
+                _Log_("[LocalSystemManager] System {} already exists", systemType);
+                return nullptr;
+            }
+            auto system                 = new T(std::forward<Args>(args)...);
+            auto iSystem                = new LocalSystem<T>(system);
+            _systems[systemType]        = std::unique_ptr<ISystem>(iSystem);
+            _enabledSystems[systemType] = true;
+            _insertionOrder.push_back(systemType);
+            _Log_("[LocalSystemManager] Added system {}", systemType);
+            return system;
+        }
 
         void Update(IEngine* environment, double deltaTime) override {
             for (auto& systemTypeHashKey : _insertionOrder) {
@@ -84,27 +99,17 @@ namespace Simp1e {
             return _enabledSystems[key];
         }
 
-        ISystem* AddSystemPointer(
-            SystemType systemType, VoidPointer systemPointer,
-            std::unique_ptr<IFunctionPointer> systemUpdateFunctionPointer
-        ) override {
-            auto key = SystemTypeToHashKey(systemType);
-            if (_systems.find(key) != _systems.end()) {
-                _Log_("[LocalSystemManager] System {} already exists", systemType);
-                return nullptr;
-            }
-            auto system          = new LocalSystem(std::move(systemPointer), std::move(systemUpdateFunctionPointer));
-            _systems[key]        = std::unique_ptr<ISystem>(system);
-            _enabledSystems[key] = true;
-            _insertionOrder.push_back(key);
-            _Log_("[LocalSystemManager] Added system {}", systemType);
-            return system;
-        }
-
-        virtual void ForEachSystem(IFunctionPointer* function) override {
+        void ForEachSystem(IFunctionPointer<void(SystemType, ISystem*)>* callback) override {
             for (auto& systemTypeHashKey : _insertionOrder) {
                 if (!_enabledSystems[systemTypeHashKey]) continue;
-                function_pointer::invoke(function, _systems[systemTypeHashKey].get());
+                callback->invoke(SystemTypeFromHashKey(systemTypeHashKey), _systems[systemTypeHashKey].get());
+            }
+        }
+
+        void ForEachSystem(FunctionPointer<void(SystemType, ISystem*)> callback) {
+            for (auto& systemTypeHashKey : _insertionOrder) {
+                if (!_enabledSystems[systemTypeHashKey]) continue;
+                callback.invoke(SystemTypeFromHashKey(systemTypeHashKey), _systems[systemTypeHashKey].get());
             }
         }
     };
