@@ -1,14 +1,14 @@
 #pragma once
 
-#include <void_pointer.h>
+#include "SystemPointer.h"
 
 namespace Simp1e {
 
     struct IEngine;
 
     struct ISystem {
-        virtual ~ISystem()                                                  = default;
-        virtual VoidPointer* GetSystemPointer() const                       = 0;
-        virtual void         Update(IEngine* environment, double deltaTime) = 0;
+        virtual ~ISystem()                                                   = default;
+        virtual SystemPointer GetSystemPointer() const                       = 0;
+        virtual void          Update(IEngine* environment, double deltaTime) = 0;
     };
 }

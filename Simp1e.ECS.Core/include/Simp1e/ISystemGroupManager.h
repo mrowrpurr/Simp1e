@@ -2,10 +2,10 @@
 
 #include <Simp1e/SystemTypeFromType.h>
 #include <function_pointer.h>
-#include <void_pointer.h>
 
 #include "IMemoryManagedEngineContainerClass.h"
 #include "ISystem.h"
+#include "SystemPointer.h"
 #include "SystemType.h"
 
 namespace Simp1e {
@@ -21,7 +21,7 @@ namespace Simp1e {
         bool         ManagesEngineItemMemory() const override { return OwnsSystemMemoryManagement(); }
 
         virtual ISystem* AddSystemPointer(
-            SystemType systemType, VoidPointer systemPointer, IFunctionPointer systemUpdateFunction
+            SystemType systemType, SystemPointer systemPointer, IFunctionPointer systemUpdateFunction
         )                                                        = 0;
         virtual ISystem* GetSystemPointer(SystemType systemType) = 0;
         virtual bool     RemoveSystem(SystemType systemType)     = 0;
