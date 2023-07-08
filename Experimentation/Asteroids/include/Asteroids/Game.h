@@ -3,6 +3,8 @@
 // using namespace Simp1e;
 
 #include <Simp1e/LocalEntityEventManager.h>
+#include <Simp1e/LocalEntityManager.h>
+#include <Simp1e/PositionComponent.h>
 
 #include <QApplication>
 #include <QLabel>
@@ -21,6 +23,10 @@ namespace Asteroids {
             LocalEntityEventManager eventManager;
             eventManager.RegisterForEntityCreated(StaticFn);
             eventManager.RegisterForEntityCreated({this, &Game::MemberFn});
+
+            LocalEntityManager entityManager;
+            auto               entity1  = entityManager.CreateEntity();
+            auto*              position = entityManager.AddComponent<PositionComponent>(entity1, 1, 2, 3);
 
             //
             int          argc = 0;

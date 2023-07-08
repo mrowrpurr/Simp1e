@@ -6,43 +6,28 @@
 
 #include <memory>
 
+#include "ComponentCast.h"
+#include "ComponentPointer.h"
 #include "ComponentType.h"
 #include "ComponentTypeFromType.h"
-#include "IEntityComponentCollection.h"
 #include "IEntityEventManager.h"
-#include "IMemoryManagedEngineContainerClass.h"
 
 namespace Simp1e {
 
-    struct IEntityManager : public IMemoryManagedEngineContainerClass {
+    struct IEntityManager {
         virtual IEntityEventManager* GetEventManager() = 0;
 
-        virtual Entity                      CreateEntity()               = 0;
-        virtual void                        DestroyEntity(Entity entity) = 0;
-        virtual bool                        EntityExists(Entity entity)  = 0;
-        virtual IEntityComponentCollection* GetEntity(Entity entity)     = 0;
+        virtual Entity CreateEntity()               = 0;
+        virtual void   DestroyEntity(Entity entity) = 0;
+        virtual bool   EntityExists(Entity entity)  = 0;
 
-        virtual bool OwnsEntityMemoryManagement() const = 0;
-        bool         ManagesEngineItemMemory() const override { return OwnsEntityMemoryManagement(); }
+        virtual bool             RemoveComponent(Entity entity, ComponentType componentType)           = 0;
+        virtual bool             HasComponent(Entity entity, ComponentType componentType) const        = 0;
+        virtual ComponentPointer GetComponentPointer(Entity entity, ComponentType componentType) const = 0;
 
-        virtual VoidPointer* AddComponentPointer(
-            Entity entity, ComponentType componentType, VoidPointer componentPointer
-        )                                                                                   = 0;
-        virtual bool  RemoveComponent(Entity entity, ComponentType componentType)           = 0;
-        virtual bool  HasComponent(Entity entity, ComponentType componentType) const        = 0;
-        virtual void* GetComponentPointer(Entity entity, ComponentType componentType) const = 0;
-
-        // TODO: update to use C function pointer
-        virtual void ForEachComponent(ComponentType componentType, IFunctionPointer* callback) = 0;
-
-        template <typename T, typename... Args>
-        T* Add(Entity entity, Args&&... args) {
-            _Log_("[IEntityManager] Add component of type {} to {}", ComponentTypeFromType<T>(), entity);
-            auto* component   = new T(std::forward<Args>(args)...);
-            auto* voidPointer = AddComponentPointer(entity, ComponentTypeFromType<T>(), void_pointer(component));
-            if (!ManagesEngineItemMemory()) voidPointer->get()->disable_destruct_on_delete();
-            return component;
-        }
+        virtual void ForEachComponent(
+            ComponentType componentType, IFunctionPointer<void(Entity, ComponentType, ComponentPointer)>* callback
+        ) = 0;
 
         template <typename T>
         bool Remove(Entity entity) {
@@ -50,39 +35,24 @@ namespace Simp1e {
         }
 
         template <typename T>
-        bool Has(Entity entity) const {
+        bool HasComponent(Entity entity) const {
             return HasComponent(entity, ComponentTypeFromType<T>());
         }
 
-        virtual void ForEachComponentType(ComponentType componentType, void (*function)(Entity, ComponentType, void*)) {
-            ForEachComponent(componentType, new_function_pointer(function));
+        template <typename T>
+        T* GetComponent(Entity entity) const {
+            return component_cast<T>(GetComponentPointer(entity, ComponentTypeFromType<T>()));
         }
 
-        template <typename ClassT>
-        void ForEachComponentType(
-            ComponentType componentType, ClassT* instance, void (ClassT::*function)(Entity, ComponentType, void*)
+        virtual void ForEachComponentType(
+            ComponentType componentType, FunctionPointer<void(Entity, ComponentType, ComponentPointer)> callback
         ) {
-            ForEachComponent(componentType, new_function_pointer(instance, function));
+            ForEachComponent(componentType, &callback);
         }
 
         template <typename T>
-        void ForEach(IFunctionPointer* callback) {
-            ForEachComponent(ComponentTypeFromType<T>(), callback);
-        }
-
-        template <typename ComponentT>
-        void ForEach(void (*function)(Entity, ComponentType, void*)) {
-            ForEachComponent(ComponentTypeFromType<ComponentT>(), new_function_pointer(function));
-        }
-
-        template <typename ComponentT, typename ClassT>
-        void ForEach(ClassT* instance, void (ClassT::*function)(Entity, ComponentType, void*)) {
-            ForEachComponent(ComponentTypeFromType<ComponentT>(), new_function_pointer(instance, function));
-        }
-
-        template <typename T>
-        T* Get(Entity entity) const {
-            return static_cast<T*>(GetComponentPointer(entity, ComponentTypeFromType<T>()));
+        void ForEach(FunctionPointer<void(Entity, ComponentType, ComponentPointer)> callback) {
+            ForEachComponent(ComponentTypeFromType<T>(), &callback);
         }
     };
 }

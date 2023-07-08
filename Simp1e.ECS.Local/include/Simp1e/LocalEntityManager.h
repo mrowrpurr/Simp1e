@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Simp1e/ComponentTypeFromHashKey.h>
+#include <Simp1e/ComponentTypeFromType.h>
 #include <Simp1e/ComponentTypeHashKey.h>
 #include <Simp1e/IEntityManager.h>
 #include <_Log_.h>
@@ -9,33 +10,42 @@
 #include <memory>
 #include <unordered_map>
 
-#include "LocalEntityComponentCollection.h"
 #include "LocalEntityEventManager.h"
 
 namespace Simp1e {
-
-    // TODO rename things. LocalEntityComponentCollection -->LocalComponentPointerCollection because it's just
-    // components
-    // TODO and change std::unordered_map<Entity, VoidPointer> over to something actually called a
-    // LocalEntityComponentCollection
 
     class LocalEntityManager : public IEntityManager {
         std::atomic<Entity>     _nextEntityId = 0;
         LocalEntityEventManager _eventManager;
 
-        // TODO: make a comtainer for these. Should accept type for VoidPointer or void* or other
-        std::unordered_map<ComponentTypeHashKey, std::unordered_map<Entity, VoidPointer>> _componentPointers;
-        std::unordered_map<Entity, std::unique_ptr<LocalEntityComponentCollection>>       _entityComponentsByEntity;
+        std::unordered_map<ComponentTypeHashKey, std::unordered_map<Entity, std::unique_ptr<IVoidPointer>>>
+                                                                                            _componentPointers;
+        std::unordered_map<Entity, std::unordered_map<ComponentTypeHashKey, IVoidPointer*>> _entityComponentsByEntity;
 
     public:
-        bool OwnsEntityMemoryManagement() const override { return true; }
-
         IEntityEventManager* GetEventManager() override { return &_eventManager; }
+
+        template <typename TComponent, typename... TArgs>
+        ComponentPointer AddComponent(Entity entity, TArgs&&... args) {
+            auto componentType = ComponentTypeFromType<TComponent>();
+            _Log_("[LocalEntityManager] AddComponent {} to {}", componentType, entity);
+
+            _eventManager.ComponentAdding(entity, componentType);
+
+            auto component        = new TComponent(std::forward<TArgs>(args)...);
+            auto componentDeleter = new VoidPointer<TComponent>(component);
+
+            _componentPointers[componentType][entity]        = std::unique_ptr<IVoidPointer>(componentDeleter);
+            _entityComponentsByEntity[entity][componentType] = componentDeleter;
+
+            _eventManager.ComponentAdded(entity, componentType, component);
+            return component;
+        }
 
         Entity CreateEntity() override {
             _Log_("[LocalEntityManager] CreateEntity");
             auto entity                       = _nextEntityId++;
-            _entityComponentsByEntity[entity] = std::make_unique<LocalEntityComponentCollection>();
+            _entityComponentsByEntity[entity] = {};
             _eventManager.EntityCreated(entity);
             return entity;
         }
@@ -60,62 +70,59 @@ namespace Simp1e {
             return _entityComponentsByEntity.find(entity) != _entityComponentsByEntity.end();
         }
 
-        IEntityComponentCollection* GetEntity(Entity entity) override {
-            auto found = _entityComponentsByEntity.find(entity);
-            if (found == _entityComponentsByEntity.end()) return nullptr;
-            return found->second.get();
-        }
-
         bool RemoveComponent(Entity entity, ComponentType componentType) override {
-            auto foundComponent = _componentPointers.find(componentType);
-            if (foundComponent == _componentPointers.end()) return false;
-
             auto foundEntity = _entityComponentsByEntity.find(entity);
             if (foundEntity == _entityComponentsByEntity.end()) return false;
 
-            _eventManager.ComponentRemoving(
-                entity, componentType, foundEntity->second->GetComponentPointer(componentType)
-            );
+            auto foundComponent = _componentPointers.find(componentType);
+            if (foundComponent == _componentPointers.end()) return false;
 
-            foundComponent->second.erase(entity);
-            foundEntity->second->RemoveComponent(componentType);
+            // Find and remove this entity/component from the Map<Entity, Map<ComponentType, Component>>
+            auto foundEntityComponent = foundEntity->second.find(componentType);
+            if (foundEntityComponent != foundEntity->second.end()) {
+                _eventManager.ComponentRemoving(entity, componentType, foundEntityComponent->second->void_ptr());
+                foundEntity->second.erase(foundEntityComponent);
+            }
+
+            // Find and remove this entity/component from the Map<ComponentType, Map<Entity, Component>>
+            for (auto& [componentEntity, component] : foundComponent->second) {
+                if (componentEntity != entity) continue;
+                foundComponent->second.erase(entity);
+                break;
+            }
 
             _eventManager.ComponentRemoved(entity, componentType);
+
             return true;
         }
 
         bool HasComponent(Entity entity, ComponentType componentType) const override {
             auto entityMap = _entityComponentsByEntity.find(entity);
             if (entityMap == _entityComponentsByEntity.end()) return false;
-            return entityMap->second->HasComponent(componentType);
+
+            auto foundComponent = entityMap->second.find(componentType);
+            return foundComponent != entityMap->second.end();
         }
 
-        void* GetComponentPointer(Entity entity, ComponentType componentType) const override {
+        ComponentPointer GetComponentPointer(Entity entity, ComponentType componentType) const override {
             _Log_("[LocalEntityManager] GetComponentPointer of type {}", componentType);
 
-            auto entityComponentCollection = _entityComponentsByEntity.find(entity);
-            if (entityComponentCollection == _entityComponentsByEntity.end()) return nullptr;
+            auto entityMap = _entityComponentsByEntity.find(entity);
+            if (entityMap == _entityComponentsByEntity.end()) return nullptr;
 
-            return entityComponentCollection->second->GetComponentPointer(componentType);
+            auto foundComponent = entityMap->second.find(componentType);
+            if (foundComponent == entityMap->second.end()) return nullptr;
+            return foundComponent->second->void_ptr();
         }
 
-        void ForEachComponent(ComponentType componentType, IFunctionPointer* functionPointer) override {
+        void ForEachComponent(
+            ComponentType                                                    componentType,
+            IFunctionPointer<void(Entity, ComponentType, ComponentPointer)>* functionPointer
+        ) override {
             auto componentMap = _componentPointers.find(componentType);
             if (componentMap == _componentPointers.end()) return;
             for (auto& [entity, component] : componentMap->second)
-                function_pointer::invoke(functionPointer, entity, componentType, component->void_ptr());
-        }
-
-        VoidPointer* AddComponentPointer(Entity entity, ComponentType componentType, VoidPointer component) override {
-            _Log_("[LocalEntityManager] AddComponentPointer of type {} of entity {}", componentType, entity);
-            _eventManager.ComponentAdding(entity, componentType);
-            auto insertResult = _componentPointers[componentType].insert({entity, std::move(component)});
-            if (insertResult.second) {
-                _entityComponentsByEntity[entity]->AddComponentPointer(componentType, &insertResult.first->second);
-                _eventManager.ComponentAdded(entity, componentType, insertResult.first->second->void_ptr());
-                return &insertResult.first->second;
-            }
-            return nullptr;
+                functionPointer->invoke(entity, componentType, component->void_ptr());
         }
     };
 }

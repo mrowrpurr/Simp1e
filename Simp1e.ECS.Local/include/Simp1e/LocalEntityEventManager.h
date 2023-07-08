@@ -2,33 +2,31 @@
 
 #include <Simp1e/ComponentTypeHashKey.h>
 #include <Simp1e/IEntityEventManager.h>
-#include <_Log_.h>
 
-#include <memory>
 #include <unordered_map>
 #include <unordered_set>
-#include <vector>
 
 namespace Simp1e {
 
     class LocalEntityEventManager : public IEntityEventManager {
         std::unordered_map<IFunctionPointerBase*, std::unique_ptr<IFunctionPointerBase>> _callbackInstancePointers;
 
-        std::unordered_set<IFunctionPointer<void(Entity)>*>                       _entityCreatedCallbacks;
-        std::unordered_set<IFunctionPointer<void(Entity)>*>                       _entityDestroyingCallbacks;
-        std::unordered_set<IFunctionPointer<void(Entity)>*>                       _entityDestroyedCallbacks;
-        std::unordered_set<IFunctionPointer<void(Entity, ComponentType)>*>        _componentAddingCallbacks;
-        std::unordered_set<IFunctionPointer<void(Entity, ComponentType, void*)>*> _componentAddedCallbacks;
-        std::unordered_set<IFunctionPointer<void(Entity, ComponentType, void*)>*> _componentRemovingCallbacks;
-        std::unordered_set<IFunctionPointer<void(Entity, ComponentType)>*>        _componentRemovedCallbacks;
+        std::unordered_set<IFunctionPointer<void(Entity)>*>                                  _entityCreatedCallbacks;
+        std::unordered_set<IFunctionPointer<void(Entity)>*>                                  _entityDestroyingCallbacks;
+        std::unordered_set<IFunctionPointer<void(Entity)>*>                                  _entityDestroyedCallbacks;
+        std::unordered_set<IFunctionPointer<void(Entity, ComponentType)>*>                   _componentAddingCallbacks;
+        std::unordered_set<IFunctionPointer<void(Entity, ComponentType, ComponentPointer)>*> _componentAddedCallbacks;
+        std::unordered_set<IFunctionPointer<void(Entity, ComponentType, ComponentPointer)>*>
+                                                                           _componentRemovingCallbacks;
+        std::unordered_set<IFunctionPointer<void(Entity, ComponentType)>*> _componentRemovedCallbacks;
 
         std::unordered_map<ComponentTypeHashKey, std::unordered_set<IFunctionPointer<void(Entity, ComponentType)>*>>
             _componentAddingCallbacksByType;
         std::unordered_map<
-            ComponentTypeHashKey, std::unordered_set<IFunctionPointer<void(Entity, ComponentType, void*)>*>>
+            ComponentTypeHashKey, std::unordered_set<IFunctionPointer<void(Entity, ComponentType, ComponentPointer)>*>>
             _componentAddedCallbacksByType;
         std::unordered_map<
-            ComponentTypeHashKey, std::unordered_set<IFunctionPointer<void(Entity, ComponentType, void*)>*>>
+            ComponentTypeHashKey, std::unordered_set<IFunctionPointer<void(Entity, ComponentType, ComponentPointer)>*>>
             _componentRemovingCallbacksByType;
         std::unordered_map<ComponentTypeHashKey, std::unordered_set<IFunctionPointer<void(Entity, ComponentType)>*>>
             _componentRemovedCallbacksByType;
@@ -68,19 +66,19 @@ namespace Simp1e {
             _componentAddingCallbacks.insert(callback);
             return callback;
         }
-        IFunctionPointer<void(Entity, ComponentType, void*)>* RegisterForAllComponentAdded(
-            IFunctionPointer<void(Entity, ComponentType, void*)>* callback
+        IFunctionPointer<void(Entity, ComponentType, ComponentPointer)>* RegisterForAllComponentAdded(
+            IFunctionPointer<void(Entity, ComponentType, ComponentPointer)>* callback
         ) override {
             _callbackInstancePointers[callback] =
-                std::unique_ptr<IFunctionPointer<void(Entity, ComponentType, void*)>>(callback);
+                std::unique_ptr<IFunctionPointer<void(Entity, ComponentType, ComponentPointer)>>(callback);
             _componentAddedCallbacks.insert(callback);
             return callback;
         }
-        IFunctionPointer<void(Entity, ComponentType, void*)>* RegisterForAllComponentRemoving(
-            IFunctionPointer<void(Entity, ComponentType, void*)>* callback
+        IFunctionPointer<void(Entity, ComponentType, ComponentPointer)>* RegisterForAllComponentRemoving(
+            IFunctionPointer<void(Entity, ComponentType, ComponentPointer)>* callback
         ) override {
             _callbackInstancePointers[callback] =
-                std::unique_ptr<IFunctionPointer<void(Entity, ComponentType, void*)>>(callback);
+                std::unique_ptr<IFunctionPointer<void(Entity, ComponentType, ComponentPointer)>>(callback);
             _componentRemovingCallbacks.insert(callback);
             return callback;
         }
@@ -101,19 +99,19 @@ namespace Simp1e {
             _componentAddingCallbacksByType[type].insert(callback);
             return callback;
         }
-        IFunctionPointer<void(Entity, ComponentType, void*)>* RegisterForComponentAdded(
-            ComponentType type, IFunctionPointer<void(Entity, ComponentType, void*)>* callback
+        IFunctionPointer<void(Entity, ComponentType, ComponentPointer)>* RegisterForComponentAdded(
+            ComponentType type, IFunctionPointer<void(Entity, ComponentType, ComponentPointer)>* callback
         ) override {
             _callbackInstancePointers[callback] =
-                std::unique_ptr<IFunctionPointer<void(Entity, ComponentType, void*)>>(callback);
+                std::unique_ptr<IFunctionPointer<void(Entity, ComponentType, ComponentPointer)>>(callback);
             _componentAddedCallbacksByType[type].insert(callback);
             return callback;
         }
-        IFunctionPointer<void(Entity, ComponentType, void*)>* RegisterForComponentRemoving(
-            ComponentType type, IFunctionPointer<void(Entity, ComponentType, void*)>* callback
+        IFunctionPointer<void(Entity, ComponentType, ComponentPointer)>* RegisterForComponentRemoving(
+            ComponentType type, IFunctionPointer<void(Entity, ComponentType, ComponentPointer)>* callback
         ) override {
             _callbackInstancePointers[callback] =
-                std::unique_ptr<IFunctionPointer<void(Entity, ComponentType, void*)>>(callback);
+                std::unique_ptr<IFunctionPointer<void(Entity, ComponentType, ComponentPointer)>>(callback);
             _componentRemovingCallbacksByType[type].insert(callback);
             return callback;
         }
@@ -143,11 +141,12 @@ namespace Simp1e {
             _callbackInstancePointers.erase(callback);
             _componentAddingCallbacks.erase(callback);
         }
-        void UnregisterForAllComponentAdded(IFunctionPointer<void(Entity, ComponentType, void*)>* callback) override {
+        void UnregisterForAllComponentAdded(IFunctionPointer<void(Entity, ComponentType, ComponentPointer)>* callback
+        ) override {
             _callbackInstancePointers.erase(callback);
             _componentAddedCallbacks.erase(callback);
         }
-        void UnregisterForAllComponentRemoving(IFunctionPointer<void(Entity, ComponentType, void*)>* callback
+        void UnregisterForAllComponentRemoving(IFunctionPointer<void(Entity, ComponentType, ComponentPointer)>* callback
         ) override {
             _callbackInstancePointers.erase(callback);
             _componentRemovingCallbacks.erase(callback);
@@ -163,13 +162,13 @@ namespace Simp1e {
             _componentAddingCallbacksByType[type].erase(callback);
         }
         void UnregisterForComponentAdded(
-            ComponentType type, IFunctionPointer<void(Entity, ComponentType, void*)>* callback
+            ComponentType type, IFunctionPointer<void(Entity, ComponentType, ComponentPointer)>* callback
         ) override {
             _callbackInstancePointers.erase(callback);
             _componentAddedCallbacksByType[type].erase(callback);
         }
         void UnregisterForComponentRemoving(
-            ComponentType type, IFunctionPointer<void(Entity, ComponentType, void*)>* callback
+            ComponentType type, IFunctionPointer<void(Entity, ComponentType, ComponentPointer)>* callback
         ) override {
             _callbackInstancePointers.erase(callback);
             _componentRemovingCallbacksByType[type].erase(callback);
@@ -196,14 +195,14 @@ namespace Simp1e {
             if (foundCallbacksByType != _componentAddingCallbacksByType.end())
                 for (auto& callback : foundCallbacksByType->second) function_pointer::invoke(callback, entity, type);
         }
-        void ComponentAdded(Entity entity, ComponentType type, void* component) override {
+        void ComponentAdded(Entity entity, ComponentType type, ComponentPointer component) override {
             for (auto& callback : _componentAddedCallbacks) function_pointer::invoke(callback, entity, type, component);
             auto foundCallbacksByType = _componentAddedCallbacksByType.find(type);
             if (foundCallbacksByType != _componentAddedCallbacksByType.end())
                 for (auto& callback : foundCallbacksByType->second)
                     function_pointer::invoke(callback, entity, type, component);
         }
-        void ComponentRemoving(Entity entity, ComponentType type, void* component) override {
+        void ComponentRemoving(Entity entity, ComponentType type, ComponentPointer component) override {
             for (auto& callback : _componentRemovingCallbacks)
                 function_pointer::invoke(callback, entity, type, component);
             auto foundCallbacksByType = _componentRemovingCallbacksByType.find(type);
