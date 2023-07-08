@@ -3,7 +3,7 @@
 #include "ICommandManager.h"
 #include "IEntityManager.h"
 #include "IEventManager.h"
-#include "ISystemManager.h"
+#include "ISystemGroupManager.h"
 
 namespace Simp1e {
 
@@ -12,9 +12,9 @@ namespace Simp1e {
 
         virtual void RunMainLoopCycle() = 0;
 
-        virtual IEntityManager*  GetEntityManager()  = 0;
-        virtual IEventManager*   GetEventManager()   = 0;
-        virtual ICommandManager* GetCommandManager() = 0;
-        virtual ISystemManager*  GetSystemManager()  = 0;
+        virtual IEntityManager*      Entities()     = 0;
+        virtual IEventManager*       Events()       = 0;
+        virtual ICommandManager*     Commands()     = 0;
+        virtual ISystemGroupManager* SystemGroups() = 0;
     };
 }

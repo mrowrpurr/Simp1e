@@ -2,7 +2,7 @@
 
 #include <Simp1e/DefaultSystemGroupTypes.h>
 #include <Simp1e/IEngine.h>
-#include <Simp1e/LocalSystemGroupManager.h>
+#include <Simp1e/LocalSystemGroup.h>
 #include <Simp1e/QSimp1eApp.h>
 #include <Simp1e/QtGameLoop.h>
 #include <Simp1e/QtGuiSystem.h>
@@ -19,15 +19,14 @@ namespace Simp1e {
 
     public:
         QtEngine(IEngine* engine) : _engine(engine), _gameLoop(std::make_unique<QtGameLoop>(engine)) {
-            auto* qtGroup =
-                _engine->GetSystemManager()->Add<LocalSystemGroupManager>(QtSystemGroupTypes::QtRenderGroup);
+            auto* qtGroup = _engine->GetSystemManager()->Add<LocalSystemGroup>(QtSystemGroupTypes::QtRenderGroup);
             _engine->GetSystemManager()->MoveGroupBeforeGroup(
                 QtSystemGroupTypes::QtRenderGroup, DefaultSystemGroupTypes::PresentationGroup
             );
             qtGroup->Add<QtGuiSystem>(engine);
         }
 
-        ISystemGroupManager* GetQtRenderGroup() const {
+        ISystemGroup* GetQtRenderGroup() const {
             return _engine->GetSystemManager()->GetGroup(QtSystemGroupTypes::QtRenderGroup);
         }
 

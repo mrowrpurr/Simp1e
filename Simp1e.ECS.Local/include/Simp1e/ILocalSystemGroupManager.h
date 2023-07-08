@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Simp1e/ISystemGroupManager.h>
+#include <Simp1e/ISystemGroup.h>
 #include <Simp1e/SystemTypeFromType.h>
 #include <function_pointer.h>
 #include <void_pointer.h>
@@ -9,7 +9,7 @@
 
 namespace Simp1e {
 
-    class ILocalSystemGroupManager : public ISystemGroupManager {
+    class ILocalSystemGroup : public ISystemGroup {
         virtual void* AddSystemPointer(
             SystemType systemType, VoidPointer systemPointer, FunctionPointer systemUpdateFunctionPointer
         ) = 0;
