@@ -2,8 +2,11 @@
 
 // using namespace Simp1e;
 
+#include <Simp1e/LocalEntityEventManager.h>
+
 #include <QApplication>
 #include <QLabel>
+
 
 namespace Asteroids {
 
