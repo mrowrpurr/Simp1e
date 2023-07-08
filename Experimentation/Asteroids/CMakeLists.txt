@@ -20,6 +20,9 @@ target_link_libraries(
     PRIVATE
     Simp1e.Core
     Simp1e.ECS.Core
+    Simp1e.ECS.Local
+    Simp1e.ECS.Components.Core
+    Simp1e.ECS.Components.Common
 )
 
 # Add include/ folder of header files

@@ -44,5 +44,8 @@ find_package(function_pointer CONFIG REQUIRED)
 
 add_subdirectory("Simp1e.Core")
 add_subdirectory("Simp1e.ECS.Core")
+add_subdirectory("Simp1e.ECS.Local")
+add_subdirectory("Simp1e.ECS.Components.Core")
+add_subdirectory("Simp1e.ECS.Components.Common")
 
 add_subdirectory("Experimentation")

@@ -1,9 +1,8 @@
 #pragma once
 
-// #include <Simp1e/LocalEntityEventManager.h>
-// #include <Simp1e/LocalEntityManager.h>
-#include <Simp1e/Entity.h>
-// #include <Simp1e/PositionComponent.h>
+#include <Simp1e/LocalEntityEventManager.h>
+#include <Simp1e/LocalEntityManager.h>
+#include <Simp1e/PositionComponent.h>
 
 #include <QApplication>
 #include <QLabel>
@@ -19,13 +18,13 @@ namespace Asteroids {
         void MemberFn(Entity entity) {}
 
         void Run() {
-            // LocalEntityEventManager eventManager;
-            // eventManager.RegisterForEntityCreated(StaticFn);
-            // eventManager.RegisterForEntityCreated({this, &Game::MemberFn});
+            LocalEntityEventManager eventManager;
+            eventManager.RegisterForEntityCreated(StaticFn);
+            eventManager.RegisterForEntityCreated({this, &Game::MemberFn});
 
-            // LocalEntityManager entityManager;
-            // auto               entity1  = entityManager.CreateEntity();
-            // auto*              position = entityManager.AddComponent<PositionComponent>(entity1, 1, 2, 3);
+            LocalEntityManager entityManager;
+            auto               entity1  = entityManager.CreateEntity();
+            auto*              position = entityManager.AddComponent<PositionComponent>(entity1, 1, 2, 3);
 
             //
             int          argc = 0;
