@@ -1,9 +1,10 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
 <qresource>
-    <file alias="logo.png">Images/Logo/Simp1e 196.png</file>
-    <file alias="icon.png">Images/Logo/Simp1e 256.png</file>
-    <file>Fonts/fredericka-the-great.regular.ttf</file>
-    <file>Fonts/yoster-island.regular.ttf</file>
+    <file alias="ship.png">C:/Code/mrowrpurr/PublicDomainResources/Openclipart/296421 - without thrust.png</file>
+    <file alias="thrust-L.png">C:/Code/mrowrpurr/PublicDomainResources/Openclipart/296421 - Just Thrust.png</file>
+    <file alias="thrust-M.png">C:/Code/mrowrpurr/PublicDomainResources/Openclipart/296421 - Just Thrust Med.png</file>
+    <file alias="thrust-S.png">C:/Code/mrowrpurr/PublicDomainResources/Openclipart/296421 - Just Thrust Small.png</file>
+    <file alias="thrust-XS.png">C:/Code/mrowrpurr/PublicDomainResources/Openclipart/296421 - Just Thrust Extra Small.png</file>
 </qresource>
 </RCC>

@@ -8,6 +8,7 @@
 #include <Simp1e/ICanvasComponent.h>
 #include <Simp1e/IEngine.h>
 #include <Simp1e/IFillColorComponent.h>
+#include <Simp1e/IImageComponent.h>
 #include <Simp1e/ILabelComponent.h>
 #include <Simp1e/IOnClickComponent.h>
 #include <Simp1e/IPositionComponent.h>
@@ -38,6 +39,8 @@
 
 #include "IQtComponentPainter.h"
 #include "IQtComponentUpdateHandler.h"
+#include "QSimp1eImageComponent.h"
+#include "QtImageComponentPainter.h"
 #include "QtPositionComponentUpdateHandler.h"
 #include "QtRectangleComponentPainter.h"
 #include "QtSizeComponentUpdateHandler.h"
@@ -162,8 +165,14 @@ namespace Simp1e {
             );
             _Log_("Adding a rectangle graphics item to the scene");
             _canvasScene->addItem(graphicsItem->GetQSimp1eGraphicsItem());
+        }
 
-            // TODO - the item needs to like... you know... be updated and know how to render and stuff...
+        void OnImageAdded(Entity entity, ComponentType componentType, void* component) {
+            _Log_("-> ImageAdded");
+            if (!_canvasScene) return;
+            auto* imageComponent = component_cast<IImageComponent>(component);
+            auto* qImageComponent =
+                entityManager()->AddComponent<QSimp1eImageComponent>(entity, imageComponent->GetImagePath());
         }
 
         void UpdateWindow(Entity entity, void* component) {
@@ -202,7 +211,9 @@ namespace Simp1e {
             entityEvents->RegisterForComponentAdded<IRectangleComponent>({this, &QtGuiSystem::OnRectangleAdded});
             entityEvents->RegisterForComponentAdded<IPositionComponent>({this, &QtGuiSystem::OnPositionAdded});
             entityEvents->RegisterForComponentAdded<ISizeComponent>({this, &QtGuiSystem::OnSizeAdded});
-            RegisterComponentPainter<IRectangleComponent, QtRectangleComponentPainter>();
+            entityEvents->RegisterForComponentAdded<IImageComponent>({this, &QtGuiSystem::OnImageAdded});
+            // RegisterComponentPainter<IRectangleComponent, QtRectangleComponentPainter>();
+            RegisterComponentPainter<IImageComponent, QtImageComponentPainter>();
             RegisterComponentUpdateHandler<IPositionComponent, QtPositionComponentUpdateHandler>();
             RegisterComponentUpdateHandler<ISizeComponent, QtSizeComponentUpdateHandler>();
         }

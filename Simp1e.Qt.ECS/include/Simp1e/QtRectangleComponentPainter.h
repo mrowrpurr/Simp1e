@@ -21,6 +21,9 @@ namespace Simp1e {
             IEngine* engine, Entity entity, void* component, QPainter* painter, const QStyleOptionGraphicsItem* option,
             QWidget* widget
         ) override {
+            if (!component_cast<IRectangleComponent>(component))
+                return;  // TODO fix it so Painters() only get called for the right components
+
             auto* entityManager = engine->GetEntities();
 
             auto* position = entityManager->GetComponent<IPositionComponent>(entity);
