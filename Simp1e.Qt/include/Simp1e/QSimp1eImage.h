@@ -5,6 +5,8 @@
 #include <_Log_.h>
 
 #include <QGraphicsSvgItem>
+#include <QImage>
+#include <QPainter>
 #include <QPixmap>
 #include <memory>
 #include <string>
@@ -12,9 +14,9 @@
 namespace Simp1e {
 
     class QSimp1eImage {
-        std::string                       _imagePath;
-        std::unique_ptr<QPixmap>          _originalPixmap = nullptr;
-        std::unique_ptr<QPixmap>          _scaledPixmap   = nullptr;
+        std::string              _imagePath;
+        std::unique_ptr<QPixmap> _originalPixmap = nullptr;
+        std::unique_ptr<QPixmap> _scaledPixmap   = nullptr;  // rename to something else, cause we scale and rotate
         std::unique_ptr<QGraphicsSvgItem> _svg;
 
     public:
@@ -54,6 +56,27 @@ namespace Simp1e {
                 return;
             _Log_("Resizing QPixmap to {}x{}", size.width(), size.height());
             _scaledPixmap = std::make_unique<QPixmap>(_originalPixmap->scaled(size.width(), size.height()));
+        }
+
+        void Rotate(sreal rotation) {
+            if (GetImageRenderType() == ImageRenderType::Vector) {
+                _Log_("SVG (rotate) not supported yet");
+                return;
+            }
+            auto image        = GetPixmap()->toImage();
+            auto rotatedImage = QImage(image.size(), QImage::Format_ARGB32_Premultiplied);
+            rotatedImage.fill(Qt::transparent);
+
+            auto painter = QPainter(&rotatedImage);
+            painter.setRenderHint(QPainter::Antialiasing);
+            painter.setRenderHint(QPainter::SmoothPixmapTransform);
+            painter.translate(rotatedImage.size().width() / 2.0, rotatedImage.size().height() / 2.0);
+            painter.rotate(rotation);
+            painter.translate(-image.size().width() / 2.0, -image.size().height() / 2.0);
+            painter.drawImage(0, 0, image);
+            painter.end();
+
+            _scaledPixmap = std::make_unique<QPixmap>(QPixmap::fromImage(rotatedImage));
         }
     };
 }
