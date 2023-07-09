@@ -1,8 +1,14 @@
+#include <string_format.h>
+
+#include <QDebug>
+
+#define _Log_(...) qDebug() << string_format(__VA_ARGS__).c_str()
+
+#include <_Log_.h>
+
 #include "Asteroids/Game.h"
 
-Asteroids::Game game;
-
 int main(int argc, char* argv[]) {
-    game.Run();
+    Asteroids::Game().Run();
     return 0;
 }

@@ -22,6 +22,8 @@ target_link_libraries(
     Simp1e.Core
     Simp1e.ECS.Local
     Simp1e.Qt.ECS
+    fmt::fmt-header-only
+    string_format::string_format
 )
 
 # Add include/ folder of header files

@@ -112,6 +112,8 @@ namespace Simp1e {
             _Log_("-> CanvasAdded");
             auto* canvasComponent = component_cast<ICanvasComponent>(component);
             if (auto* layout = GetParentLayout(canvasComponent->GetParentEntity())) {
+                auto* testTempLabel = new QLabel{"CANVAS IS HERE"};
+                layout->addWidget(testTempLabel);
                 auto* view  = new QSimp1eGraphicsView();
                 auto* scene = new QSimp1eGraphicsScene();
                 view->setScene(scene);
@@ -127,6 +129,7 @@ namespace Simp1e {
             auto* rectangleComponent = component_cast<IRectangleComponent>(component);
             auto* graphicsItem       = new QSimp1eGraphicsItem();
             entityManager()->AddComponent<QSimp1eGraphicsItemComponent>(entity, graphicsItem);
+            _Log_("Adding a rectangle graphics item to the scene");
             _canvasScene->addItem(graphicsItem);
 
             // TODO - the item needs to like... you know... be updated and know how to render and stuff...
@@ -156,6 +159,7 @@ namespace Simp1e {
             );
             entityEvents->RegisterForComponentAdded<ILabelComponent>({this, &QtGuiSystem::OnLabelAdded});
             entityEvents->RegisterForComponentAdded<ICanvasComponent>({this, &QtGuiSystem::OnCanvasAdded});
+            entityEvents->RegisterForComponentAdded<IRectangleComponent>({this, &QtGuiSystem::OnRectangleAdded});
         }
 
         void RegisterComponentPainter(ComponentTypeHashKey componentTypeHashKey, IQtComponentPainter* painter) {

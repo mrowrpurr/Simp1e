@@ -8,6 +8,7 @@
 #include <Simp1e/QtGuiSystem.h>
 #include <Simp1e/QtSystemGroupTypes.h>
 
+#include <QLabel>
 #include <memory>
 
 namespace Simp1e {
@@ -30,7 +31,7 @@ namespace Simp1e {
             return _engine->GetSystemGroups()->GetGroup(QtSystemGroupTypes::QtRenderGroup);
         }
 
-        void Run() {
+        void Run() {  // QLabel label("Hello World!");
             _gameLoop->Run();
             _app.exec();
         }

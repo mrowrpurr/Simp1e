@@ -11,7 +11,13 @@
 #include <Simp1e/WindowComponent.h>
 #include <_Log_.h>
 
+#include <QLabel>
+
 using namespace Simp1e;
+
+#include <Simp1e/QtEngine.h>
+
+#include <QLabel>
 
 namespace Asteroids {
 
