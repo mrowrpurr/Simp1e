@@ -23,8 +23,8 @@ namespace Simp1e {
 
     protected:
         void resizeEvent(QResizeEvent* event) override {
-            _Log_("RESIZE");
-            FitSceneToViewHeight();
+            // _Log_("RESIZE");
+            // FitSceneToViewHeight();
             // auto topLeft = mapToScene(0, 0);
             // _eventManager.Emit<ResizeEvent>({
             //     {static_cast<sreal>(topLeft.x()),           static_cast<sreal>(topLeft.y())           },

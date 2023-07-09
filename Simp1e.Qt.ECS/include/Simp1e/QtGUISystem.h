@@ -57,10 +57,22 @@ namespace Simp1e {
 
         std::unordered_map<ComponentTypeHashKey, std::unique_ptr<IQtComponentUpdateHandler>> _componentUpdateHandlers;
 
-        ///////
         QSimp1eGraphicsScene* _canvasScene;
 
         IEntityManager* entityManager() const { return _engine->GetEntities(); }
+
+        QSimp1eGraphicsItemComponent* addGraphicsItem(Entity entity) {
+            auto* component = entityManager()->GetComponent<QSimp1eGraphicsItemComponent>(entity);
+            if (component) return component;
+
+            component = entityManager()->AddComponent<QSimp1eGraphicsItemComponent>(
+                entity, entity, _entityPaintFunctionPointer
+            );
+
+            _canvasScene->addItem(component->GetQSimp1eGraphicsItem());
+
+            return component;
+        }
 
         QWidget* GetParentWidget(Entity parentEntity) {
             auto* qWidgetComponent = entityManager()->GetComponent<QWidgetComponent>(parentEntity);
@@ -136,11 +148,8 @@ namespace Simp1e {
                 view->move(0, 0);
                 view->horizontalScrollBar()->setValue(0);
                 layout->addWidget(view);
-                view->FitSceneToViewHeight();
-                // Save for graphical components to render on:
+                // Save for graphical components to render on: (kinda gross, clean this up...)
                 _canvasScene = scene;
-                // Gross hack, just for now:
-                layout->parentWidget()->parentWidget()->resize(ToQSize(size));
             }
         }
 
@@ -159,17 +168,14 @@ namespace Simp1e {
         void OnRectangleAdded(Entity entity, ComponentType componentType, void* component) {
             _Log_("-> RectangleAdded");
             if (!_canvasScene) return;
+            addGraphicsItem(entity);
             auto* rectangleComponent = component_cast<IRectangleComponent>(component);
-            auto* graphicsItem       = entityManager()->AddComponent<QSimp1eGraphicsItemComponent>(
-                entity, entity, _entityPaintFunctionPointer
-            );
-            _Log_("Adding a rectangle graphics item to the scene");
-            _canvasScene->addItem(graphicsItem->GetQSimp1eGraphicsItem());
         }
 
         void OnImageAdded(Entity entity, ComponentType componentType, void* component) {
             _Log_("-> ImageAdded");
             if (!_canvasScene) return;
+            addGraphicsItem(entity);
             auto* imageComponent = component_cast<IImageComponent>(component);
             auto* qImageComponent =
                 entityManager()->AddComponent<QSimp1eImageComponent>(entity, imageComponent->GetImagePath());
@@ -212,7 +218,7 @@ namespace Simp1e {
             entityEvents->RegisterForComponentAdded<IPositionComponent>({this, &QtGuiSystem::OnPositionAdded});
             entityEvents->RegisterForComponentAdded<ISizeComponent>({this, &QtGuiSystem::OnSizeAdded});
             entityEvents->RegisterForComponentAdded<IImageComponent>({this, &QtGuiSystem::OnImageAdded});
-            // RegisterComponentPainter<IRectangleComponent, QtRectangleComponentPainter>();
+            RegisterComponentPainter<IRectangleComponent, QtRectangleComponentPainter>();
             RegisterComponentPainter<IImageComponent, QtImageComponentPainter>();
             RegisterComponentUpdateHandler<IPositionComponent, QtPositionComponentUpdateHandler>();
             RegisterComponentUpdateHandler<ISizeComponent, QtSizeComponentUpdateHandler>();

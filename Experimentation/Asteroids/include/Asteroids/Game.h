@@ -27,7 +27,7 @@ namespace Asteroids {
     class Game {
         LocalEngine _engine;
         QtEngine    _qtEngine{&_engine};
-        Size        _size{1000, 800};
+        Size        _size{20000, 20000};
 
     public:
         Entity CreateWindowEntity(LocalEntityManager& entityManager) {
@@ -92,8 +92,6 @@ namespace Asteroids {
             auto ship = entityManager.CreateEntity();
             entityManager.AddComponent<SizeComponent>(ship, Size(100, 125));
             entityManager.AddComponent<PositionComponent>(ship, _size.width() / 2, _size.height() / 2);
-            entityManager.AddComponent<RectangleComponent>(ship);
-            entityManager.AddComponent<LineColorComponent>(ship, Color::Red());
             entityManager.AddComponent<RotationComponent>(ship);
             entityManager.AddComponent<ImageComponent>(ship, ":/ship.png");
             return ship;
