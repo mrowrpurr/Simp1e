@@ -10,7 +10,8 @@ target_sources(${PROJECT_NAME} PRIVATE ${HEADER_FILES})
 # Include Qt
 target_link_libraries(
     ${PROJECT_NAME}
-    PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
+    PRIVATE
+    Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::SvgWidgets
 )
 
@@ -19,10 +20,8 @@ target_link_libraries(
     ${PROJECT_NAME}
     PRIVATE
     Simp1e.Core
-    Simp1e.ECS.Core
     Simp1e.ECS.Local
-    Simp1e.ECS.Components.Core
-    Simp1e.ECS.Components.Common
+    Simp1e.Qt.ECS
 )
 
 # Add include/ folder of header files
