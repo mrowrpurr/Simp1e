@@ -39,6 +39,8 @@ namespace Simp1e {
 
     class QtGuiSystem {
         IEngine* _engine;
+        IFunctionPointer<void(Entity, QPainter*, const QStyleOptionGraphicsItem*, QWidget*)>*
+            _entityPaintFunctionPointer;
 
         std::unordered_map<ComponentTypeHashKey, std::unique_ptr<IQtComponentPainter>>       _componentPainters;
         std::unordered_map<ComponentTypeHashKey, std::unique_ptr<IQtComponentUpdateHandler>> _componentUpdateHandlers;
@@ -127,7 +129,9 @@ namespace Simp1e {
             _Log_("-> RectangleAdded");
             if (!_canvasScene) return;
             auto* rectangleComponent = component_cast<IRectangleComponent>(component);
-            auto* graphicsItem       = entityManager()->AddComponent<QSimp1eGraphicsItemComponent>(entity);
+            auto* graphicsItem       = entityManager()->AddComponent<QSimp1eGraphicsItemComponent>(
+                entity, entity, _entityPaintFunctionPointer
+            );
             _Log_("Adding a rectangle graphics item to the scene");
             _canvasScene->addItem(graphicsItem->GetQSimp1eGraphicsItem());
 
@@ -146,11 +150,18 @@ namespace Simp1e {
             _Log_("-> OnUpdateComponentWithUpdateHandler {} {}", entity, componentType);
         }
 
+        void OnPaintGraphicsItem(
+            Entity entity, QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr
+        ) {
+            _Log_("QtGuiSystem::OnPaintGraphicsItem {}", entity);
+        }
+
     public:
         DEFINE_SYSTEM_TYPE("QtGUI")
 
         QtGuiSystem(IEngine* engine) : _engine(engine) {
-            auto* entityEvents = entityManager()->GetEventManager();
+            _entityPaintFunctionPointer = new_function_pointer(this, &QtGuiSystem::OnPaintGraphicsItem);
+            auto* entityEvents          = entityManager()->GetEventManager();
             entityEvents->RegisterForComponentAdded<IWindowComponent>({this, &QtGuiSystem::OnWindowAdded});
             entityEvents->RegisterForComponentAdded<IWindowMenuComponent>({this, &QtGuiSystem::OnWindowMenuAdded});
             entityEvents->RegisterForComponentAdded<IWindowMenuItemComponent>(
