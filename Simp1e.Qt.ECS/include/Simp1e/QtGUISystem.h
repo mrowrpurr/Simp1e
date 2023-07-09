@@ -25,6 +25,7 @@
 #include <Simp1e/QSimp1eGraphicsView.h>
 #include <Simp1e/QWidgetComponent.h>
 #include <Simp1e/ToQRect.h>
+#include <Simp1e/ToQSize.h>
 #include <_Log_.h>
 
 #include <QLabel>
@@ -132,8 +133,11 @@ namespace Simp1e {
                 view->move(0, 0);
                 view->horizontalScrollBar()->setValue(0);
                 layout->addWidget(view);
+                view->FitSceneToViewHeight();
                 // Save for graphical components to render on:
                 _canvasScene = scene;
+                // Gross hack, just for now:
+                layout->parentWidget()->parentWidget()->resize(ToQSize(size));
             }
         }
 

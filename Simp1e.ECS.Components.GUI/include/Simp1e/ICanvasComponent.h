@@ -17,6 +17,7 @@ namespace Simp1e {
             Height       = 1 << 2,
         };
 
+        // TODO: get rid of size! This should come from the SizeComponent
         virtual Size GetSize() const = 0;
 
         virtual int  GetWidth() const    = 0;

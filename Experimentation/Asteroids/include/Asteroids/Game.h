@@ -2,10 +2,13 @@
 
 #include <Simp1e/CanvasComponent.h>
 #include <Simp1e/FillColorComponent.h>
+#include <Simp1e/ImageComponent.h>
+#include <Simp1e/LineColorComponent.h>
 #include <Simp1e/LocalEngine.h>
 #include <Simp1e/PositionComponent.h>
 #include <Simp1e/QtEngine.h>
 #include <Simp1e/RectangleComponent.h>
+#include <Simp1e/RotationComponent.h>
 #include <Simp1e/Size.h>
 #include <Simp1e/SizeComponent.h>
 #include <Simp1e/WindowComponent.h>
@@ -35,7 +38,7 @@ namespace Asteroids {
 
         Entity CreateGameCanvas(Entity window, LocalEntityManager& entityManager) {
             auto canvas = entityManager.CreateEntity();
-            entityManager.AddComponent<CanvasComponent>(canvas, window);
+            entityManager.AddComponent<CanvasComponent>(canvas, window, _size.width(), _size.height());
             entityManager.AddComponent<SizeComponent>(canvas, _size);
             return canvas;
         }
@@ -85,6 +88,17 @@ namespace Asteroids {
             return rectangle;
         }
 
+        Entity CreateShip(LocalEntityManager& entityManager) {
+            auto ship = entityManager.CreateEntity();
+            entityManager.AddComponent<SizeComponent>(ship, Size(100, 125));
+            entityManager.AddComponent<PositionComponent>(ship, _size.width() / 2, _size.height() / 2);
+            entityManager.AddComponent<RectangleComponent>(ship);
+            entityManager.AddComponent<LineColorComponent>(ship, Color::Red());
+            entityManager.AddComponent<RotationComponent>(ship);
+            entityManager.AddComponent<ImageComponent>(ship, ":/ship.png");
+            return ship;
+        }
+
         // TODO: load components from filesystem
         void LoadComponents(LocalEntityManager& entityManager) {
             auto window = CreateWindowEntity(entityManager);
@@ -94,6 +108,7 @@ namespace Asteroids {
             CreateTopRightRectangle(entityManager);
             CreateBottomLeftRectangle(entityManager);
             CreateBottomRightRectangle(entityManager);
+            CreateShip(entityManager);
         }
 
         void Setup() {
