@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Point.h"
 #include "Vec3.h"
 #include "sreal.h"
 
@@ -16,6 +17,8 @@ namespace Simp1e {
         Position(sreal x, sreal y, sreal z) : Vec3(x, y, z) {}
         Position(const Params& params) : Vec3(params.x, params.y, params.z) {}
 
+        virtual Point ToPoint() const { return Point(x(), y()); }
+
         virtual sreal x() const { return one(); }
         virtual sreal y() const { return two(); }
         virtual sreal z() const { return three(); }
@@ -24,7 +27,7 @@ namespace Simp1e {
         virtual void SetY(sreal y) { SetTwo(y); }
         virtual void SetZ(sreal z) { SetThree(z); }
 
-        bool operator==(const Position& other) const {
+        virtual bool operator==(const Position& other) const {
             return x() == other.x() && y() == other.y() && z() == other.z();
         }
     };

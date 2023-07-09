@@ -23,6 +23,6 @@ namespace Simp1e {
         virtual void SetOne(T one) { _one = one; }
         virtual void SetTwo(T two) { _two = two; }
 
-        bool operator==(const Vec2& other) const { return _one == other._one && _two == other._two; }
+        virtual bool operator==(const Vec2& other) const { return _one == other._one && _two == other._two; }
     };
 }

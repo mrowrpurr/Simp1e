@@ -22,20 +22,12 @@ namespace Simp1e {
         Rectangle(const Size& size) : _origin(0, 0), _size(size) {}
         Rectangle(sreal width, sreal height) : _origin(0, 0), _size(width, height) {}
 
-        Point& origin() { return _origin; }
-        Size&  size() { return _size; }
+        virtual Point origin() const { return _origin; }
+        virtual Size  size() const { return _size; }
 
-        const Point& origin() const { return _origin; }
-        const Size&  size() const { return _size; }
-
-        sreal& x() { return _origin.x(); }
-        sreal& y() { return _origin.y(); }
-        sreal& width() { return _size.width(); }
-        sreal& height() { return _size.height(); }
-
-        const sreal& x() const { return _origin.x(); }
-        const sreal& y() const { return _origin.y(); }
-        const sreal& width() const { return _size.width(); }
-        const sreal& height() const { return _size.height(); }
+        virtual sreal x() const { return _origin.x(); }
+        virtual sreal y() const { return _origin.y(); }
+        virtual sreal width() const { return _size.width(); }
+        virtual sreal height() const { return _size.height(); }
     };
 }

@@ -27,6 +27,8 @@ namespace Simp1e {
         virtual void SetTwo(T two) { Vec2<T>::SetTwo(two); }
         virtual void SetThree(T three) { _three = three; }
 
-        bool operator==(const Vec3& other) const { return Vec2<T>::operator==(other) && _three == other._three; }
+        virtual bool operator==(const Vec3& other) const {
+            return Vec2<T>::operator==(other) && _three == other._three;
+        }
     };
 }

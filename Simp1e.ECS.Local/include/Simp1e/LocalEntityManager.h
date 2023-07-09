@@ -98,7 +98,7 @@ namespace Simp1e {
         }
 
         ComponentPointer GetComponentPointer(Entity entity, ComponentType componentType) const override {
-            _Log_("[LocalEntityManager] GetComponentPointer of type {}", componentType);
+            // _Log_("[LocalEntityManager] GetComponentPointer of type {}", componentType);
 
             auto entityMap = _entityComponentsByEntity.find(entity);
             if (entityMap == _entityComponentsByEntity.end()) return nullptr;

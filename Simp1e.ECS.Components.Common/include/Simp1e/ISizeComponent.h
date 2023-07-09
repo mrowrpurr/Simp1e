@@ -2,6 +2,7 @@
 
 #include <Simp1e/DefineComponentType.h>
 #include <Simp1e/DirtyTrackingComponentBase.h>
+#include <Simp1e/Size.h>
 #include <Simp1e/sreal.h>
 
 namespace Simp1e {
@@ -13,6 +14,8 @@ namespace Simp1e {
             Width  = 1 << 0,
             Height = 1 << 1,
         };
+
+        virtual Size GetSize() const = 0;
 
         virtual sreal GetWidth() const  = 0;
         virtual sreal GetHeight() const = 0;

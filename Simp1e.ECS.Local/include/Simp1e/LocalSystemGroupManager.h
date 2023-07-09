@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Simp1e/ISystemGroupManager.h>
+#include <_Log_.h>
 
 #include <memory>
 #include <unordered_map>
@@ -17,8 +18,10 @@ namespace Simp1e {
 
     public:
         ISystemGroup* AddGroup(SystemGroupType groupName) override {
-            auto* systemGroup        = new LocalSystemGroup();
-            _systemGroups[groupName] = std::unique_ptr<ISystemGroup>(systemGroup);
+            auto* systemGroup               = new LocalSystemGroup();
+            _systemGroups[groupName]        = std::unique_ptr<ISystemGroup>(systemGroup);
+            _enabledSystemGroups[groupName] = true;
+            _systemGroupOrder.push_back(groupName);
             return systemGroup;
         }
 

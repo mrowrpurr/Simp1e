@@ -1,9 +1,10 @@
 #pragma once
 
 #include "Vec2.h"
+#include "sreal.h"
 
 namespace Simp1e {
-    class Point : public Vec2 {
+    class Point : public Vec2<sreal> {
     public:
         struct Params {
             sreal x;
@@ -20,6 +21,6 @@ namespace Simp1e {
         virtual void SetX(sreal x) { SetOne(x); }
         virtual void SetY(sreal y) { SetTwo(y); }
 
-        bool operator==(const Point& other) const { return one() == other.one() && two() == other.two(); }
+        virtual bool operator==(const Point& other) const { return one() == other.one() && two() == other.two(); }
     };
 }

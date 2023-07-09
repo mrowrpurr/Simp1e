@@ -24,16 +24,22 @@
 #include <Simp1e/QSimp1eGraphicsScene.h>
 #include <Simp1e/QSimp1eGraphicsView.h>
 #include <Simp1e/QWidgetComponent.h>
+#include <Simp1e/ToQRect.h>
 #include <_Log_.h>
 
 #include <QLabel>
 #include <QMenuBar>
+#include <QScrollBar>
 #include <QStatusBar>
 #include <memory>
 #include <unordered_map>
+#include <vector>
 
 #include "IQtComponentPainter.h"
 #include "IQtComponentUpdateHandler.h"
+#include "QtPositionComponentUpdateHandler.h"
+#include "QtRectangleComponentPainter.h"
+#include "QtSizeComponentUpdateHandler.h"
 
 namespace Simp1e {
 
@@ -42,7 +48,9 @@ namespace Simp1e {
         IFunctionPointer<void(Entity, QPainter*, const QStyleOptionGraphicsItem*, QWidget*)>*
             _entityPaintFunctionPointer;
 
-        std::unordered_map<ComponentTypeHashKey, std::unique_ptr<IQtComponentPainter>>       _componentPainters;
+        std::unordered_map<ComponentTypeHashKey, std::unique_ptr<IQtComponentPainter>> _componentPainters;
+        std::vector<ComponentTypeHashKey>                                              _componentPaintersOrder;
+
         std::unordered_map<ComponentTypeHashKey, std::unique_ptr<IQtComponentUpdateHandler>> _componentUpdateHandlers;
 
         ///////
@@ -118,11 +126,27 @@ namespace Simp1e {
                 layout->addWidget(testTempLabel);
                 auto* view  = new QSimp1eGraphicsView();
                 auto* scene = new QSimp1eGraphicsScene();
+                auto  size  = canvasComponent->GetSize();
+                if (!size.IsNull()) scene->setSceneRect(ToQRect(size));
                 view->setScene(scene);
+                view->move(0, 0);
+                view->horizontalScrollBar()->setValue(0);
                 layout->addWidget(view);
                 // Save for graphical components to render on:
                 _canvasScene = scene;
             }
+        }
+
+        void OnPositionAdded(Entity entity, ComponentType componentType, void* component) {
+            _Log_("-> PositionAdded");
+            auto* positionComponent = component_cast<IPositionComponent>(component);
+            positionComponent->SetDirty(true);  // Start off in need of an update.
+        }
+
+        void OnSizeAdded(Entity entity, ComponentType componentType, void* component) {
+            _Log_("-> SizeAdded");
+            auto* sizeComponent = component_cast<ISizeComponent>(component);
+            sizeComponent->SetDirty(true);  // Start off in need of an update.
         }
 
         void OnRectangleAdded(Entity entity, ComponentType componentType, void* component) {
@@ -146,14 +170,16 @@ namespace Simp1e {
             windowComponent->UnsetDirtyFlag(IWindowComponent::Fields::StatusBarText);
         }
 
-        void OnUpdateComponentWithUpdateHandler(Entity entity, ComponentType componentType, void* component) {
-            _Log_("-> OnUpdateComponentWithUpdateHandler {} {}", entity, componentType);
-        }
-
         void OnPaintGraphicsItem(
             Entity entity, QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr
         ) {
-            _Log_("QtGuiSystem::OnPaintGraphicsItem {}", entity);
+            for (int i = 0; i < _componentPaintersOrder.size(); ++i) {
+                auto  componentTypeHashKey = _componentPaintersOrder[i];
+                auto& componentPainter     = _componentPainters[componentTypeHashKey];
+                auto* component =
+                    entityManager()->GetComponentPointer(entity, ComponentTypeFromHashKey(componentTypeHashKey));
+                componentPainter->Paint(_engine, entity, component, painter, option, widget);
+            }
         }
 
     public:
@@ -170,20 +196,23 @@ namespace Simp1e {
             entityEvents->RegisterForComponentAdded<ILabelComponent>({this, &QtGuiSystem::OnLabelAdded});
             entityEvents->RegisterForComponentAdded<ICanvasComponent>({this, &QtGuiSystem::OnCanvasAdded});
             entityEvents->RegisterForComponentAdded<IRectangleComponent>({this, &QtGuiSystem::OnRectangleAdded});
+            entityEvents->RegisterForComponentAdded<IPositionComponent>({this, &QtGuiSystem::OnPositionAdded});
+            entityEvents->RegisterForComponentAdded<ISizeComponent>({this, &QtGuiSystem::OnSizeAdded});
+            RegisterComponentPainter<IRectangleComponent, QtRectangleComponentPainter>();
+            RegisterComponentUpdateHandler<IPositionComponent, QtPositionComponentUpdateHandler>();
+            RegisterComponentUpdateHandler<ISizeComponent, QtSizeComponentUpdateHandler>();
         }
 
         void RegisterComponentPainter(ComponentTypeHashKey componentTypeHashKey, IQtComponentPainter* painter) {
             _componentPainters[componentTypeHashKey] = std::unique_ptr<IQtComponentPainter>(painter);
+            _componentPaintersOrder.push_back(componentTypeHashKey);
         }
 
-        template <typename TComponent>
-        void RegisterComponentPainter(IQtComponentPainter* painter) {
-            RegisterComponentPainter(ComponentTypeFromType<TComponent>(), painter);
-        }
-
-        template <typename TComponent, typename... TArgs>
+        template <typename TComponent, typename TComponentPainter, typename... TArgs>
         void RegisterComponentPainter(TArgs&&... args) {
-            RegisterComponentPainter<TComponent>(new TComponent(std::forward<TArgs>(args)...));
+            RegisterComponentPainter(
+                ComponentTypeFromType<TComponent>(), new TComponentPainter(std::forward<TArgs>(args)...)
+            );
         }
 
         void RegisterComponentUpdateHandler(
@@ -192,21 +221,23 @@ namespace Simp1e {
             _componentUpdateHandlers[componentTypeHashKey] = std::unique_ptr<IQtComponentUpdateHandler>(updateHandler);
         }
 
-        template <typename TComponent>
-        void RegisterComponentUpdateHandler(IQtComponentUpdateHandler* updateHandler) {
-            RegisterComponentUpdateHandler(ComponentTypeFromType<TComponent>(), updateHandler);
-        }
-
-        template <typename TComponent, typename... TArgs>
+        template <typename TComponent, typename TComponentUpdater, typename... TArgs>
         void RegisterComponentUpdateHandler(TArgs&&... args) {
-            RegisterComponentUpdateHandler<TComponent>(new TComponent(std::forward<TArgs>(args)...));
+            RegisterComponentUpdateHandler(
+                ComponentTypeFromType<TComponent>(), new TComponentUpdater(std::forward<TArgs>(args)...)
+            );
         }
 
         void Update(IEngine* engine, double deltaTime) {
-            for (auto& [componentTypeKey, componentUpdateHandler] : _componentUpdateHandlers)
+            for (auto& [componentTypeKey, componentUpdateHandler] : _componentUpdateHandlers) {
+                auto* updateHandler = componentUpdateHandler.get();
                 entityManager()->ForEachComponent(
-                    ComponentTypeFromHashKey(componentTypeKey), {this, &QtGuiSystem::OnUpdateComponentWithUpdateHandler}
+                    ComponentTypeFromHashKey(componentTypeKey),
+                    function_pointer([this, updateHandler](
+                                         Entity entity, ComponentType componentType, ComponentPointer componentPointer
+                                     ) { updateHandler->Update(_engine, entity, componentPointer); })
                 );
+            }
         }
     };
 }

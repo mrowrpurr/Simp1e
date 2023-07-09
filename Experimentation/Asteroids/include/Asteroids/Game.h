@@ -24,7 +24,7 @@ namespace Asteroids {
     class Game {
         LocalEngine _engine;
         QtEngine    _qtEngine{&_engine};
-        Size        _size{2000, 1000};
+        Size        _size{1000, 800};
 
     public:
         Entity CreateWindowEntity(LocalEntityManager& entityManager) {

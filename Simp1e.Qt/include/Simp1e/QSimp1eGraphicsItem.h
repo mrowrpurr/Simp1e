@@ -18,7 +18,13 @@ namespace Simp1e {
         )
             : QGraphicsItem(parent), _paintFunction(_paintFunctionPointer) {}
 
-        void SetBoundingRect(const QRectF& boundingRect) { _boundingRect = boundingRect; }
+        void SetBoundingRect(const QRectF& boundingRect) {
+            prepareGeometryChange();
+            _boundingRect = boundingRect;
+            update();
+        }
+
+        QRectF GetBoundingRect() const { return _boundingRect; }
 
     protected:
         virtual QRectF boundingRect() const override { return _boundingRect; }

@@ -18,9 +18,9 @@ namespace Simp1e {
         virtual sreal width() const { return one(); }
         virtual sreal height() const { return two(); }
 
-        void SetWidth(sreal width) { SetOne(width); }
-        void SetHeight(sreal height) { SetTwo(height); }
+        virtual void SetWidth(sreal width) { SetOne(width); }
+        virtual void SetHeight(sreal height) { SetTwo(height); }
 
-        bool IsNull() const { return width() == 0 && height() == 0; }
+        virtual bool IsNull() const { return width() == 0 && height() == 0; }
     };
 }

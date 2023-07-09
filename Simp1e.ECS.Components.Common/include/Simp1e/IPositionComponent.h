@@ -15,6 +15,8 @@ namespace Simp1e {
             Z = 1 << 2,
         };
 
+        virtual Position GetPosition() const = 0;
+
         virtual sreal x() const = 0;
         virtual sreal y() const = 0;
         virtual sreal z() const = 0;

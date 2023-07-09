@@ -16,6 +16,8 @@ namespace Simp1e {
         sreal y() const override { return _position.y(); }
         sreal z() const override { return _position.z(); }
 
+        Position GetPosition() const override { return _position; }
+
         void SetX(sreal x) override {
             _position.SetX(x);
             SetDirtyFlag(Fields::X);

@@ -6,7 +6,7 @@ namespace Simp1e {
 
     class CanvasComponent : public ICanvasComponent {
         Entity _parentEntity = 0;
-        int    _width        = 0;
+        int    _width        = 0;  // TODO: update to store as Size
         int    _height       = 0;
 
     public:
@@ -17,6 +17,8 @@ namespace Simp1e {
             _parentEntity = parentEntity;
             SetDirtyFlag(Fields::ParentEntity);
         }
+
+        Size GetSize() const override { return Size(_width, _height); }
 
         int  GetWidth() const override { return _width; }
         void SetWidth(int width) override {

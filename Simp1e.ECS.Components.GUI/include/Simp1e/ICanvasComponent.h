@@ -4,6 +4,7 @@
 #include <Simp1e/DirtyTrackingComponentBase.h>
 #include <Simp1e/Entity.h>
 #include <Simp1e/IHasParentEntity.h>
+#include <Simp1e/Size.h>
 
 namespace Simp1e {
 
@@ -15,6 +16,8 @@ namespace Simp1e {
             Width        = 1 << 1,
             Height       = 1 << 2,
         };
+
+        virtual Size GetSize() const = 0;
 
         virtual int  GetWidth() const    = 0;
         virtual void SetWidth(int width) = 0;

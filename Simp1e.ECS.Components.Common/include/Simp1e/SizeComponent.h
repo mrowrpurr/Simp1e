@@ -14,14 +14,16 @@ namespace Simp1e {
         SizeComponent(sreal width, sreal height) : _size(width, height) {}
         SizeComponent(const Size& size) : _size(size) {}
 
-        virtual sreal GetWidth() const override { return _size.width(); }
-        virtual sreal GetHeight() const override { return _size.height(); }
+        Size GetSize() const override { return _size; }
 
-        virtual void SetWidth(sreal width) override {
+        sreal GetWidth() const override { return _size.width(); }
+        sreal GetHeight() const override { return _size.height(); }
+
+        void SetWidth(sreal width) override {
             _size.SetWidth(width);
             SetDirtyFlag(Fields::Width);
         }
-        virtual void SetHeight(sreal height) override {
+        void SetHeight(sreal height) override {
             _size.SetHeight(height);
             SetDirtyFlag(Fields::Height);
         }
