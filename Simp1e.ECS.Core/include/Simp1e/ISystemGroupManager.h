@@ -14,6 +14,7 @@ namespace Simp1e {
 
         virtual void Update(IEngine* environment, double deltaTime) = 0;
 
+        virtual ISystemGroup* AddGroup(SystemGroupType groupName)          = 0;
         virtual ISystemGroup* GetGroup(SystemGroupType systemGroupType)    = 0;
         virtual bool          RemoveGroup(SystemGroupType systemGroupType) = 0;
         virtual bool          HasGroup(SystemGroupType systemGroupType)    = 0;

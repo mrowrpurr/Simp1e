@@ -46,10 +46,10 @@ namespace Simp1e {
         ///////
         QSimp1eGraphicsScene* _canvasScene;
 
-        IEntityManager* entityManager() const { return _engine->GetEntityManager(); }
+        IEntityManager* entityManager() const { return _engine->GetEntities(); }
 
         QWidget* GetParentWidget(Entity parentEntity) {
-            auto* qWidgetComponent = entityManager()->Get<QWidgetComponent>(parentEntity);
+            auto* qWidgetComponent = entityManager()->GetComponent<QWidgetComponent>(parentEntity);
             if (!qWidgetComponent) return nullptr;
             return qWidgetComponent->GetQWidget();
         }
@@ -61,37 +61,38 @@ namespace Simp1e {
 
         void OnWindowMenuItemClicked(Entity entity, IWindowMenuItemComponent* windowMenuItemComponent) {
             auto* clickFunction = windowMenuItemComponent->GetClickFunction();
-            if (clickFunction) clickFunction->Invoke();
+            if (clickFunction) clickFunction->invoke();
         }
 
         void OnWindowAdded(Entity entity, ComponentType componentType, void* component) {
             _Log_("-> OnWindowAdded");
             auto* windowComponent = component_cast<IWindowComponent>(component);
             auto* qMainWindowComponent =
-                entityManager()->Add<QMainWindowComponent>(entity, windowComponent->GetTitle());
-            entityManager()->Add<QWidgetComponent>(entity, qMainWindowComponent->GetCentralQWidget());
+                entityManager()->AddComponent<QMainWindowComponent>(entity, windowComponent->GetTitle());
+            entityManager()->AddComponent<QWidgetComponent>(entity, qMainWindowComponent->GetCentralQWidget());
         }
 
         void OnWindowMenuAdded(Entity entity, ComponentType componentType, void* component) {
             _Log_("-> OnWindowMenuAdded");
             auto* windowMenuComponent = component_cast<IWindowMenuComponent>(component);
             auto* qMainIWindowComponent =
-                _engine->GetEntityManager()->Get<QMainWindowComponent>(windowMenuComponent->GetWindowEntity());
+                _engine->GetEntities()->GetComponent<QMainWindowComponent>(windowMenuComponent->GetWindowEntity());
             auto* qMenu = qMainIWindowComponent->GetQMainWindow()->menuBar()->addMenu(windowMenuComponent->GetText());
-            entityManager()->Add<QMenuComponent>(entity, qMenu);
+            entityManager()->AddComponent<QMenuComponent>(entity, qMenu);
         }
 
         void OnWindowMenuItemAdded(Entity entity, ComponentType componentType, void* component) {
             _Log_("-> OnWindowMenuItemAdded");
             auto* windowMenuItemComponent = component_cast<IWindowMenuItemComponent>(component);
-            auto* windowMenuComponent =
-                _engine->GetEntityManager()->Get<IWindowMenuComponent>(windowMenuItemComponent->GetWindowMenuEntity());
+            auto* windowMenuComponent     = _engine->GetEntities()->GetComponent<IWindowMenuComponent>(
+                windowMenuItemComponent->GetWindowMenuEntity()
+            );
             auto* qMainIWindowComponent =
-                _engine->GetEntityManager()->Get<QMainWindowComponent>(windowMenuComponent->GetWindowEntity());
+                _engine->GetEntities()->GetComponent<QMainWindowComponent>(windowMenuComponent->GetWindowEntity());
             auto* qMenuComponent =
-                _engine->GetEntityManager()->Get<QMenuComponent>(windowMenuItemComponent->GetWindowMenuEntity());
+                _engine->GetEntities()->GetComponent<QMenuComponent>(windowMenuItemComponent->GetWindowMenuEntity());
             auto* qAction = qMenuComponent->GetQMenu()->addAction(windowMenuItemComponent->GetText());
-            entityManager()->Add<QActionComponent>(entity, qAction);
+            entityManager()->AddComponent<QActionComponent>(entity, qAction);
             QObject::connect(qAction, &QAction::triggered, [this, entity, windowMenuItemComponent]() {
                 OnWindowMenuItemClicked(entity, windowMenuItemComponent);
             });
@@ -125,7 +126,7 @@ namespace Simp1e {
             if (!_canvasScene) return;
             auto* rectangleComponent = component_cast<IRectangleComponent>(component);
             auto* graphicsItem       = new QSimp1eGraphicsItem();
-            entityManager()->Add<QSimp1eGraphicsItemComponent>(entity, graphicsItem);
+            entityManager()->AddComponent<QSimp1eGraphicsItemComponent>(entity, graphicsItem);
             _canvasScene->addItem(graphicsItem);
 
             // TODO - the item needs to like... you know... be updated and know how to render and stuff...
@@ -134,7 +135,7 @@ namespace Simp1e {
         void UpdateWindow(Entity entity, void* component) {
             auto windowComponent = component_cast<IWindowComponent>(component);
             if (!windowComponent->IsDirtyFlagSet(IWindowComponent::Fields::StatusBarText)) return;
-            auto* qMainIWindowComponent = _engine->GetEntityManager()->Get<QMainWindowComponent>(entity);
+            auto* qMainIWindowComponent = _engine->GetEntities()->GetComponent<QMainWindowComponent>(entity);
             qMainIWindowComponent->GetQMainWindow()->statusBar()->showMessage(windowComponent->GetStatusBarText());
             windowComponent->UnsetDirtyFlag(IWindowComponent::Fields::StatusBarText);
         }
@@ -148,13 +149,13 @@ namespace Simp1e {
 
         QtGuiSystem(IEngine* engine) : _engine(engine) {
             auto* entityEvents = entityManager()->GetEventManager();
-            entityEvents->RegisterForComponentAdded<IWindowComponent>(this, &QtGuiSystem::OnWindowAdded);
-            entityEvents->RegisterForComponentAdded<IWindowMenuComponent>(this, &QtGuiSystem::OnWindowMenuAdded);
+            entityEvents->RegisterForComponentAdded<IWindowComponent>({this, &QtGuiSystem::OnWindowAdded});
+            entityEvents->RegisterForComponentAdded<IWindowMenuComponent>({this, &QtGuiSystem::OnWindowMenuAdded});
             entityEvents->RegisterForComponentAdded<IWindowMenuItemComponent>(
-                this, &QtGuiSystem::OnWindowMenuItemAdded
+                {this, &QtGuiSystem::OnWindowMenuItemAdded}
             );
-            entityEvents->RegisterForComponentAdded<ILabelComponent>(this, &QtGuiSystem::OnLabelAdded);
-            entityEvents->RegisterForComponentAdded<ICanvasComponent>(this, &QtGuiSystem::OnCanvasAdded);
+            entityEvents->RegisterForComponentAdded<ILabelComponent>({this, &QtGuiSystem::OnLabelAdded});
+            entityEvents->RegisterForComponentAdded<ICanvasComponent>({this, &QtGuiSystem::OnCanvasAdded});
         }
 
         void RegisterComponentPainter(ComponentTypeHashKey componentTypeHashKey, IQtComponentPainter* painter) {
@@ -189,8 +190,8 @@ namespace Simp1e {
 
         void Update(IEngine* engine, double deltaTime) {
             for (auto& [componentTypeKey, componentUpdateHandler] : _componentUpdateHandlers)
-                entityManager()->ForEachComponentType(
-                    ComponentTypeFromHashKey(componentTypeKey), this, &QtGuiSystem::OnUpdateComponentWithUpdateHandler
+                entityManager()->ForEachComponent(
+                    ComponentTypeFromHashKey(componentTypeKey), {this, &QtGuiSystem::OnUpdateComponentWithUpdateHandler}
                 );
         }
     };

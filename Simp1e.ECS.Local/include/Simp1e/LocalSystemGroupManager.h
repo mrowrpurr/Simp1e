@@ -16,7 +16,7 @@ namespace Simp1e {
         std::vector<SystemGroupType>                                       _systemGroupOrder;
 
     public:
-        ISystemGroup* AddGroup(SystemGroupType groupName) {
+        ISystemGroup* AddGroup(SystemGroupType groupName) override {
             auto* systemGroup        = new LocalSystemGroup();
             _systemGroups[groupName] = std::unique_ptr<ISystemGroup>(systemGroup);
             return systemGroup;

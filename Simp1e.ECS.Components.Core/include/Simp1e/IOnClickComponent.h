@@ -14,7 +14,7 @@ namespace Simp1e {
             FunctionPointer = 1 << 0,
         };
 
-        virtual IFunctionPointer* GetFunctionPointer() const                            = 0;
-        virtual void              SetFunctionPointer(IFunctionPointer* functionPointer) = 0;
+        virtual IFunctionPointerBase* GetFunctionPointer() const                                = 0;
+        virtual void                  SetFunctionPointer(IFunctionPointerBase* functionPointer) = 0;
     };
 }

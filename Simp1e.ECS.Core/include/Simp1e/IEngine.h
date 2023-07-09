@@ -12,9 +12,9 @@ namespace Simp1e {
 
         virtual void RunMainLoopCycle() = 0;
 
-        virtual IEntityManager*      Entities()     = 0;
-        virtual IEventManager*       Events()       = 0;
-        virtual ICommandManager*     Commands()     = 0;
-        virtual ISystemGroupManager* SystemGroups() = 0;
+        virtual IEntityManager*      GetEntities()     = 0;
+        virtual IEventManager*       GetEvents()       = 0;
+        virtual ICommandManager*     GetCommands()     = 0;
+        virtual ISystemGroupManager* GetSystemGroups() = 0;
     };
 }

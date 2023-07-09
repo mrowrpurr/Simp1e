@@ -19,15 +19,15 @@ namespace Simp1e {
 
     public:
         QtEngine(IEngine* engine) : _engine(engine), _gameLoop(std::make_unique<QtGameLoop>(engine)) {
-            auto* qtGroup = _engine->GetSystemManager()->Add<LocalSystemGroup>(QtSystemGroupTypes::QtRenderGroup);
-            _engine->GetSystemManager()->MoveGroupBeforeGroup(
+            auto* qtGroup = _engine->GetSystemGroups()->AddGroup(QtSystemGroupTypes::QtRenderGroup);
+            _engine->GetSystemGroups()->MoveGroupBeforeGroup(
                 QtSystemGroupTypes::QtRenderGroup, DefaultSystemGroupTypes::PresentationGroup
             );
-            qtGroup->Add<QtGuiSystem>(engine);
+            qtGroup->AddSystem<QtGuiSystem>(engine);
         }
 
         ISystemGroup* GetQtRenderGroup() const {
-            return _engine->GetSystemManager()->GetGroup(QtSystemGroupTypes::QtRenderGroup);
+            return _engine->GetSystemGroups()->GetGroup(QtSystemGroupTypes::QtRenderGroup);
         }
 
         void Run() {

@@ -25,21 +25,14 @@ namespace Simp1e {
     public:
         IEntityEventManager* GetEventManager() override { return &_eventManager; }
 
-        template <typename TComponent, typename... TArgs>
-        ComponentPointer AddComponent(Entity entity, TArgs&&... args) {
-            auto componentType = ComponentTypeFromType<TComponent>();
-            _Log_("[LocalEntityManager] AddComponent {} to {}", componentType, entity);
-
+        ComponentPointer AddComponentPointer(Entity entity, ComponentType componentType, IVoidPointer* pointer)
+            override {
+            _Log_("[LocalEntityManager] AddComponentPointer {} to {}", componentType, entity);
             _eventManager.ComponentAdding(entity, componentType);
-
-            auto component        = new TComponent(std::forward<TArgs>(args)...);
-            auto componentDeleter = new VoidPointer<TComponent>(component);
-
-            _componentPointers[componentType][entity]        = std::unique_ptr<IVoidPointer>(componentDeleter);
-            _entityComponentsByEntity[entity][componentType] = componentDeleter;
-
-            _eventManager.ComponentAdded(entity, componentType, component);
-            return component;
+            _componentPointers[componentType][entity]        = std::unique_ptr<IVoidPointer>(pointer);
+            _entityComponentsByEntity[entity][componentType] = pointer;
+            _eventManager.ComponentAdded(entity, componentType, pointer->void_ptr());
+            return pointer->void_ptr();
         }
 
         Entity CreateEntity() override {

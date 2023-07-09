@@ -17,14 +17,14 @@ namespace Simp1e {
             ClickFunction = 1 << 3,
         };
 
-        virtual Entity            GetWindowMenuEntity() const                         = 0;
-        virtual const char*       GetText() const                                     = 0;
-        virtual void              SetText(const char* text)                           = 0;
-        virtual bool              IsVisible() const                                   = 0;
-        virtual void              SetVisible(bool enabled)                            = 0;
-        virtual bool              IsEnabled() const                                   = 0;
-        virtual void              SetEnabled(bool enabled)                            = 0;
-        virtual void              SetClickFunction(IFunctionPointer* functionPointer) = 0;
-        virtual IFunctionPointer* GetClickFunction() const                            = 0;
+        virtual Entity                    GetWindowMenuEntity() const                                 = 0;
+        virtual const char*               GetText() const                                             = 0;
+        virtual void                      SetText(const char* text)                                   = 0;
+        virtual bool                      IsVisible() const                                           = 0;
+        virtual void                      SetVisible(bool enabled)                                    = 0;
+        virtual bool                      IsEnabled() const                                           = 0;
+        virtual void                      SetEnabled(bool enabled)                                    = 0;
+        virtual void                      SetClickFunction(IFunctionPointer<void()>* functionPointer) = 0;
+        virtual IFunctionPointer<void()>* GetClickFunction() const                                    = 0;
     };
 }

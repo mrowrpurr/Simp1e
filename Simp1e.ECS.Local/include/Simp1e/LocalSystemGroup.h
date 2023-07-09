@@ -9,40 +9,42 @@
 #include <memory>
 #include <unordered_map>
 
-#include "LocalSystem.h"
-
 namespace Simp1e {
 
     class LocalSystemGroup : public ISystemGroup {
-        std::unordered_map<SystemTypeHashKey, std::unique_ptr<ISystem>> _systems;
-        std::unordered_map<SystemTypeHashKey, bool>                     _enabledSystems;
-        std::vector<SystemTypeHashKey>                                  _insertionOrder;
+        std::unordered_map<SystemTypeHashKey, std::unique_ptr<IVoidPointer>> _systems;
+        std::unordered_map<SystemTypeHashKey, std::unique_ptr<IFunctionPointer<void(IEngine*, double)>>>
+                                                    _systemUpdateFunctions;
+        std::unordered_map<SystemTypeHashKey, bool> _enabledSystems;
+        std::vector<SystemTypeHashKey>              _insertionOrder;
 
     public:
-        template <typename T, typename... Args>
-        T* AddSystem(Args&&... args) {
-            auto systemType = SystemTypeFromType<T>();
-            if (_systems.find(systemType) != _systems.end()) {
-                _Log_("[LocalSystemManager] System {} already exists", systemType);
+        SystemPointer AddSystemPointer(
+            SystemType systemType, IVoidPointer* systemPointer,
+            IFunctionPointer<void(IEngine*, double)>* systemUpdateFunction
+        ) override {
+            auto systemTypeHashKey = SystemTypeToHashKey(systemType);
+            if (_systems.find(systemTypeHashKey) != _systems.end()) {
+                _Log_("[LocalSystemManager] System {} already exists", systemTypeHashKey);
                 return nullptr;
             }
-            auto system                 = new T(std::forward<Args>(args)...);
-            auto iSystem                = new LocalSystem<T>(system);
-            _systems[systemType]        = std::unique_ptr<ISystem>(iSystem);
-            _enabledSystems[systemType] = true;
-            _insertionOrder.push_back(systemType);
-            _Log_("[LocalSystemManager] Added system {}", systemType);
-            return system;
+            _systems[systemTypeHashKey] = std::unique_ptr<IVoidPointer>(systemPointer);
+            _systemUpdateFunctions[systemTypeHashKey] =
+                std::unique_ptr<IFunctionPointer<void(IEngine*, double)>>(systemUpdateFunction);
+            _enabledSystems[systemTypeHashKey] = true;
+            _insertionOrder.push_back(systemTypeHashKey);
+            _Log_("[LocalSystemManager] Added system {}", systemTypeHashKey);
+            return systemPointer->void_ptr();
         }
 
         void Update(IEngine* environment, double deltaTime) override {
             for (auto& systemTypeHashKey : _insertionOrder) {
                 if (!_enabledSystems[systemTypeHashKey]) continue;
-                _systems[systemTypeHashKey]->Update(environment, deltaTime);
+                _systemUpdateFunctions[systemTypeHashKey]->invoke(environment, deltaTime);
             }
         }
 
-        ISystem* GetSystemPointer(SystemType systemType) override {
+        SystemPointer GetSystemPointer(SystemType systemType) override {
             auto found = _systems.find(SystemTypeToHashKey(systemType));
             if (found == _systems.end()) return nullptr;
             return found->second.get();
@@ -54,6 +56,7 @@ namespace Simp1e {
             if (found == _systems.end()) return false;
             _systems.erase(key);
             _enabledSystems.erase(key);
+            _systemUpdateFunctions.erase(key);
             _insertionOrder.erase(
                 std::remove(_insertionOrder.begin(), _insertionOrder.end(), key), _insertionOrder.end()
             );
@@ -99,10 +102,17 @@ namespace Simp1e {
             return _enabledSystems[key];
         }
 
-        void ForEachSystem(IFunctionPointer<void(SystemType, ISystem*)>* callback) override {
+        void ForEachSystem(
+            IFunctionPointer<void(SystemType, SystemPointer, IFunctionPointer<void(IEngine*, double)>*)>* callback
+        ) override {
             for (auto& systemTypeHashKey : _insertionOrder) {
                 if (!_enabledSystems[systemTypeHashKey]) continue;
-                callback->invoke(SystemTypeFromHashKey(systemTypeHashKey), _systems[systemTypeHashKey].get());
+                auto foundUpdateFunction = _systemUpdateFunctions.find(systemTypeHashKey);
+                if (foundUpdateFunction == _systemUpdateFunctions.end()) continue;
+                callback->invoke(
+                    SystemTypeFromHashKey(systemTypeHashKey), _systems[systemTypeHashKey].get(),
+                    foundUpdateFunction->second.get()
+                );
             }
         }
     };

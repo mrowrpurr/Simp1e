@@ -33,6 +33,38 @@ namespace Simp1e {
         virtual IFunctionPointer<void(Entity, ComponentType)>*
         RegisterForComponentRemoved(ComponentType componentType, IFunctionPointer<void(Entity, ComponentType)>*) = 0;
 
+        template <typename TComponent>
+        IFunctionPointer<void(Entity, ComponentType)>* RegisterForComponentAdding(
+            FunctionPointer<void(Entity, ComponentType)> callback
+        ) {
+            callback.do_not_destroy_function_pointer();
+            return RegisterForComponentAdding(ComponentTypeFromType<TComponent>(), callback.inner_function_pointer());
+        }
+
+        template <typename TComponent>
+        IFunctionPointer<void(Entity, ComponentType, ComponentPointer)>* RegisterForComponentAdded(
+            FunctionPointer<void(Entity, ComponentType, ComponentPointer)> callback
+        ) {
+            callback.do_not_destroy_function_pointer();
+            return RegisterForComponentAdded(ComponentTypeFromType<TComponent>(), callback.inner_function_pointer());
+        }
+
+        template <typename TComponent>
+        IFunctionPointer<void(Entity, ComponentType, ComponentPointer)>* RegisterForComponentRemoving(
+            FunctionPointer<void(Entity, ComponentType, ComponentPointer)> callback
+        ) {
+            callback.do_not_destroy_function_pointer();
+            return RegisterForComponentRemoving(ComponentTypeFromType<TComponent>(), callback.inner_function_pointer());
+        }
+
+        template <typename TComponent>
+        IFunctionPointer<void(Entity, ComponentType)>* RegisterForComponentRemoved(
+            FunctionPointer<void(Entity, ComponentType)> callback
+        ) {
+            callback.do_not_destroy_function_pointer();
+            return RegisterForComponentRemoved(ComponentTypeFromType<TComponent>(), callback.inner_function_pointer());
+        }
+
         virtual void UnregisterForEntityCreated(IFunctionPointer<void(Entity)>*)    = 0;
         virtual void UnregisterForEntityDestroying(IFunctionPointer<void(Entity)>*) = 0;
         virtual void UnregisterForEntityDestroyed(IFunctionPointer<void(Entity)>*)  = 0;
