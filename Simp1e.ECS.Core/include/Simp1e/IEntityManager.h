@@ -40,7 +40,13 @@ namespace Simp1e {
 
         template <typename TComponent, typename... TArgs>
         TComponent* AddComponent(Entity entity, TArgs&&... args) {
-            auto componentType = ComponentTypeFromType<TComponent>();
+            auto  componentType     = ComponentTypeFromType<TComponent>();
+            auto* existingComponent = GetComponentPointer(entity, componentType);
+            if (existingComponent) {
+                _Log_("[LocalEntityManager] Entity {} already has component {}", entity, componentType);
+                return component_cast<TComponent>(existingComponent);
+            }
+
             _Log_("[LocalEntityManager] AddComponent {} to {}", componentType, entity);
 
             auto component        = new TComponent(std::forward<TArgs>(args)...);

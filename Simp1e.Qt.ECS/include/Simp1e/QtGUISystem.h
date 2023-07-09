@@ -127,10 +127,9 @@ namespace Simp1e {
             _Log_("-> RectangleAdded");
             if (!_canvasScene) return;
             auto* rectangleComponent = component_cast<IRectangleComponent>(component);
-            auto* graphicsItem       = new QSimp1eGraphicsItem();
-            entityManager()->AddComponent<QSimp1eGraphicsItemComponent>(entity, graphicsItem);
+            auto* graphicsItem       = entityManager()->AddComponent<QSimp1eGraphicsItemComponent>(entity);
             _Log_("Adding a rectangle graphics item to the scene");
-            _canvasScene->addItem(graphicsItem);
+            _canvasScene->addItem(graphicsItem->GetQSimp1eGraphicsItem());
 
             // TODO - the item needs to like... you know... be updated and know how to render and stuff...
         }

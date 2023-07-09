@@ -31,7 +31,7 @@ namespace Simp1e {
             return _engine->GetSystemGroups()->GetGroup(QtSystemGroupTypes::QtRenderGroup);
         }
 
-        void Run() {  // QLabel label("Hello World!");
+        void Run() {
             _gameLoop->Run();
             _app.exec();
         }
