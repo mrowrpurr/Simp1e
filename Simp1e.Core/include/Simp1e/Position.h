@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string_format.h>
+
 #include "Point.h"
 #include "Vec3.h"
 #include "sreal.h"
@@ -30,5 +32,8 @@ namespace Simp1e {
         virtual bool operator==(const Position& other) const {
             return x() == other.x() && y() == other.y() && z() == other.z();
         }
+
+        std::string ToString() const { return string_format("Position({}, {}, {})", x(), y(), z()); }
+        operator std::string() const { return ToString(); }
     };
 }

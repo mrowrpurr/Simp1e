@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "Vec2.h"
 
 namespace Simp1e {

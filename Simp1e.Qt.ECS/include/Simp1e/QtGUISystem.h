@@ -49,11 +49,6 @@
 #include "QtSimp1eImageComponent.h"
 #include "QtSizeComponentUpdateHandler.h"
 
-//
-// #include <QGraphicsPixmapItem>
-// #include <QGraphicsSvgItem>
-// #include <QtSvg/QSvgRenderer>
-
 namespace Simp1e {
 
     class QtGuiSystem {
@@ -160,20 +155,9 @@ namespace Simp1e {
                 view->verticalScrollBar()->setValue(0);
                 //
                 layout->addWidget(view);
+
                 // Save for graphical components to render on: (kinda gross, clean this up...)
                 _canvasScene = scene;
-
-                // Add something to the canvas...
-                // QGraphicsPixmapItem* item = new QGraphicsPixmapItem(
-                // QPixmap("C:/Code/mrowrpurr/StockImages/shutterstock_1498801328 - medium quality.jpg")
-                // );
-                // _canvasScene->addItem(item);
-
-                auto* svgItem = new QGraphicsSvgItem(
-                    "C:/Code/mrowrpurr/StockImages/shutterstock_343715348 - without background2.svg"
-                );
-                svgItem->setScale(3.0);
-                _canvasScene->addItem(svgItem);
             }
         }
 
@@ -209,7 +193,7 @@ namespace Simp1e {
             _Log_("-> ParallaxEffectAdded");
             if (!_canvasScene) return;
             addGraphicsItem(entity);
-            entityManager()->AddComponent<QtParallaxEffectComponent>(entity);
+            entityManager()->AddComponent<QtParallaxEffectComponent>(entity, _canvasScene);
         }
 
         void UpdateWindow(Entity entity, void* component) {

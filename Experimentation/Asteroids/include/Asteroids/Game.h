@@ -46,12 +46,12 @@ namespace Asteroids {
         Entity CreateParallaxEffect(LocalEntityManager& entityManager) {
             auto parallaxEffect = entityManager.CreateEntity();
             auto parallax       = entityManager.AddComponent<ParallaxEffectComponent>(parallaxEffect);
-            parallax->AddLayer("C:/Code/mrowrpurr/StockImages/shutterstock_1921487843.svg", 0.5, 1.0);
+            parallax->AddLayer("Layer1", "C:/Code/mrowrpurr/StockImages/shutterstock_1921487843.svg", 0.5, 1.0, 0.3);
             parallax->AddLayer(
-                "C:/Code/mrowrpurr/StockImages/shutterstock_579041497 - without background.svg", 1.0, 1.0
+                "Layer2", "C:/Code/mrowrpurr/StockImages/shutterstock_579041497 - without background.svg", 1.0, 4.0, 0.5
             );
             parallax->AddLayer(
-                "C:/Code/mrowrpurr/StockImages/shutterstock_353699963 - without background.svg", 2.0, 1.0
+                "Layer3", "C:/Code/mrowrpurr/StockImages/shutterstock_354953852 - without background.svg", 2.0, 3.0, 0.7
             );
             return parallaxEffect;
         }
