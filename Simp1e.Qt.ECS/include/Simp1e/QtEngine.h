@@ -19,6 +19,7 @@ namespace Simp1e {
         std::unique_ptr<QtGameLoop> _gameLoop;
 
     public:
+        // TODO: Find a way to refactor into something that actually really makes proper use of Systems<> maybe?
         QtEngine(IEngine* engine) : _engine(engine), _gameLoop(std::make_unique<QtGameLoop>(engine)) {
             auto* qtGroup = _engine->GetSystemGroups()->AddGroup(QtSystemGroupTypes::QtRenderGroup);
             _engine->GetSystemGroups()->MoveGroupBeforeGroup(

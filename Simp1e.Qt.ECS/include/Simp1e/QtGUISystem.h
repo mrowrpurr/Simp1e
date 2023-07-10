@@ -11,6 +11,7 @@
 #include <Simp1e/IImageComponent.h>
 #include <Simp1e/ILabelComponent.h>
 #include <Simp1e/IOnClickComponent.h>
+#include <Simp1e/IParallaxEffectComponent.h>
 #include <Simp1e/IPositionComponent.h>
 #include <Simp1e/IRectangleComponent.h>
 #include <Simp1e/ISizeComponent.h>
@@ -41,15 +42,17 @@
 #include "IQtComponentPainter.h"
 #include "IQtComponentUpdateHandler.h"
 #include "QtImageComponentPainter.h"
+#include "QtParallaxEffectComponent.h"
+#include "QtParallaxEffectComponentUpdateHandler.h"
 #include "QtPositionComponentUpdateHandler.h"
 #include "QtRectangleComponentPainter.h"
 #include "QtSimp1eImageComponent.h"
 #include "QtSizeComponentUpdateHandler.h"
 
 //
-#include <QGraphicsPixmapItem>
-#include <QGraphicsSvgItem>
-#include <QtSvg/QSvgRenderer>
+// #include <QGraphicsPixmapItem>
+// #include <QGraphicsSvgItem>
+// #include <QtSvg/QSvgRenderer>
 
 namespace Simp1e {
 
@@ -202,6 +205,13 @@ namespace Simp1e {
                 entityManager()->AddComponent<QtSimp1eImageComponent>(entity, imageComponent->GetImagePath());
         }
 
+        void OnParallaxEffectAdded(Entity entity, ComponentType componentType, void* component) {
+            _Log_("-> ParallaxEffectAdded");
+            if (!_canvasScene) return;
+            addGraphicsItem(entity);
+            entityManager()->AddComponent<QtParallaxEffectComponent>(entity);
+        }
+
         void UpdateWindow(Entity entity, void* component) {
             auto windowComponent = component_cast<IWindowComponent>(component);
             if (!windowComponent->IsDirtyFlagSet(IWindowComponent::Fields::StatusBarText)) return;
@@ -229,7 +239,9 @@ namespace Simp1e {
             QImageReader::setAllocationLimit(0);
 
             _entityPaintFunctionPointer = new_function_pointer(this, &QtGuiSystem::OnPaintGraphicsItem);
-            auto* entityEvents          = entityManager()->GetEventManager();
+
+            auto* entityEvents = entityManager()->GetEventManager();
+
             entityEvents->RegisterForComponentAdded<IWindowComponent>({this, &QtGuiSystem::OnWindowAdded});
             entityEvents->RegisterForComponentAdded<IWindowMenuComponent>({this, &QtGuiSystem::OnWindowMenuAdded});
             entityEvents->RegisterForComponentAdded<IWindowMenuItemComponent>(
@@ -241,10 +253,16 @@ namespace Simp1e {
             entityEvents->RegisterForComponentAdded<IPositionComponent>({this, &QtGuiSystem::OnPositionAdded});
             entityEvents->RegisterForComponentAdded<ISizeComponent>({this, &QtGuiSystem::OnSizeAdded});
             entityEvents->RegisterForComponentAdded<IImageComponent>({this, &QtGuiSystem::OnImageAdded});
+            entityEvents->RegisterForComponentAdded<IParallaxEffectComponent>(
+                {this, &QtGuiSystem::OnParallaxEffectAdded}
+            );
+
             RegisterComponentPainter<IRectangleComponent, QtRectangleComponentPainter>();
             RegisterComponentPainter<IImageComponent, QtImageComponentPainter>();
+
             RegisterComponentUpdateHandler<IPositionComponent, QtPositionComponentUpdateHandler>();
             RegisterComponentUpdateHandler<ISizeComponent, QtSizeComponentUpdateHandler>();
+            RegisterComponentUpdateHandler<IParallaxEffectComponent, QtParallaxEffectComponentUpdateHandler>();
         }
 
         void RegisterComponentPainter(ComponentTypeHashKey componentTypeHashKey, IQtComponentPainter* painter) {

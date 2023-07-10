@@ -5,6 +5,7 @@
 #include <Simp1e/ImageComponent.h>
 #include <Simp1e/LineColorComponent.h>
 #include <Simp1e/LocalEngine.h>
+#include <Simp1e/ParallaxEffectComponent.h>
 #include <Simp1e/PositionComponent.h>
 #include <Simp1e/QtEngine.h>
 #include <Simp1e/RectangleComponent.h>
@@ -40,6 +41,19 @@ namespace Asteroids {
             auto canvas = entityManager.CreateEntity();
             entityManager.AddComponent<CanvasComponent>(canvas, window);
             return canvas;
+        }
+
+        Entity CreateParallaxEffect(LocalEntityManager& entityManager) {
+            auto parallaxEffect = entityManager.CreateEntity();
+            auto parallax       = entityManager.AddComponent<ParallaxEffectComponent>(parallaxEffect);
+            parallax->AddLayer("C:/Code/mrowrpurr/StockImages/shutterstock_1921487843.svg", 0.5, 1.0);
+            parallax->AddLayer(
+                "C:/Code/mrowrpurr/StockImages/shutterstock_579041497 - without background.svg", 1.0, 1.0
+            );
+            parallax->AddLayer(
+                "C:/Code/mrowrpurr/StockImages/shutterstock_353699963 - without background.svg", 2.0, 1.0
+            );
+            return parallaxEffect;
         }
 
         Entity CreateLargerThanViewPortBackground(LocalEntityManager& entityManager) {
@@ -78,6 +92,7 @@ namespace Asteroids {
             auto window = CreateWindowEntity(entityManager);
             CreateGameCanvas(window, entityManager);
             CreateLargerThanViewPortBackground(entityManager);
+            CreateParallaxEffect(entityManager);
             CreateViewPortRectangle(entityManager);
             CreateShip(entityManager);
         }

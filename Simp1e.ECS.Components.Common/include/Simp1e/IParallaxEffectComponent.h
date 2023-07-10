@@ -3,6 +3,7 @@
 #include <Simp1e/DefineComponentType.h>
 #include <Simp1e/DirtyTrackingComponentBase.h>
 #include <Simp1e/Position.h>
+#include <Simp1e/sreal.h>
 
 namespace Simp1e {
 
@@ -14,7 +15,7 @@ namespace Simp1e {
             TargetPerspectivePosition = 1 << 1,
         };
 
-        virtual int  AddLayer(const char* path, float speed = 1.0, float scale = 1.0f) = 0;
+        virtual int  AddLayer(const char* path, sreal speed = 1.0, sreal scale = 1.0f) = 0;
         virtual void EnableLayer(int index)                                            = 0;
         virtual void DisableLayer(int index)                                           = 0;
         virtual void RemoveLayer(int index)                                            = 0;
