@@ -6,13 +6,13 @@
 
 namespace Simp1e {
 
-    class QSimp1eGraphicsItem : public QGraphicsItem {
+    class QtSimp1eGraphicsItem : public QGraphicsItem {
         QRectF                                                                                        _boundingRect;
         std::unique_ptr<IFunctionPointer<void(QPainter*, const QStyleOptionGraphicsItem*, QWidget*)>> _paintFunction =
             nullptr;
 
     public:
-        QSimp1eGraphicsItem(
+        QtSimp1eGraphicsItem(
             IFunctionPointer<void(QPainter*, const QStyleOptionGraphicsItem*, QWidget*)>* _paintFunctionPointer,
             QGraphicsItem*                                                                parent = nullptr
         )

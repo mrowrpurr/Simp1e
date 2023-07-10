@@ -6,13 +6,13 @@
 
 namespace Simp1e {
 
-    class QActionComponent {
+    class QtActionComponent {
         QAction* _action;
 
     public:
         DEFINE_COMPONENT_TYPE("QAction")
 
-        QActionComponent(QAction* action) : _action(action) {}
+        QtActionComponent(QAction* action) : _action(action) {}
 
         QAction* GetQAction() const { return _action; }
     };

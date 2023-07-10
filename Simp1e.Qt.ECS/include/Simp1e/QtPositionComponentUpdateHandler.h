@@ -7,7 +7,7 @@
 #include <_Log_.h>
 
 #include "IQtComponentUpdateHandler.h"
-#include "QSimp1eGraphicsItemComponent.h"
+#include "QtSimp1eGraphicsItemComponent.h"
 
 namespace Simp1e {
 
@@ -20,9 +20,9 @@ namespace Simp1e {
             if (!position) return;
             if (!position->IsDirty()) return;
 
-            auto* graphicsItemComponent = entityManager->GetComponent<QSimp1eGraphicsItemComponent>(entity);
+            auto* graphicsItemComponent = entityManager->GetComponent<QtSimp1eGraphicsItemComponent>(entity);
             if (!graphicsItemComponent) return;
-            auto* graphicsItem = graphicsItemComponent->GetQSimp1eGraphicsItem();
+            auto* graphicsItem = graphicsItemComponent->GetQtSimp1eGraphicsItem();
             if (!graphicsItem) return;
 
             auto pos = ToQPointF(position->GetPosition().ToPoint());

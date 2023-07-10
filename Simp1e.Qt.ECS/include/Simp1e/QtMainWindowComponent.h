@@ -8,14 +8,14 @@
 
 namespace Simp1e {
 
-    class QMainWindowComponent {
+    class QtMainWindowComponent {
         std::unique_ptr<QMainWindow> _mainWindow;
 
     public:
         DEFINE_COMPONENT_TYPE("QMainWindow")
 
-        QMainWindowComponent() : QMainWindowComponent(nullptr) {}
-        QMainWindowComponent(const char* title) : _mainWindow(std::make_unique<QMainWindow>()) {
+        QtMainWindowComponent() : QtMainWindowComponent(nullptr) {}
+        QtMainWindowComponent(const char* title) : _mainWindow(std::make_unique<QMainWindow>()) {
             _mainWindow->setWindowTitle(title);
             auto* centralWidget = new QWidget();
             centralWidget->setLayout(new QVBoxLayout());

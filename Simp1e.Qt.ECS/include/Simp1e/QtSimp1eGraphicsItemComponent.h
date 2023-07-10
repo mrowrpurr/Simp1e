@@ -2,16 +2,16 @@
 
 #include <Simp1e/DefineComponentType.h>
 #include <Simp1e/IEngine.h>
-#include <Simp1e/QSimp1eGraphicsItem.h>
+#include <Simp1e/QtSimp1eGraphicsItem.h>
 #include <_Log_.h>
 
 #include <memory>
 
 namespace Simp1e {
 
-    class QSimp1eGraphicsItemComponent {
-        Entity                               _entity;
-        std::unique_ptr<QSimp1eGraphicsItem> _item;
+    class QtSimp1eGraphicsItemComponent {
+        Entity                                _entity;
+        std::unique_ptr<QtSimp1eGraphicsItem> _item;
         IFunctionPointer<void(Entity, QPainter*, const QStyleOptionGraphicsItem*, QWidget*)>*
             _systemEntityPaintFunction;
 
@@ -20,18 +20,18 @@ namespace Simp1e {
         }
 
     public:
-        DEFINE_COMPONENT_TYPE("QSimp1eGraphicsItem")
+        DEFINE_COMPONENT_TYPE("QtSimp1eGraphicsItem")
 
-        QSimp1eGraphicsItemComponent(
+        QtSimp1eGraphicsItemComponent(
             Entity                                                                                entity,
             IFunctionPointer<void(Entity, QPainter*, const QStyleOptionGraphicsItem*, QWidget*)>* paintFunctionPointer
         )
             : _entity(entity),
               _systemEntityPaintFunction(paintFunctionPointer),
-              _item(std::make_unique<QSimp1eGraphicsItem>(
-                  new_function_pointer(this, &QSimp1eGraphicsItemComponent::OnPaint)
+              _item(std::make_unique<QtSimp1eGraphicsItem>(
+                  new_function_pointer(this, &QtSimp1eGraphicsItemComponent::OnPaint)
               )) {}
 
-        QSimp1eGraphicsItem* GetQSimp1eGraphicsItem() const { return _item.get(); }
+        QtSimp1eGraphicsItem* GetQtSimp1eGraphicsItem() const { return _item.get(); }
     };
 }

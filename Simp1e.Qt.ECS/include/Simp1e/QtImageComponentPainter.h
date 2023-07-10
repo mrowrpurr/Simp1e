@@ -8,7 +8,7 @@
 #include <_Log_.h>
 
 #include "IQtComponentPainter.h"
-#include "QSimp1eImageComponent.h"
+#include "QtSimp1eImageComponent.h"
 
 namespace Simp1e {
 
@@ -39,7 +39,7 @@ namespace Simp1e {
                 return;
             }
 
-            auto* qImageComponent = entityManager->GetComponent<QSimp1eImageComponent>(entity);
+            auto* qImageComponent = entityManager->GetComponent<QtSimp1eImageComponent>(entity);
             if (!qImageComponent) {
                 _Log_("[Image Painter] No image component found for entity {}", entity);
                 return;
