@@ -14,7 +14,7 @@ namespace Simp1e {
         };
 
         Position() = default;
-        Position(sreal x, sreal y, sreal z) : Vec3(x, y, z) {}
+        Position(sreal x, sreal y, sreal z = 0) : Vec3(x, y, z) {}
         Position(const Params& params) : Vec3(params.x, params.y, params.z) {}
 
         virtual Point ToPoint() const { return Point(x(), y()); }

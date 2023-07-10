@@ -22,7 +22,7 @@ namespace Simp1e {
             setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
             setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
             setRenderHint(QPainter::Antialiasing);
-            setStyleSheet("background: magenta");
+            setStyleSheet("background: black");  // Set via <FillColor> of a <Canvas>
         }
 
         void FitSceneToViewHeight() {

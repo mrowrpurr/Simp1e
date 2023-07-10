@@ -48,7 +48,8 @@ namespace Simp1e {
             if (fillColor) painter->fillRect(rect, ToQColor(fillColor->GetColor()));
 
             auto* lineColor = entityManager->GetComponent<ILineColorComponent>(entity);
-            if (lineColor) painter->setPen(ToQColor(lineColor->GetColor()));
+            // TODO - read the line width from somewhere
+            if (lineColor) painter->setPen(QPen(ToQColor(lineColor->GetColor()), 5.0, Qt::SolidLine));
 
             painter->drawRect(rect);
         }

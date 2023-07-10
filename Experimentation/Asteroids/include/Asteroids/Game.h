@@ -27,72 +27,43 @@ namespace Asteroids {
     class Game {
         LocalEngine _engine;
         QtEngine    _qtEngine{&_engine};
-        Size        _size{20000, 20000};
+        Size        _viewportSize{2840, 2160};
 
     public:
         Entity CreateWindowEntity(LocalEntityManager& entityManager) {
             auto window = entityManager.CreateEntity();
-            entityManager.AddComponent<WindowComponent>(window, "Asteroids");
+            entityManager.AddComponent<WindowComponent>(window, "Asteroids (Simp1e prototype)");
             return window;
         }
 
         Entity CreateGameCanvas(Entity window, LocalEntityManager& entityManager) {
             auto canvas = entityManager.CreateEntity();
-            entityManager.AddComponent<CanvasComponent>(canvas, window, _size.width(), _size.height());
-            entityManager.AddComponent<SizeComponent>(canvas, _size);
+            entityManager.AddComponent<CanvasComponent>(canvas, window);
             return canvas;
         }
 
-        Entity CreateBackground(LocalEntityManager& entityManager) {
+        Entity CreateLargerThanViewPortBackground(LocalEntityManager& entityManager) {
             auto background = entityManager.CreateEntity();
-            entityManager.AddComponent<PositionComponent>(background);
-            entityManager.AddComponent<SizeComponent>(background, _size);
+            entityManager.AddComponent<PositionComponent>(background, Point(-10000, -10000));
+            entityManager.AddComponent<SizeComponent>(background, Size(20000, 20000));
             entityManager.AddComponent<RectangleComponent>(background);
-            entityManager.AddComponent<FillColorComponent>(background, Color::Black());
-            // entityManager.AddComponent<LineColorComponent>(background, Color::Magenta(150));
+            entityManager.AddComponent<LineColorComponent>(background, Color::Magenta());
             return background;
         }
 
-        Entity CreateTopLeftRectangle(LocalEntityManager& entityManager) {
-            auto rectangle = entityManager.CreateEntity();
-            entityManager.AddComponent<PositionComponent>(rectangle);
-            entityManager.AddComponent<SizeComponent>(rectangle, Size(100, 100));
-            entityManager.AddComponent<RectangleComponent>(rectangle);
-            entityManager.AddComponent<FillColorComponent>(rectangle, Color::Red(50));
-            return rectangle;
-        }
-
-        Entity CreateTopRightRectangle(LocalEntityManager& entityManager) {
-            auto rectangle = entityManager.CreateEntity();
-            entityManager.AddComponent<PositionComponent>(rectangle, _size.width() - 100, 0);
-            entityManager.AddComponent<SizeComponent>(rectangle, Size(100, 100));
-            entityManager.AddComponent<RectangleComponent>(rectangle);
-            entityManager.AddComponent<FillColorComponent>(rectangle, Color::Green(50));
-            return rectangle;
-        }
-
-        Entity CreateBottomLeftRectangle(LocalEntityManager& entityManager) {
-            auto rectangle = entityManager.CreateEntity();
-            entityManager.AddComponent<PositionComponent>(rectangle, 0, _size.height() - 100);
-            entityManager.AddComponent<SizeComponent>(rectangle, Size(100, 100));
-            entityManager.AddComponent<RectangleComponent>(rectangle);
-            entityManager.AddComponent<FillColorComponent>(rectangle, Color::Blue(50));
-            return rectangle;
-        }
-
-        Entity CreateBottomRightRectangle(LocalEntityManager& entityManager) {
-            auto rectangle = entityManager.CreateEntity();
-            entityManager.AddComponent<PositionComponent>(rectangle, _size.width() - 100, _size.height() - 100);
-            entityManager.AddComponent<SizeComponent>(rectangle, Size(100, 100));
-            entityManager.AddComponent<RectangleComponent>(rectangle);
-            entityManager.AddComponent<FillColorComponent>(rectangle, Color::Yellow(50));
-            return rectangle;
+        Entity CreateViewPortRectangle(LocalEntityManager& entityManager) {
+            auto background = entityManager.CreateEntity();
+            entityManager.AddComponent<PositionComponent>(background);
+            entityManager.AddComponent<SizeComponent>(background, _viewportSize);
+            entityManager.AddComponent<RectangleComponent>(background);
+            entityManager.AddComponent<LineColorComponent>(background, Color::Blue());
+            return background;
         }
 
         Entity CreateShip(LocalEntityManager& entityManager) {
             auto ship = entityManager.CreateEntity();
             entityManager.AddComponent<SizeComponent>(ship, Size(100, 125));
-            entityManager.AddComponent<PositionComponent>(ship, _size.width() / 2, _size.height() / 2);
+            entityManager.AddComponent<PositionComponent>(ship, Point(0, 0));
             entityManager.AddComponent<RotationComponent>(ship);
             entityManager.AddComponent<ImageComponent>(ship, ":/ship.png");
             return ship;
@@ -106,11 +77,8 @@ namespace Asteroids {
         void LoadComponents(LocalEntityManager& entityManager) {
             auto window = CreateWindowEntity(entityManager);
             CreateGameCanvas(window, entityManager);
-            CreateBackground(entityManager);
-            CreateTopLeftRectangle(entityManager);
-            CreateTopRightRectangle(entityManager);
-            CreateBottomLeftRectangle(entityManager);
-            CreateBottomRightRectangle(entityManager);
+            CreateLargerThanViewPortBackground(entityManager);
+            CreateViewPortRectangle(entityManager);
             CreateShip(entityManager);
         }
 

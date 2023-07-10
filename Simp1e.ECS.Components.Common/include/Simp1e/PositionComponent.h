@@ -10,6 +10,7 @@ namespace Simp1e {
     public:
         PositionComponent() = default;
         PositionComponent(const Position& position) : _position(position) {}
+        PositionComponent(const Point& point) : _position(point.x(), point.y()) {}
         PositionComponent(sreal x, sreal y, sreal z = 0) : _position(x, y, z) {}
 
         sreal x() const override { return _position.x(); }
