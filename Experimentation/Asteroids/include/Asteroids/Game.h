@@ -48,7 +48,8 @@ namespace Asteroids {
             entityManager.AddComponent<PositionComponent>(background);
             entityManager.AddComponent<SizeComponent>(background, _size);
             entityManager.AddComponent<RectangleComponent>(background);
-            entityManager.AddComponent<FillColorComponent>(background, Color::Pink());
+            entityManager.AddComponent<FillColorComponent>(background, Color::Black());
+            // entityManager.AddComponent<LineColorComponent>(background, Color::Magenta(150));
             return background;
         }
 
@@ -57,7 +58,7 @@ namespace Asteroids {
             entityManager.AddComponent<PositionComponent>(rectangle);
             entityManager.AddComponent<SizeComponent>(rectangle, Size(100, 100));
             entityManager.AddComponent<RectangleComponent>(rectangle);
-            entityManager.AddComponent<FillColorComponent>(rectangle, Color::Red());
+            entityManager.AddComponent<FillColorComponent>(rectangle, Color::Red(50));
             return rectangle;
         }
 
@@ -66,7 +67,7 @@ namespace Asteroids {
             entityManager.AddComponent<PositionComponent>(rectangle, _size.width() - 100, 0);
             entityManager.AddComponent<SizeComponent>(rectangle, Size(100, 100));
             entityManager.AddComponent<RectangleComponent>(rectangle);
-            entityManager.AddComponent<FillColorComponent>(rectangle, Color::Green());
+            entityManager.AddComponent<FillColorComponent>(rectangle, Color::Green(50));
             return rectangle;
         }
 
@@ -75,7 +76,7 @@ namespace Asteroids {
             entityManager.AddComponent<PositionComponent>(rectangle, 0, _size.height() - 100);
             entityManager.AddComponent<SizeComponent>(rectangle, Size(100, 100));
             entityManager.AddComponent<RectangleComponent>(rectangle);
-            entityManager.AddComponent<FillColorComponent>(rectangle, Color::Blue());
+            entityManager.AddComponent<FillColorComponent>(rectangle, Color::Blue(50));
             return rectangle;
         }
 
@@ -84,7 +85,7 @@ namespace Asteroids {
             entityManager.AddComponent<PositionComponent>(rectangle, _size.width() - 100, _size.height() - 100);
             entityManager.AddComponent<SizeComponent>(rectangle, Size(100, 100));
             entityManager.AddComponent<RectangleComponent>(rectangle);
-            entityManager.AddComponent<FillColorComponent>(rectangle, Color::Yellow());
+            entityManager.AddComponent<FillColorComponent>(rectangle, Color::Yellow(50));
             return rectangle;
         }
 
@@ -95,6 +96,10 @@ namespace Asteroids {
             entityManager.AddComponent<RotationComponent>(ship);
             entityManager.AddComponent<ImageComponent>(ship, ":/ship.png");
             return ship;
+        }
+
+        Entity CreateShipPropulsion(LocalEntityManager& entityManager) {
+            // ...
         }
 
         // TODO: load components from filesystem

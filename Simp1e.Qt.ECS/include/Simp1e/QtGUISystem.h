@@ -29,6 +29,7 @@
 #include <Simp1e/ToQSize.h>
 #include <_Log_.h>
 
+#include <QImageReader>
 #include <QLabel>
 #include <QMenuBar>
 #include <QScrollBar>
@@ -44,6 +45,11 @@
 #include "QtPositionComponentUpdateHandler.h"
 #include "QtRectangleComponentPainter.h"
 #include "QtSizeComponentUpdateHandler.h"
+
+//
+#include <QGraphicsPixmapItem>
+#include <QGraphicsSvgItem>
+#include <QtSvg/QSvgRenderer>
 
 namespace Simp1e {
 
@@ -145,11 +151,26 @@ namespace Simp1e {
                 auto  size  = canvasComponent->GetSize();
                 if (!size.IsNull()) scene->setSceneRect(ToQRect(size));
                 view->setScene(scene);
+                //
                 view->move(0, 0);
                 view->horizontalScrollBar()->setValue(0);
+                view->verticalScrollBar()->setValue(0);
+                //
                 layout->addWidget(view);
                 // Save for graphical components to render on: (kinda gross, clean this up...)
                 _canvasScene = scene;
+
+                // Add something to the canvas...
+                // QGraphicsPixmapItem* item = new QGraphicsPixmapItem(
+                // QPixmap("C:/Code/mrowrpurr/StockImages/shutterstock_1498801328 - medium quality.jpg")
+                // );
+                // _canvasScene->addItem(item);
+
+                auto* svgItem = new QGraphicsSvgItem(
+                    "C:/Code/mrowrpurr/StockImages/shutterstock_343715348 - without background2.svg"
+                );
+                svgItem->setScale(3.0);
+                _canvasScene->addItem(svgItem);
             }
         }
 
@@ -205,6 +226,8 @@ namespace Simp1e {
         DEFINE_SYSTEM_TYPE("QtGUI")
 
         QtGuiSystem(IEngine* engine) : _engine(engine) {
+            QImageReader::setAllocationLimit(0);
+
             _entityPaintFunctionPointer = new_function_pointer(this, &QtGuiSystem::OnPaintGraphicsItem);
             auto* entityEvents          = entityManager()->GetEventManager();
             entityEvents->RegisterForComponentAdded<IWindowComponent>({this, &QtGuiSystem::OnWindowAdded});
