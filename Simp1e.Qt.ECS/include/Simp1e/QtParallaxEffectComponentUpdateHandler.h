@@ -2,6 +2,7 @@
 
 #include <Simp1e/ComponentCast.h>
 #include <Simp1e/IParallaxEffectComponent.h>
+#include <Simp1e/ISizeComponent.h>
 #include <_Log_.h>
 
 #include "IQtComponentUpdateHandler.h"
@@ -14,6 +15,12 @@ namespace Simp1e {
         void Update(IEngine* engine, Entity entity, void* component) override {
             auto* parallaxEffectComponent = component_cast<IParallaxEffectComponent>(component);
             if (!parallaxEffectComponent->IsDirty()) return;
+
+            auto* size = engine->GetEntities()->GetComponent<ISizeComponent>(entity);
+            if (!size) {
+                _Log_("QtParallaxEffectComponentUpdateHandler::Update: Size component is not found!");
+                return;
+            }
 
             _Log_("Parallax changed!");
 
@@ -28,19 +35,24 @@ namespace Simp1e {
                 return;
             }
 
-            SynchronizeEffectDataWithUI(parallaxEffectComponent, qtParallaxEffectComponent);
+            SynchronizeEffectDataWithUI(parallaxEffectComponent, qtParallaxEffectComponent, size->GetSize());
 
             parallaxEffectComponent->ClearDirty();
         }
 
         void SynchronizeEffectDataWithUI(
-            IParallaxEffectComponent* parallaxEffectComponent, QtParallaxEffectComponent* qtParallaxEffectComponent
+            IParallaxEffectComponent* parallaxEffectComponent, QtParallaxEffectComponent* qtParallaxEffectComponent,
+            const Size& size
         ) {
             auto targetPerspectivePosition = parallaxEffectComponent->GetTargetPerspectivePosition();
-            parallaxEffectComponent->ForEachLayer(
-                new_function_pointer([qtParallaxEffectComponent, targetPerspectivePosition](IParallaxEffectLayer* layer
-                                     ) { qtParallaxEffectComponent->ConfigureLayer(layer, targetPerspectivePosition); })
-            );
+            int  index                     = 0;
+            parallaxEffectComponent->ForEachLayer(new_function_pointer(
+                [&index, size, qtParallaxEffectComponent, targetPerspectivePosition](IParallaxEffectLayer* layer) {
+                    qtParallaxEffectComponent->ConfigureLayer(index, size, targetPerspectivePosition, layer);
+
+                    index++;
+                }
+            ));
         }
     };
 }

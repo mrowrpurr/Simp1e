@@ -28,7 +28,7 @@ namespace Asteroids {
     class Game {
         LocalEngine _engine;
         QtEngine    _qtEngine{&_engine};
-        Size        _viewportSize{2840, 2160};
+        Size        _viewportSize{3840, 2160};
 
     public:
         Entity CreateWindowEntity(LocalEntityManager& entityManager) {
@@ -45,7 +45,8 @@ namespace Asteroids {
 
         Entity CreateParallaxEffect(LocalEntityManager& entityManager) {
             auto parallaxEffect = entityManager.CreateEntity();
-            auto parallax       = entityManager.AddComponent<ParallaxEffectComponent>(parallaxEffect);
+            entityManager.AddComponent<SizeComponent>(parallaxEffect, _viewportSize);
+            auto parallax = entityManager.AddComponent<ParallaxEffectComponent>(parallaxEffect);
             parallax->AddLayer("Layer1", "C:/Code/mrowrpurr/StockImages/shutterstock_1921487843.svg", 0.5, 1.0, 0.3);
             parallax->AddLayer(
                 "Layer2", "C:/Code/mrowrpurr/StockImages/shutterstock_579041497 - without background.svg", 1.0, 4.0, 0.5

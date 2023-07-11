@@ -35,5 +35,16 @@ namespace Simp1e {
 
         std::string ToString() const { return string_format("Position({}, {}, {})", x(), y(), z()); }
         operator std::string() const { return ToString(); }
+
+        // Addition operator
+        Position operator+(const Position& other) const {
+            return Position(x() + other.x(), y() + other.y(), z() + other.z());
+        }
+
+        // Multiplication operator
+        Position operator*(const Position& other) const {
+            return Position(x() * other.x(), y() * other.y(), z() * other.z());
+        }
+        Position operator*(sreal scalar) const { return Position(x() * scalar, y() * scalar, z() * scalar); }
     };
 }
