@@ -10,5 +10,4 @@ target_link_libraries(
     ${PROJECT_NAME}
     INTERFACE
     Simp1e.ECS.Core
-    Simp1e.ECS.Events.Common
 )

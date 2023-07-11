@@ -13,8 +13,8 @@ namespace Simp1e {
     struct IEventManager {
         virtual ~IEventManager() = default;
 
-        virtual void RegisterListener(const EventType& eventType, IFunctionPointer<void(EventPointer)>*) = 0;
-        virtual void UnregisterListener(IFunctionPointer<void(EventPointer)>*)                           = 0;
+        virtual void RegisterListener(const EventType& eventType, IFunctionPointer<void(EventPointer)>*)   = 0;
+        virtual void UnregisterListener(const EventType& eventType, IFunctionPointer<void(EventPointer)>*) = 0;
 
         virtual void RegisterGlobalListener(IFunctionPointer<void(EventPointer)>*)   = 0;
         virtual void UnregisterGlobalListener(IFunctionPointer<void(EventPointer)>*) = 0;

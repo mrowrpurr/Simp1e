@@ -10,7 +10,6 @@
 #include <Simp1e/IFillColorComponent.h>
 #include <Simp1e/IImageComponent.h>
 #include <Simp1e/ILabelComponent.h>
-#include <Simp1e/IOnClickComponent.h>
 #include <Simp1e/IParallaxEffectComponent.h>
 #include <Simp1e/IPositionComponent.h>
 #include <Simp1e/IRectangleComponent.h>
