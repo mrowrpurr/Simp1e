@@ -1,0 +1,5 @@
+target("Simp1e.ECS.Systems.Common")
+    set_kind("headeronly")
+    add_deps("Simp1e.ECS.Core")
+    add_includedirs("include", {public = true})
+    add_headerfiles("include/(**.h)")
