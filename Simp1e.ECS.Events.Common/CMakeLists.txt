@@ -1,4 +1,4 @@
-project(Simp1e.ECS.Systems.Common)
+project(Simp1e.ECS.Events.Common)
 
 add_library(${PROJECT_NAME} INTERFACE)
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -10,5 +10,4 @@ target_link_libraries(
     ${PROJECT_NAME}
     INTERFACE
     Simp1e.ECS.Core
-    Simp1e.ECS.Events.Common
 )

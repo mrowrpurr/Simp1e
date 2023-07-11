@@ -1,5 +1,5 @@
-target("Simp1e.ECS.Systems.Common")
+target("Simp1e.ECS.Events.Common")
     set_kind("headeronly")
-    add_deps("Simp1e.ECS.Core", "Simp1e.ECS.Events.Common")
+    add_deps("Simp1e.ECS.Core")
     add_includedirs("include", {public = true})
     add_headerfiles("include/(**.h)")

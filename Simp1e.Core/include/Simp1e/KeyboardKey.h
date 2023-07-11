@@ -116,11 +116,6 @@ namespace Simp1e {
         LeftSuper,
         RightSuper,
 
-        Menu,
-
-        ModifierShift,
-        ModifierCtrl,
-        ModifierAlt,
-        ModifierSuper
+        Menu
     };
 }
