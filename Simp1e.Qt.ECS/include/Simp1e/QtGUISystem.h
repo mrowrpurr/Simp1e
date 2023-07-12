@@ -30,6 +30,7 @@
 #include <_Log_.h>
 
 #include <QImageReader>
+#include <QKeyEvent>
 #include <QLabel>
 #include <QMenuBar>
 #include <QScrollBar>
@@ -157,6 +158,15 @@ namespace Simp1e {
 
                 // Save for graphical components to render on: (kinda gross, clean this up...)
                 _canvasScene = scene;
+
+                // Hack, let's listen for some events...
+                view->OnKeyPress(function_pointer([](QKeyEvent* event) {
+                    _Log_("-> OnKeyPress!");
+                    if (event->key() == Qt::Key_Up) _Log_("-> UP!");
+                    if (event->key() == Qt::Key_Down) _Log_("-> DOWN!");
+                    if (event->key() == Qt::Key_Left) _Log_("-> LEFT!");
+                    if (event->key() == Qt::Key_Right) _Log_("-> RIGHT!");
+                }));
             }
         }
 

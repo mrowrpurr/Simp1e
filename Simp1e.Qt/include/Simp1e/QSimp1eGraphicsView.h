@@ -1,17 +1,22 @@
 #pragma once
 
 #include <_Log_.h>
+#include <function_pointer.h>
 
 #include <QGraphicsView>
 #include <QScrollBar>
 #include <QWheelEvent>
+#include <memory>
 #include <optional>
+#include <unordered_set>
 
 namespace Simp1e {
 
     class QSimp1eGraphicsView : public QGraphicsView {
-        QPoint _lastPanPoint;
-        bool   _isPanning = false;
+        QPoint                                                                  _lastPanPoint;
+        bool                                                                    _isPanning = false;
+        std::unordered_set<std::unique_ptr<IFunctionPointer<void(QKeyEvent*)>>> _keyPressListeners;
+        std::unordered_set<std::unique_ptr<IFunctionPointer<void(QKeyEvent*)>>> _keyReleaseListeners;
 
     public:
         QSimp1eGraphicsView(QWidget* parent = nullptr) : QGraphicsView(parent) {
@@ -31,6 +36,28 @@ namespace Simp1e {
             setTransform(QTransform::fromScale(scaleFactor, scaleFactor));
         }
 
+        void OnKeyPress(IFunctionPointer<void(QKeyEvent*)>* callback) {
+            _keyPressListeners.insert(std::unique_ptr<IFunctionPointer<void(QKeyEvent*)>>(callback));
+        }
+
+        void OnKeyRelease(IFunctionPointer<void(QKeyEvent*)>* callback) {
+            _keyReleaseListeners.insert(std::unique_ptr<IFunctionPointer<void(QKeyEvent*)>>(callback));
+        }
+
+        void OnKeyPress(FunctionPointer<void(QKeyEvent*)> callback) {
+            callback.do_not_destroy_function_pointer();
+            _keyPressListeners.insert(
+                std::unique_ptr<IFunctionPointer<void(QKeyEvent*)>>(callback.inner_function_pointer())
+            );
+        }
+
+        void OnKeyRelease(FunctionPointer<void(QKeyEvent*)> callback) {
+            callback.do_not_destroy_function_pointer();
+            _keyReleaseListeners.insert(
+                std::unique_ptr<IFunctionPointer<void(QKeyEvent*)>>(callback.inner_function_pointer())
+            );
+        }
+
     protected:
         void resizeEvent(QResizeEvent* event) override {
             // _Log_("RESIZE");
@@ -41,6 +68,14 @@ namespace Simp1e {
             //     {static_cast<sreal>(event->size().width()), static_cast<sreal>(event->size().height())}
             // });
             // for (auto item : scene()->items()) item->update();
+        }
+
+        void keyPressEvent(QKeyEvent* event) override {
+            for (auto& listener : _keyPressListeners) listener->invoke(event);
+        }
+
+        void keyReleaseEvent(QKeyEvent* event) override {
+            for (auto& listener : _keyReleaseListeners) listener->invoke(event);
         }
 
         void wheelEvent(QWheelEvent* event) override {
