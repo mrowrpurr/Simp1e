@@ -22,5 +22,10 @@ namespace Simp1e {
         virtual void SetY(sreal y) { SetTwo(y); }
 
         virtual bool operator==(const Point& other) const { return one() == other.one() && two() == other.two(); }
+
+        virtual Point operator+(const Point& other) const { return Point(one() + other.one(), two() + other.two()); }
+        virtual Point operator-(const Point& other) const { return Point(one() - other.one(), two() - other.two()); }
+        virtual Point operator*(const Point& other) const { return Point(one() * other.one(), two() * other.two()); }
+        virtual Point operator/(const Point& other) const { return Point(one() / other.one(), two() / other.two()); }
     };
 }

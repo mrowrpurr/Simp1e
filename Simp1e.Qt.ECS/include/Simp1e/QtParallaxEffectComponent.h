@@ -2,119 +2,163 @@
 
 #include <Simp1e/DefineComponentType.h>
 #include <Simp1e/IParallaxEffectComponent.h>
+#include <Simp1e/PositionHashKeySupport.h>
+#include <Simp1e/Rectangle.h>
 #include <Simp1e/Size.h>
 #include <Simp1e/ToQPointF.h>
 #include <_Log_.h>
 
 #include <QGraphicsPixmapItem>
 #include <QGraphicsScene>
+#include <QPixmap>
+#include <memory>
+#include <string>
 #include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
 namespace Simp1e {
 
     class QtParallaxEffectComponent {
         QGraphicsScene* _scene;
 
-        struct TileData {
-            QGraphicsPixmapItem* item;
-            Position             position;  // The tile's position in the world
+        struct LayerTile {
+            Position                             position;
+            std::unique_ptr<QGraphicsPixmapItem> pixmapItem;
+
+            LayerTile(const Position& position, QPixmap& pixmap, IParallaxEffectLayer* layer) : position(position) {
+                pixmapItem = std::make_unique<QGraphicsPixmapItem>(pixmap);
+                pixmapItem->setPos(ToQPointF(position));
+                pixmapItem->setZValue(-100);  // TODO: get the index!
+                pixmapItem->setOpacity(layer->opacity());
+            }
+
+            ~LayerTile() {
+                if (pixmapItem) pixmapItem->scene()->removeItem(pixmapItem.get());
+            }
         };
 
-        // This map associates each layer with its set of tiles
-        std::unordered_map<IParallaxEffectLayer*, std::vector<TileData>> layerToTiles;
+        struct LayerInfo {
+            QPixmap     pixmap;
+            Position    lastPosition;
+            std::string lastImageName;  // TODO: Use this to detect when to update the pixmap
+            std::vector<std::unique_ptr<LayerTile>> tiles;
+            std::unordered_set<Position>            tilesPositions;
+        };
+
+        std::unordered_map<std::string, LayerInfo> _layerInfo;
+
+        LayerInfo& _getLayerInfo(IParallaxEffectLayer* layer) {
+            auto found = _layerInfo.find(layer->layerName());
+            if (found != _layerInfo.end()) return found->second;
+            auto& layerInfo  = _layerInfo[layer->layerName()];
+            layerInfo.pixmap = QPixmap(layer->imagePath());
+            if (layer->scale() != 1.0)
+                layerInfo.pixmap = layerInfo.pixmap.scaled(
+                    layerInfo.pixmap.width() * layer->scale(), layerInfo.pixmap.height() * layer->scale()
+                );
+            return layerInfo;
+        }
+
+        void _findOrCreateTile(const Position& desiredPosition, LayerInfo& layerInfo, IParallaxEffectLayer* layer) {
+            for (auto& tile : layerInfo.tiles)
+                if (tile->position == desiredPosition) return;
+            auto& tile =
+                layerInfo.tiles.emplace_back(std::make_unique<LayerTile>(desiredPosition, layerInfo.pixmap, layer));
+            _scene->addItem(tile->pixmapItem.get());
+            layerInfo.tilesPositions.insert(desiredPosition);
+        }
+
+        void _updateAllTilePositions(const Position& positionDelta, LayerInfo& layerInfo) {
+            for (auto& tile : layerInfo.tiles) {
+                layerInfo.tilesPositions.erase(tile->position);
+                tile->position.SetX(tile->position.x() + positionDelta.x());
+                tile->position.SetY(tile->position.y() + positionDelta.y());
+                tile->pixmapItem->setPos(ToQPointF(tile->position));
+                layerInfo.tilesPositions.insert(tile->position);
+            }
+        }
+
+        void _addTilesToFillViewport(
+            const Position& desiredPosition, const Rectangle& viewport, LayerInfo& layerInfo,
+            IParallaxEffectLayer* layer
+        ) {
+            if (layerInfo.tilesPositions.find(desiredPosition) != layerInfo.tilesPositions.end()) return;
+
+            Rectangle desiredRect(desiredPosition, Size(layerInfo.pixmap.width(), layerInfo.pixmap.height()));
+            if (!viewport.intersects(desiredRect)) return;
+
+            _Log_("----");
+            _Log_("ADDING. Currently there are {} tiles", layerInfo.tiles.size());
+            for (auto& tile : layerInfo.tiles) {
+                Rectangle tileRect(tile->position, Size(layerInfo.pixmap.width(), layerInfo.pixmap.height()));
+                _Log_("Tile:{}", tileRect.ToString());
+            }
+            for (auto& position : layerInfo.tilesPositions) _Log_("KNOWN TilePosition:{}", position.ToString());
+            _Log_("----");
+
+            _Log_(
+                "Adding! Apparently Desired Rect {} intersects the viewport {}", desiredRect.ToString(),
+                viewport.ToString()
+            );
+
+            _findOrCreateTile(desiredPosition, layerInfo, layer);
+
+            _addTilesToFillViewport(
+                Position(desiredPosition.x(), desiredPosition.y() - layerInfo.pixmap.height()), viewport, layerInfo,
+                layer
+            );
+            _addTilesToFillViewport(
+                Position(desiredPosition.x(), desiredPosition.y() + layerInfo.pixmap.height()), viewport, layerInfo,
+                layer
+            );
+            _addTilesToFillViewport(
+                Position(desiredPosition.x() - layerInfo.pixmap.width(), desiredPosition.y()), viewport, layerInfo,
+                layer
+            );
+            _addTilesToFillViewport(
+                Position(desiredPosition.x() + layerInfo.pixmap.width(), desiredPosition.y()), viewport, layerInfo,
+                layer
+            );
+        }
+
+        void _removeTilesOutsideOfViewport(const Rectangle& viewport, LayerInfo& layerInfo) {
+            for (auto it = layerInfo.tiles.begin(); it != layerInfo.tiles.end();) {
+                Rectangle tileRect((*it)->position, Size(layerInfo.pixmap.width(), layerInfo.pixmap.height()));
+                _Log_("Should we remove? TileRect:{} Viewport:{}", tileRect.ToString(), viewport.ToString());
+                if (!viewport.intersects(tileRect)) {
+                    _Log_("Removing Tile:{}", (*it)->position.ToString());
+                    it = layerInfo.tiles.erase(it);
+                    layerInfo.tilesPositions.erase((*it)->position);
+                } else ++it;
+            }
+        }
 
     public:
         DEFINE_COMPONENT_TYPE("QtParallaxEffect")
 
         QtParallaxEffectComponent(QGraphicsScene* scene) : _scene(scene) {}
 
-        // Index is the index of the layer, e.g. 0, 1, 2... I'm using it for z-index
-        // Size is the size of the viewport
-        // The IParallaxEffectLayer is the layer data which includes: name, path, speed, scale, opacity
-        // viewportTopLeft is the current position of the top left of the perspective
-        //
-        // This function is called every frame (if the player moved) and is responsible for updating the
-        // position of the layer items. It's also responsible for creating the layer items if they don't
-        // exist yet.
-        //
-        // The QGraphicsScene is available in the _scene member variable.
         void ConfigureLayer(
             int index, const Size& viewportSize, const Position& viewportTopLeft, IParallaxEffectLayer* layer
         ) {
-            // TODO add some logic
-
-            // Just make an item for now to see SOMETHING ...
-            // The following code just adds this layer to the scene so we can see it.
-            // auto* item = new QGraphicsPixmapItem(QPixmap(layer->imagePath()));
-            // if (layer->opacity() != 1.0) item->setOpacity(layer->opacity());
-            // if (layer->scale() != 1.0) item->setScale(layer->scale());
-            // item->setZValue(-100 + index);
-            // item->setPos({-500, -500});
-            // _Log_(
-            //     "LAYER {} width:{} height:{}", layer->layerName(), item->boundingRect().width(),
-            //     item->boundingRect().height()
-            // );
-            // _scene->addItem(item);
-            ///
-
-            // Calculate the size of the tiles
-            QPixmap pixmap(layer->imagePath());
-            QSize   tileSize = pixmap.size() * layer->scale();
-
-            // Calculate the number of tiles required to cover the viewport in each dimension
-            int numTilesX = viewportSize.width() / tileSize.width() + 2;    // +2 for the buffer tiles
-            int numTilesY = viewportSize.height() / tileSize.height() + 2;  // +2 for the buffer tiles
-
-            // Calculate the start position for the tile grid. This position will always be at the top left of the
-            // viewport. We offset the position based on the layer's speed to create the parallax effect.
-            Position startPos = viewportTopLeft * layer->speed();
-            startPos.SetX(std::floor(startPos.x() / tileSize.width()) * tileSize.width());
-            startPos.SetY(std::floor(startPos.y() / tileSize.height()) * tileSize.height());
-
-            // Fetch the existing tiles for this layer
-            std::vector<TileData>& tiles = layerToTiles[layer];
-
-            // Remove tiles that are outside the new grid
-            tiles.erase(
-                std::remove_if(
-                    tiles.begin(), tiles.end(),
-                    [&](const TileData& tile) {
-                        qreal distX = std::abs(tile.position.x() - viewportTopLeft.x());
-                        qreal distY = std::abs(tile.position.y() - viewportTopLeft.y());
-                        return distX > numTilesX * tileSize.width() || distY > numTilesY * tileSize.height();
-                    }
-                ),
-                tiles.end()
+            Rectangle viewport(viewportTopLeft, viewportSize);
+            auto&     layerInfo = _getLayerInfo(layer);
+            Position  positionDelta(
+                (viewportTopLeft.x() - layerInfo.lastPosition.x()) * layer->speed(),
+                (viewportTopLeft.y() - layerInfo.lastPosition.y()) * layer->speed()
             );
+            layerInfo.lastPosition = viewportTopLeft;
 
-            // Create the new grid of tiles
-            for (int i = 0; i < numTilesX; ++i) {
-                for (int j = 0; j < numTilesY; ++j) {
-                    Position tilePos =
-                        startPos +
-                        Position{static_cast<sreal>(i * tileSize.width()), static_cast<sreal>(j * tileSize.height())};
+            _Log_("CONFIGURE LAYER - there are currently {} tiles", layerInfo.tiles.size());
 
-                    // Check if a tile already exists at this position
-                    auto it = std::find_if(tiles.begin(), tiles.end(), [&](const TileData& tile) {
-                        return tile.position == tilePos;
-                    });
+            _updateAllTilePositions(positionDelta, layerInfo);
 
-                    if (it != tiles.end()) {
-                        // A tile already exists at this position, so just move it
-                        it->item->setPos(ToQPointF(tilePos.ToPoint()));
-                    } else {
-                        // No tile exists at this position, so create a new one
-                        auto* item = new QGraphicsPixmapItem(pixmap);
-                        item->setPos(ToQPointF(tilePos.ToPoint()));
-                        item->setScale(layer->scale());
-                        item->setOpacity(layer->opacity());
-                        item->setZValue(-100 + index);
-                        _scene->addItem(item);
+            // Must be done after updating tile positions
+            auto startingPosition = layerInfo.tiles.empty() ? viewportTopLeft : layerInfo.tiles.front()->position;
 
-                        tiles.push_back({item, tilePos});
-                    }
-                }
-            }
+            _addTilesToFillViewport(startingPosition, viewport, layerInfo, layer);
+            // _removeTilesOutsideOfViewport(viewport, layerInfo);
         }
     };
 }

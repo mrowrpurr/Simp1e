@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 namespace Simp1e {
 
     template <typename T>
@@ -11,6 +13,14 @@ namespace Simp1e {
         struct Params {
             T one;
             T two;
+        };
+
+        struct Hash {
+            size_t operator()(const Vec2& vec) const { return std::hash<T>()(vec.one()) ^ std::hash<T>()(vec.two()); }
+        };
+
+        struct Equal {
+            bool operator()(const Vec2& left, const Vec2& right) const { return left == right; }
         };
 
         Vec2() = default;

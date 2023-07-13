@@ -15,6 +15,16 @@ namespace Simp1e {
             sreal z;
         };
 
+        struct Hash {
+            size_t operator()(const Position& vec) const {
+                return std::hash<sreal>()(vec.x()) ^ std::hash<sreal>()(vec.y()) ^ std::hash<sreal>()(vec.z());
+            }
+        };
+
+        struct Equal {
+            bool operator()(const Position& left, const Position& right) const { return left == right; }
+        };
+
         Position() = default;
         Position(sreal x, sreal y, sreal z = 0) : Vec3(x, y, z) {}
         Position(const Params& params) : Vec3(params.x, params.y, params.z) {}
@@ -33,18 +43,18 @@ namespace Simp1e {
             return x() == other.x() && y() == other.y() && z() == other.z();
         }
 
-        std::string ToString() const { return string_format("Position({}, {}, {})", x(), y(), z()); }
+        std::string ToString() const { return string_format("Position({:.2f}, {:.2f}, {:.2f})", x(), y(), z()); }
         operator std::string() const { return ToString(); }
 
-        // Addition operator
         Position operator+(const Position& other) const {
-            return Position(x() + other.x(), y() + other.y(), z() + other.z());
+            return Position(one() + other.one(), two() + other.two(), three() + other.three());
         }
-
-        // Multiplication operator
+        Position operator-(const Position& other) const {
+            return Position(one() - other.one(), two() - other.two(), three() - other.three());
+        }
         Position operator*(const Position& other) const {
-            return Position(x() * other.x(), y() * other.y(), z() * other.z());
+            return Position(one() * other.one(), two() * other.two(), three() * other.three());
         }
-        Position operator*(sreal scalar) const { return Position(x() * scalar, y() * scalar, z() * scalar); }
+        Position operator*(sreal scalar) const { return Position(one() * scalar, two() * scalar, three() * scalar); }
     };
 }

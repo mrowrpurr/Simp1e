@@ -5,6 +5,7 @@
 #include <Simp1e/ComponentTypeFromType.h>
 #include <Simp1e/ComponentTypeHashKey.h>
 #include <Simp1e/DefineSystemType.h>
+#include <Simp1e/Direction.h>
 #include <Simp1e/ICanvasComponent.h>
 #include <Simp1e/IEngine.h>
 #include <Simp1e/IFillColorComponent.h>
@@ -37,6 +38,7 @@
 #include <QStatusBar>
 #include <memory>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "IQtComponentPainter.h"
@@ -61,7 +63,11 @@ namespace Simp1e {
 
         std::unordered_map<ComponentTypeHashKey, std::unique_ptr<IQtComponentUpdateHandler>> _componentUpdateHandlers;
 
+        // TODO: these are hacks. They shouldn't be fields like this.
         QSimp1eGraphicsScene* _canvasScene;
+        QSimp1eGraphicsView*  _canvasView;
+
+        std::unordered_set<std::unique_ptr<IFunctionPointer<void(QKeyEvent*)>>> _keyPressListeners;
 
         IEntityManager* entityManager() const { return _engine->GetEntities(); }
 
@@ -158,15 +164,7 @@ namespace Simp1e {
 
                 // Save for graphical components to render on: (kinda gross, clean this up...)
                 _canvasScene = scene;
-
-                // Hack, let's listen for some events...
-                view->OnKeyPress(function_pointer([](QKeyEvent* event) {
-                    _Log_("-> OnKeyPress!");
-                    if (event->key() == Qt::Key_Up) _Log_("-> UP!");
-                    if (event->key() == Qt::Key_Down) _Log_("-> DOWN!");
-                    if (event->key() == Qt::Key_Left) _Log_("-> LEFT!");
-                    if (event->key() == Qt::Key_Right) _Log_("-> RIGHT!");
-                }));
+                _canvasView  = view;
             }
         }
 
@@ -281,6 +279,10 @@ namespace Simp1e {
             RegisterComponentUpdateHandler(
                 ComponentTypeFromType<TComponent>(), new TComponentUpdater(std::forward<TArgs>(args)...)
             );
+        }
+
+        void OnKeyPress(IFunctionPointer<void(QKeyEvent*)>* functionPointer) {
+            if (_canvasView) _canvasView->OnKeyPress(functionPointer);
         }
 
         void Update(IEngine* engine, double deltaTime) {

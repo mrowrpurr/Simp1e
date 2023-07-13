@@ -9,10 +9,10 @@ namespace Simp1e {
     class ParallaxEffectLayer : public IParallaxEffectLayer {
         std::string _layerName;
         std::string _imagePath;
-        sreal       _speed;
-        sreal       _scale;
-        sreal       _opacity;
-        bool        _enabled;
+        sreal       _speed   = 1.0;
+        sreal       _scale   = 1.0;
+        sreal       _opacity = 1.0;
+        bool        _enabled = true;
 
     public:
         ParallaxEffectLayer() = default;

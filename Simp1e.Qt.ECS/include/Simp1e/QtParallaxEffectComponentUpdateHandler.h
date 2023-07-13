@@ -16,13 +16,13 @@ namespace Simp1e {
             auto* parallaxEffectComponent = component_cast<IParallaxEffectComponent>(component);
             if (!parallaxEffectComponent->IsDirty()) return;
 
+            _Log_("UPDATE PARALLAX BACKGROUND");
+
             auto* size = engine->GetEntities()->GetComponent<ISizeComponent>(entity);
             if (!size) {
                 _Log_("QtParallaxEffectComponentUpdateHandler::Update: Size component is not found!");
                 return;
             }
-
-            _Log_("Parallax changed!");
 
             if (!parallaxEffectComponent) {
                 _Log_("QtParallaxEffectComponentUpdateHandler::Update: Component is not a IParallaxEffectComponent!");
@@ -38,6 +38,8 @@ namespace Simp1e {
             SynchronizeEffectDataWithUI(parallaxEffectComponent, qtParallaxEffectComponent, size->GetSize());
 
             parallaxEffectComponent->ClearDirty();
+
+            _Log_("Parallax changed!");
         }
 
         void SynchronizeEffectDataWithUI(

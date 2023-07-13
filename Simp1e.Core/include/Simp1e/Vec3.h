@@ -17,6 +17,16 @@ namespace Simp1e {
             T three;
         };
 
+        struct Hash {
+            size_t operator()(const Vec3& vec) const {
+                return std::hash<T>()(vec.one()) ^ std::hash<T>()(vec.two()) ^ std::hash<T>()(vec.three());
+            }
+        };
+
+        struct Equal {
+            bool operator()(const Vec3& left, const Vec3& right) const { return left == right; }
+        };
+
         Vec3() = default;
         Vec3(T one, T two, T three) : Vec2<T>(one, two), _three(three) {}
         Vec3(const Params& params) : Vec2<T>(params.one, params.two), _three(params.three) {}
@@ -32,5 +42,16 @@ namespace Simp1e {
         virtual bool operator==(const Vec3& other) const {
             return Vec2<T>::operator==(other) && _three == other._three;
         }
+
+        Vec3 operator+(const Vec3& other) const {
+            return Vec3(one() + other.one(), two() + other.two(), three() + other.three());
+        }
+        Vec3 operator-(const Vec3& other) const {
+            return Vec3(one() - other.one(), two() - other.two(), three() - other.three());
+        }
+        Vec3 operator*(const Vec3& other) const {
+            return Vec3(one() * other.one(), two() * other.two(), three() * other.three());
+        }
+        Vec3 operator*(T scalar) const { return Vec3(one() * scalar, two() * scalar, three() * scalar); }
     };
 }

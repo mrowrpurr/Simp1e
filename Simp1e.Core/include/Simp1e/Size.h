@@ -22,5 +22,10 @@ namespace Simp1e {
         virtual void SetHeight(sreal height) { SetTwo(height); }
 
         virtual bool IsNull() const { return width() == 0 && height() == 0; }
+
+        Size operator+(const Size& other) const { return Size(width() + other.width(), height() + other.height()); }
+        Size operator-(const Size& other) const { return Size(width() - other.width(), height() - other.height()); }
+        Size operator*(const Size& other) const { return Size(width() * other.width(), height() * other.height()); }
+        Size operator*(sreal scalar) const { return Size(width() * scalar, height() * scalar); }
     };
 }

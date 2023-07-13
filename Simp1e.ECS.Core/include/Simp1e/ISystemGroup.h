@@ -23,6 +23,14 @@ namespace Simp1e {
         virtual bool          RemoveSystem(SystemType systemType)     = 0;
         virtual bool          HasSystem(SystemType systemType)        = 0;
 
+        template <typename T>
+        SystemPointer AddSystemPointer(T* system) {
+            return AddSystemPointer(
+                SystemTypeFromType<T>(), new VoidPointer(system),
+                new_function_pointer([system](IEngine* engine, double timeDelta) { system->Update(engine, timeDelta); })
+            );
+        }
+
         template <typename T, typename... Args>
         T* AddSystem(Args&&... args) {
             auto* system               = new T(std::forward<Args>(args)...);
