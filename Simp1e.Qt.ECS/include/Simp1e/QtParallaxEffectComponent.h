@@ -66,14 +66,18 @@ namespace Simp1e {
             return false;
         }
 
-        void _findOrCreateTile(const Position& desiredPosition, LayerInfo& layerInfo, IParallaxEffectLayer* layer) {
+        void _findOrCreateTile(
+            const Position& desiredPosition, LayerInfo& layerInfo, IParallaxEffectLayer* layer,
+            const Rectangle& viewport
+        ) {
             if (_checkedPositionsForAddingTiles.find(desiredPosition) != _checkedPositionsForAddingTiles.end()) return;
             _checkedPositionsForAddingTiles.insert(desiredPosition);
 
             Rectangle desiredRect(desiredPosition, Size(layerInfo.pixmap.width(), layerInfo.pixmap.height()));
+            if (!viewport.intersects(desiredRect) && !viewport.contains(desiredRect)) return;
             if (_tileIntersectsAnyExistingLayer(desiredRect, layerInfo)) return;
 
-            _Log_("ADD {}", desiredRect.ToString());
+            _Log_("ADD Tile {}", desiredRect.ToString());
 
             auto& tile =
                 layerInfo.tiles.emplace_back(std::make_unique<LayerTile>(desiredRect, layerInfo.pixmap, layer));
@@ -88,32 +92,32 @@ namespace Simp1e {
         }
 
         void _addTilesToFillViewport(
-            const Position& desiredPosition, const Rectangle& viewport, LayerInfo& layerInfo,
-            IParallaxEffectLayer* layer
+            const Position& desiredPosition, const Rectangle& viewportToConsider, const Rectangle& realViewport,
+            LayerInfo& layerInfo, IParallaxEffectLayer* layer
         ) {
             if (_checkedPositionsForAddingTiles.find(desiredPosition) != _checkedPositionsForAddingTiles.end()) return;
-            // _Log_("_addTilesToFillViewport: {}", desiredPosition.ToString());
 
             Rectangle desiredRect(desiredPosition, Size(layerInfo.pixmap.width(), layerInfo.pixmap.height()));
-            if (!viewport.intersects(desiredRect)) return;
+            if (!realViewport.intersects(desiredRect) && !realViewport.contains(desiredRect))
+                return;  // It would be deleted!
 
-            _findOrCreateTile(desiredPosition, layerInfo, layer);
+            _findOrCreateTile(desiredPosition, layerInfo, layer, viewportToConsider);
 
             _addTilesToFillViewport(
-                Position(desiredPosition.x(), desiredPosition.y() - layerInfo.pixmap.height()), viewport, layerInfo,
-                layer
+                Position(desiredPosition.x(), desiredPosition.y() - layerInfo.pixmap.height()), viewportToConsider,
+                realViewport, layerInfo, layer
             );
             _addTilesToFillViewport(
-                Position(desiredPosition.x(), desiredPosition.y() + layerInfo.pixmap.height()), viewport, layerInfo,
-                layer
+                Position(desiredPosition.x(), desiredPosition.y() + layerInfo.pixmap.height()), viewportToConsider,
+                realViewport, layerInfo, layer
             );
             _addTilesToFillViewport(
-                Position(desiredPosition.x() - layerInfo.pixmap.width(), desiredPosition.y()), viewport, layerInfo,
-                layer
+                Position(desiredPosition.x() - layerInfo.pixmap.width(), desiredPosition.y()), viewportToConsider,
+                realViewport, layerInfo, layer
             );
             _addTilesToFillViewport(
-                Position(desiredPosition.x() + layerInfo.pixmap.width(), desiredPosition.y()), viewport, layerInfo,
-                layer
+                Position(desiredPosition.x() + layerInfo.pixmap.width(), desiredPosition.y()), viewportToConsider,
+                realViewport, layerInfo, layer
             );
         }
 
@@ -121,7 +125,8 @@ namespace Simp1e {
             for (auto it = layerInfo.tiles.begin(); it != layerInfo.tiles.end();) {
                 if (!viewport.intersects((*it)->rect) && !viewport.contains((*it)->rect)) {
                     _Log_(
-                        "REMOVE {} (because it doesn't intersect with {})", (*it)->rect.ToString(), viewport.ToString()
+                        "REMOVE Tile {} (because it doesn't intersect with {})", (*it)->rect.ToString(),
+                        viewport.ToString()
                     );
                     it = layerInfo.tiles.erase(it);
                 } else ++it;
@@ -162,12 +167,13 @@ namespace Simp1e {
 
             // Must be done after updating tile positions
             _checkedPositionsForAddingTiles.clear();
-            if (layerInfo.tiles.empty()) _findOrCreateTile(viewportTopLeft, layerInfo, layer);
+            if (layerInfo.tiles.empty())
+                _addTilesToFillViewport(viewportTopLeft, viewportWithPadding, viewport, layerInfo, layer);
 
             auto startingPosition = layerInfo.tiles.front()->rect.topLeft();
 
             _Log_("Add Tiles To Fill Viewport from starting position {}", startingPosition.ToString());
-            _addTilesToFillViewport(startingPosition, viewportWithPadding, layerInfo, layer);
+            _addTilesToFillViewport(startingPosition, viewportWithPadding, viewport, layerInfo, layer);
             _removeTilesOutsideOfViewport(viewport, layerInfo);
 
             _Log_("CONFIGURE LAYER - there are now {} tiles", layerInfo.tiles.size());
