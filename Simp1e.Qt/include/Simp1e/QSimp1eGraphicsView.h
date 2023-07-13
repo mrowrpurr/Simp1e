@@ -53,15 +53,15 @@ namespace Simp1e {
         void FitScreenToSystemHeight() {
             // FitScreenToSystemWidth();
             // FitSceneToViewHeight();
-            auto screenGeometry = QGuiApplication::primaryScreen()->geometry();
-            auto scaleFactor    = screenGeometry.height() / static_cast<qreal>(height());
-            setTransform(QTransform::fromScale(scaleFactor, scaleFactor));
+            // auto screenGeometry = QGuiApplication::primaryScreen()->geometry();
+            // auto scaleFactor    = screenGeometry.height() / static_cast<qreal>(height());
+            // setTransform(QTransform::fromScale(scaleFactor, scaleFactor));
         }
 
         void FitScreenToSystemWidth() {
-            auto screenGeometry = QGuiApplication::primaryScreen()->geometry();
-            auto scaleFactor    = screenGeometry.width() / static_cast<qreal>(width());
-            setTransform(QTransform::fromScale(scaleFactor, scaleFactor));
+            // auto screenGeometry = QGuiApplication::primaryScreen()->geometry();
+            // auto scaleFactor    = screenGeometry.width() / static_cast<qreal>(width());
+            // setTransform(QTransform::fromScale(scaleFactor, scaleFactor));
         }
 
         void FitSceneToViewHeight() {
@@ -107,8 +107,8 @@ namespace Simp1e {
     protected:
         void resizeEvent(QResizeEvent* event) override {
             // _Log_("RESIZE");
-            // FitSceneToViewHeight();
-            FitScreenToSystemHeight();
+            FitSceneToViewHeight();
+            // FitScreenToSystemHeight();
             for (auto& listener : _resizeListeners) listener->invoke();
             // auto topLeft = mapToScene(0, 0);
             // _eventManager.Emit<ResizeEvent>({

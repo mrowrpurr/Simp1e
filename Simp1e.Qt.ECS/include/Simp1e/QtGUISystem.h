@@ -160,8 +160,8 @@ namespace Simp1e {
                 view->horizontalScrollBar()->setValue(0);
                 view->verticalScrollBar()->setValue(0);
                 //
-                // view->FitSceneToViewHeight();
-                view->FitScreenToSystemHeight();
+                view->FitSceneToViewHeight();
+                // view->FitScreenToSystemHeight();
                 //
                 layout->addWidget(view);
 
@@ -190,12 +190,12 @@ namespace Simp1e {
             auto* rectangleComponent = component_cast<IRectangleComponent>(component);
         }
 
-        QGraphicsItem* theShip = nullptr;  // Cause there's only 1 image right now
+        // QGraphicsItem* theShip = nullptr;  // Cause there's only 1 image right now
 
         void OnImageAdded(Entity entity, ComponentType componentType, void* component) {
             _Log_("-> ImageAdded");
             if (!_canvasScene) return;
-            theShip              = addGraphicsItem(entity)->GetQtSimp1eGraphicsItem();
+            addGraphicsItem(entity)->GetQtSimp1eGraphicsItem();
             auto* imageComponent = component_cast<IImageComponent>(component);
             auto* qImageComponent =
                 entityManager()->AddComponent<QtSimp1eImageComponent>(entity, imageComponent->GetImagePath());
@@ -305,17 +305,12 @@ namespace Simp1e {
         qreal _rotation = 0;
 
         void Rotate(double angle) {
-            _rotation -= angle;
-            if (_canvasView) _canvasView->rotate(_rotation);
+            // _rotation -= angle;
+            if (_canvasView) _canvasView->rotate(angle);
         }
 
-        void CenterOnTheShip() {
-            if (theShip && _canvasView) {
-                _Log_("CENTERING VIEW ON THE SHIP");
-                _canvasView->centerOn(theShip);
-            } else {
-                _Log_("No ship to center on");
-            }
+        void CenterOn(const Position& position) {
+            if (_canvasView) _canvasView->centerOn(ToQPointF(position));
         }
 
         void Update(IEngine* engine, double deltaTime) {

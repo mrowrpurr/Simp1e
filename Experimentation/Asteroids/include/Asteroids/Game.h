@@ -61,22 +61,19 @@ class MoveStuff {
         else if (direction == Direction::West) currentShipPosition.SetX(currentShipPosition.x() - 2);
 
         shipPosition->SetPosition(currentShipPosition);
-        parallaxBackground->SetTargetPerspectivePosition(Position(
-            (currentShipPosition.x() - _viewportSize.width() / 2),
-            (currentShipPosition.y() - _viewportSize.height() / 2)
-        ));
+        parallaxBackground->SetTargetPerspectivePosition(currentShipPosition);
+        // parallaxBackground->SetTargetPerspectivePosition(Position(
+        //     (currentShipPosition.x() - _viewportSize.width() / 2),
+        //     (currentShipPosition.y() - _viewportSize.height() / 2)
+        // ));
         viewportPreviewPosition->SetPosition(currentShipPosition);
-        if (_qtEnginePtr) _qtEnginePtr->GetQtGuiSystem()->CenterOnTheShip();
+        if (_qtEnginePtr) _qtEnginePtr->GetQtGuiSystem()->CenterOn(currentShipPosition);
     }
 
 public:
     DEFINE_SYSTEM_TYPE("MoveStuff")
 
     void Update(IEngine* engine, float deltaTime) {
-        if (_yReading != 0) {
-            if (_yReading <= -4.0 || _yReading >= 4.0) _qtEnginePtr->GetQtGuiSystem()->Rotate(_yReading / 5);
-            _yReading = 0;
-        }
         if (_sizeChanged) {
             _sizeChanged = false;
             // Parallax Background component
@@ -96,6 +93,10 @@ public:
         // if (_shipDirection == Direction::None) return;
         // Move(engine, _shipDirection);
         // _shipDirection = Direction::None;
+        if (_yReading != 0) {
+            if (_yReading <= -0.5 || _yReading >= 0.5) _qtEnginePtr->GetQtGuiSystem()->Rotate(_yReading * 2);
+            _yReading = 0;
+        }
     }
 };
 
@@ -122,7 +123,7 @@ namespace Asteroids {
 
         Entity CreateGameCanvas(Entity window, LocalEntityManager& entityManager) {
             auto canvas = entityManager.CreateEntity();
-            entityManager.AddComponent<CanvasComponent>(canvas, window);
+            entityManager.AddComponent<CanvasComponent>(canvas, window, _viewportSize.width(), _viewportSize.height());
             return canvas;
         }
 
@@ -167,7 +168,7 @@ namespace Asteroids {
 
         Entity CreateShip(LocalEntityManager& entityManager) {
             auto ship = entityManager.CreateEntity();
-            entityManager.AddComponent<SizeComponent>(ship, Size(100, 125));
+            entityManager.AddComponent<SizeComponent>(ship, Size(50, 75));
             entityManager.AddComponent<PositionComponent>(
                 ship, Point(_viewportSize.width() / 2, _viewportSize.height() / 2)
             );
@@ -201,7 +202,7 @@ namespace Asteroids {
             }));
             _qtEngine.GetQtGuiSystem()->OnViewportEvent(new_function_pointer([this](QEvent* event) {
                 _Log_("Viewport Event");
-                _qtEngine.GetQtGuiSystem()->CenterOnTheShip();
+                // _qtEngine.GetQtGuiSystem()->CenterOnTheShip();
                 switch (event->type()) {
                     case QEvent::TouchBegin:
                         _Log_("TOUCH BEGIN");
@@ -249,7 +250,7 @@ namespace Asteroids {
                 //
                 UpdateViewportSize();
                 _sizeChanged = true;
-                _qtEngine.GetQtGuiSystem()->CenterOnTheShip();
+                // _qtEngine.GetQtGuiSystem()->CenterOnTheShip();
             }));
         }
 
