@@ -4,30 +4,64 @@
 #include <function_pointer.h>
 
 #include <QGraphicsView>
+#include <QGuiApplication>
 #include <QScrollBar>
 #include <QWheelEvent>
 #include <memory>
 #include <optional>
 #include <unordered_set>
 
+//
+#include <QAccelerometer>
+#include <QSensorReading>
+
 namespace Simp1e {
 
     class QSimp1eGraphicsView : public QGraphicsView {
-        QPoint                                                                  _lastPanPoint;
-        bool                                                                    _isPanning = false;
-        std::unordered_set<std::unique_ptr<IFunctionPointer<void(QKeyEvent*)>>> _keyPressListeners;
-        std::unordered_set<std::unique_ptr<IFunctionPointer<void(QKeyEvent*)>>> _keyReleaseListeners;
+        QPoint                                                                              _lastPanPoint;
+        bool                                                                                _isPanning = false;
+        std::unordered_set<std::unique_ptr<IFunctionPointer<void(QKeyEvent*)>>>             _keyPressListeners;
+        std::unordered_set<std::unique_ptr<IFunctionPointer<void(QKeyEvent*)>>>             _keyReleaseListeners;
+        std::unordered_set<std::unique_ptr<IFunctionPointer<void(QEvent*)>>>                _viewportEventListeners;
+        std::unordered_set<std::unique_ptr<IFunctionPointer<void()>>>                       _resizeListeners;
+        QAccelerometer                                                                      accelerometer;
+        std::unordered_set<std::unique_ptr<IFunctionPointer<void(QAccelerometerReading*)>>> _accelerometerListeners;
+
+        void accelerometerReadingChanged() {
+            auto* reading = accelerometer.reading();
+            _Log_("READING x:{} y:{} z:{}", reading->x(), reading->y(), reading->z());
+            for (auto& listener : _accelerometerListeners) listener->invoke(reading);
+        }
 
     public:
         QSimp1eGraphicsView(QWidget* parent = nullptr) : QGraphicsView(parent) {
             // Enable scrollbars
             // setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
             // setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+            setAttribute(::Qt::WA_AcceptTouchEvents);
             setDragMode(QGraphicsView::NoDrag);
             setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
             setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
             setRenderHint(QPainter::Antialiasing);
             setStyleSheet("background: black");  // Set via <FillColor> of a <Canvas>
+            QObject::connect(&accelerometer, &QAccelerometer::readingChanged, [this]() {
+                accelerometerReadingChanged();
+            });
+            accelerometer.start();
+        }
+
+        void FitScreenToSystemHeight() {
+            // FitScreenToSystemWidth();
+            // FitSceneToViewHeight();
+            auto screenGeometry = QGuiApplication::primaryScreen()->geometry();
+            auto scaleFactor    = screenGeometry.height() / static_cast<qreal>(height());
+            setTransform(QTransform::fromScale(scaleFactor, scaleFactor));
+        }
+
+        void FitScreenToSystemWidth() {
+            auto screenGeometry = QGuiApplication::primaryScreen()->geometry();
+            auto scaleFactor    = screenGeometry.width() / static_cast<qreal>(width());
+            setTransform(QTransform::fromScale(scaleFactor, scaleFactor));
         }
 
         void FitSceneToViewHeight() {
@@ -58,10 +92,24 @@ namespace Simp1e {
             );
         }
 
+        void OnViewportEvent(IFunctionPointer<void(QEvent*)>* callback) {
+            _viewportEventListeners.insert(std::unique_ptr<IFunctionPointer<void(QEvent*)>>(callback));
+        }
+
+        void OnResize(IFunctionPointer<void()>* callback) {
+            _resizeListeners.insert(std::unique_ptr<IFunctionPointer<void()>>(callback));
+        }
+
+        void OnAccelerometerReadingChanged(IFunctionPointer<void(QAccelerometerReading*)>* callback) {
+            _accelerometerListeners.insert(std::unique_ptr<IFunctionPointer<void(QAccelerometerReading*)>>(callback));
+        }
+
     protected:
         void resizeEvent(QResizeEvent* event) override {
             // _Log_("RESIZE");
             // FitSceneToViewHeight();
+            FitScreenToSystemHeight();
+            for (auto& listener : _resizeListeners) listener->invoke();
             // auto topLeft = mapToScene(0, 0);
             // _eventManager.Emit<ResizeEvent>({
             //     {static_cast<sreal>(topLeft.x()),           static_cast<sreal>(topLeft.y())           },
@@ -107,6 +155,11 @@ namespace Simp1e {
             if (event->button() == Qt::LeftButton) {
                 _isPanning = false;
             }
+        }
+
+        bool viewportEvent(QEvent* event) override {
+            for (auto& listener : _viewportEventListeners) listener->invoke(event);
+            return QGraphicsView::viewportEvent(event);
         }
     };
 }

@@ -17,6 +17,7 @@ target_link_libraries(
     PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::SvgWidgets
+    Qt${QT_VERSION_MAJOR}::Sensors
 )
 
 # Include required Simp1e libraries

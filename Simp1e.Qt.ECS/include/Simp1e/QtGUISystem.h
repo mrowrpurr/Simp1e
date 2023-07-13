@@ -148,8 +148,8 @@ namespace Simp1e {
             _Log_("-> CanvasAdded");
             auto* canvasComponent = component_cast<ICanvasComponent>(component);
             if (auto* layout = GetParentLayout(canvasComponent->GetParentEntity())) {
-                auto* testTempLabel = new QLabel{"CANVAS IS HERE"};
-                layout->addWidget(testTempLabel);
+                // auto* testTempLabel = new QLabel{"CANVAS IS HERE"};
+                // layout->addWidget(testTempLabel);
                 auto* view  = new QSimp1eGraphicsView();
                 auto* scene = new QSimp1eGraphicsScene();
                 auto  size  = canvasComponent->GetSize();
@@ -159,6 +159,9 @@ namespace Simp1e {
                 view->move(0, 0);
                 view->horizontalScrollBar()->setValue(0);
                 view->verticalScrollBar()->setValue(0);
+                //
+                // view->FitSceneToViewHeight();
+                view->FitScreenToSystemHeight();
                 //
                 layout->addWidget(view);
 
@@ -187,10 +190,12 @@ namespace Simp1e {
             auto* rectangleComponent = component_cast<IRectangleComponent>(component);
         }
 
+        QGraphicsItem* theShip = nullptr;  // Cause there's only 1 image right now
+
         void OnImageAdded(Entity entity, ComponentType componentType, void* component) {
             _Log_("-> ImageAdded");
             if (!_canvasScene) return;
-            addGraphicsItem(entity);
+            theShip              = addGraphicsItem(entity)->GetQtSimp1eGraphicsItem();
             auto* imageComponent = component_cast<IImageComponent>(component);
             auto* qImageComponent =
                 entityManager()->AddComponent<QtSimp1eImageComponent>(entity, imageComponent->GetImagePath());
@@ -283,6 +288,34 @@ namespace Simp1e {
 
         void OnKeyPress(IFunctionPointer<void(QKeyEvent*)>* functionPointer) {
             if (_canvasView) _canvasView->OnKeyPress(functionPointer);
+        }
+
+        void OnViewportEvent(IFunctionPointer<void(QEvent*)>* callback) {
+            if (_canvasView) _canvasView->OnViewportEvent(callback);
+        }
+
+        void OnResize(IFunctionPointer<void()>* callback) {
+            if (_canvasView) _canvasView->OnResize(callback);
+        }
+
+        void OnAccelerometerReadingChanged(IFunctionPointer<void(QAccelerometerReading*)>* callback) {
+            if (_canvasView) _canvasView->OnAccelerometerReadingChanged(callback);
+        }
+
+        qreal _rotation = 0;
+
+        void Rotate(double angle) {
+            _rotation -= angle;
+            if (_canvasView) _canvasView->rotate(_rotation);
+        }
+
+        void CenterOnTheShip() {
+            if (theShip && _canvasView) {
+                _Log_("CENTERING VIEW ON THE SHIP");
+                _canvasView->centerOn(theShip);
+            } else {
+                _Log_("No ship to center on");
+            }
         }
 
         void Update(IEngine* engine, double deltaTime) {

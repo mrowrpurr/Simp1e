@@ -5,6 +5,8 @@ project(Simp1e-Projects VERSION 0.1 LANGUAGES CXX)
 add_definitions(-DFMT_HEADER_ONLY)
 add_definitions(-DSTRING_FORMAT_USE_FMT)
 
+set(QT_CREATOR_SKIP_VCPKG_SETUP ON)
+
 message(STATUS "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
 message(STATUS "CMAKE_SYSTEM_PREFIX_PATH: ${CMAKE_SYSTEM_PREFIX_PATH}")
 message(STATUS "CMAKE_FIND_ROOT_PATH: ${CMAKE_FIND_ROOT_PATH}")
@@ -28,8 +30,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Find Qt packages
-find_package(QT NAMES Qt6 REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets SvgWidgets)
+find_package(QT NAMES Qt6 REQUIRED COMPONENTS Widgets Sensors)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets SvgWidgets Sensors)
 
 # Find vcpkg packages
 find_package(fmt CONFIG REQUIRED)

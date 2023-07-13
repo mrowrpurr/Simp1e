@@ -161,7 +161,7 @@ namespace Simp1e {
             auto      width  = layerInfo.pixmap.width();
             auto      height = layerInfo.pixmap.height();
             Rectangle viewportWithPadding(
-                Position(viewportTopLeft.x() - width, viewportTopLeft.y() - height),
+                Position(viewportTopLeft.x() - width * 2, viewportTopLeft.y() - height * 2),
                 Size(viewportSize.width() + width * 2, viewportSize.height() + height * 2)
             );
 

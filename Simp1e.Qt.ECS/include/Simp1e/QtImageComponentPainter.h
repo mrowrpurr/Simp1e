@@ -65,8 +65,8 @@ namespace Simp1e {
             //     "Painting image {} at {},{}", imageComponent->GetImagePath(), positionComponent->GetPosition().x(),
             //     positionComponent->GetPosition().y()
             // );
-            painter->drawPixmap(ToQPoint({0, 0}), *pixmap);
-            // painter->drawPixmap(ToQPoint(positionComponent->GetPosition().ToPoint()), *pixmap);
+            // painter->drawPixmap(ToQPoint({0, 0}), *pixmap);
+            painter->drawPixmap(ToQPoint(positionComponent->GetPosition().ToPoint()), *pixmap);
         }
     };
 }

@@ -15,6 +15,11 @@ namespace Simp1e {
         SizeComponent(const Size& size) : _size(size) {}
 
         Size GetSize() const override { return _size; }
+        void SetSize(const Size& size) override {
+            _size = size;
+            SetDirtyFlag(Fields::Width);
+            SetDirtyFlag(Fields::Height);
+        }
 
         sreal GetWidth() const override { return _size.width(); }
         sreal GetHeight() const override { return _size.height(); }

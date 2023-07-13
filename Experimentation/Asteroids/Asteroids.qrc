@@ -3,5 +3,8 @@
 <qresource>
     <file alias="ship.png">C:/Code/mrowrpurr/PublicDomainResources/Openclipart/296421 - Ship Only.png</file>
     <file alias="ship-thrust.png">C:/Code/mrowrpurr/PublicDomainResources/Openclipart/296421 - Propulsion Only.png</file>
+    <file alias="background-layer-1.jpg">C:/Code/mrowrpurr/StockImages/shutterstock_1921487843 - no borders.jpg</file>
+    <file alias="background-layer-2.png">C:/Code/mrowrpurr/StockImages/shutterstock_354953852 - without background.png</file>
+    <file alias="background-layer-3.png">C:/Code/mrowrpurr/StockImages/shutterstock_2314360105 - without background-fs8.png</file>
 </qresource>
 </RCC>

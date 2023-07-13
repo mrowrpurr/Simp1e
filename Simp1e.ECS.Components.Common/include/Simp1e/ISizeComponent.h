@@ -15,7 +15,8 @@ namespace Simp1e {
             Height = 1 << 1,
         };
 
-        virtual Size GetSize() const = 0;
+        virtual Size GetSize() const           = 0;
+        virtual void SetSize(const Size& size) = 0;
 
         virtual sreal GetWidth() const  = 0;
         virtual sreal GetHeight() const = 0;
