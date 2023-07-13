@@ -1,5 +1,9 @@
 #pragma once
 
+#include <string_format.h>
+
+#include <string>
+
 #include "Vec2.h"
 #include "sreal.h"
 
@@ -27,5 +31,14 @@ namespace Simp1e {
         virtual Point operator-(const Point& other) const { return Point(one() - other.one(), two() - other.two()); }
         virtual Point operator*(const Point& other) const { return Point(one() * other.one(), two() * other.two()); }
         virtual Point operator/(const Point& other) const { return Point(one() / other.one(), two() / other.two()); }
+
+        virtual std::string ToString() const { return string_format("Point({}, {})", x(), y()); }
+        operator std::string() const { return ToString(); }
+
+        virtual Point ToPoint() const { return *this; }
+
+        virtual sreal distance(const Point& other) const {
+            return std::sqrt(std::pow(x() - other.x(), 2) + std::pow(y() - other.y(), 2));
+        }
     };
 }

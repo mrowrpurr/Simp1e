@@ -1,6 +1,10 @@
 #pragma once
 
+#include <string_format.h>
+
+#include <cmath>
 #include <functional>
+#include <string>
 
 namespace Simp1e {
 
@@ -34,5 +38,19 @@ namespace Simp1e {
         virtual void SetTwo(T two) { _two = two; }
 
         virtual bool operator==(const Vec2& other) const { return _one == other._one && _two == other._two; }
+
+        Vec2 operator+(const Vec2& other) const { return Vec2(_one + other._one, _two + other._two); }
+        Vec2 operator-(const Vec2& other) const { return Vec2(_one - other._one, _two - other._two); }
+        Vec2 operator*(const Vec2& other) const { return Vec2(_one * other._one, _two * other._two); }
+        Vec2 operator*(T scalar) const { return Vec2(_one * scalar, _two * scalar); }
+
+        virtual std::string ToString() const { return string_format("Vec2({:.2f}, {:.2f})", _one, _two); }
+        virtual operator std::string() const { return ToString(); }
+
+        T distance(T otherOne, T otherTwo) const {
+            T one = _one - otherOne;
+            T two = _two - otherTwo;
+            return std::sqrt(one * one + two * two);
+        }
     };
 }

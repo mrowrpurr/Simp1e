@@ -83,8 +83,8 @@ namespace Asteroids {
             auto parallaxEffect = entityManager.CreateEntity();
             entityManager.AddComponent<SizeComponent>(parallaxEffect, _viewportSize);
             auto parallax = entityManager.AddComponent<ParallaxEffectComponent>(parallaxEffect);
-            parallax->AddLayer("Layer1", "C:/Users/mrowr/Downloads/galaxy-2357504_1920.jpg", 2.0, 1.0, 0.4);
-            // parallax->AddLayer("Layer1", "C:/Code/mrowrpurr/StockImages/shutterstock_1921487843.svg", 2.0, 1.0, 0.4);
+            // parallax->AddLayer("Layer1", "C:/Users/mrowr/Downloads/galaxy-2357504_1920.jpg", 2.0, 1.0, 0.4);
+            parallax->AddLayer("Layer1", "C:/Code/mrowrpurr/StockImages/shutterstock_1921487843.svg", 2.0, 1.0, 0.4);
             // parallax->AddLayer(
             //     "Layer2", "C:/Code/mrowrpurr/StockImages/shutterstock_354953852 - without background.svg", 0.4, 1.0,
             //     0.7
