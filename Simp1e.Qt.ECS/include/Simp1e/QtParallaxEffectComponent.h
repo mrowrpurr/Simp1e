@@ -62,7 +62,7 @@ namespace Simp1e {
 
         bool _tileIntersectsAnyExistingLayer(const Rectangle& rect, LayerInfo& layerInfo) {
             for (auto& tile : layerInfo.tiles)
-                if (tile->rect.intersects(rect)) return true;
+                if (rect == tile->rect || tile->rect.intersectsInside(rect)) return true;
             return false;
         }
 
@@ -71,9 +71,9 @@ namespace Simp1e {
             _checkedPositionsForAddingTiles.insert(desiredPosition);
 
             Rectangle desiredRect(desiredPosition, Size(layerInfo.pixmap.width(), layerInfo.pixmap.height()));
-            // if (_tileIntersectsAnyExistingLayer(desiredRect, layerInfo)) return;
+            if (_tileIntersectsAnyExistingLayer(desiredRect, layerInfo)) return;
 
-            _Log_("Adding! {}", desiredRect.ToString());
+            _Log_("ADD {}", desiredRect.ToString());
 
             auto& tile =
                 layerInfo.tiles.emplace_back(std::make_unique<LayerTile>(desiredRect, layerInfo.pixmap, layer));
@@ -92,13 +92,12 @@ namespace Simp1e {
             IParallaxEffectLayer* layer
         ) {
             if (_checkedPositionsForAddingTiles.find(desiredPosition) != _checkedPositionsForAddingTiles.end()) return;
+            // _Log_("_addTilesToFillViewport: {}", desiredPosition.ToString());
 
             Rectangle desiredRect(desiredPosition, Size(layerInfo.pixmap.width(), layerInfo.pixmap.height()));
             if (!viewport.intersects(desiredRect)) return;
 
             _findOrCreateTile(desiredPosition, layerInfo, layer);
-
-            auto buffer = 1;
 
             _addTilesToFillViewport(
                 Position(desiredPosition.x(), desiredPosition.y() - layerInfo.pixmap.height()), viewport, layerInfo,
@@ -120,8 +119,10 @@ namespace Simp1e {
 
         void _removeTilesOutsideOfViewport(const Rectangle& viewport, LayerInfo& layerInfo) {
             for (auto it = layerInfo.tiles.begin(); it != layerInfo.tiles.end();) {
-                if (!viewport.intersects((*it)->rect) && !viewport.containsInside((*it)->rect)) {
-                    _Log_("Removing! {} - it is outside of viewport {}", (*it)->rect.ToString(), viewport.ToString());
+                if (!viewport.intersects((*it)->rect) && !viewport.contains((*it)->rect)) {
+                    _Log_(
+                        "REMOVE {} (because it doesn't intersect with {})", (*it)->rect.ToString(), viewport.ToString()
+                    );
                     it = layerInfo.tiles.erase(it);
                 } else ++it;
             }
@@ -145,46 +146,31 @@ namespace Simp1e {
             );
             layerInfo.lastPosition = viewportTopLeft;
 
-            _Log_("CONFIGURE LAYER - there are currently {} tiles", layerInfo.tiles.size());
-
             _updateAllTilePositions(newBasePosition, layerInfo);
 
-            auto      padding = 100;
+            _Log_("CONFIGURE LAYER - there are currently {} tiles", layerInfo.tiles.size());
+            for (auto& tile : layerInfo.tiles) {
+                _Log_("TILE: {}", tile->rect.ToString());
+            }
+
+            auto      width  = layerInfo.pixmap.width();
+            auto      height = layerInfo.pixmap.height();
             Rectangle viewportWithPadding(
-                Position(viewportTopLeft.x() - padding, viewportTopLeft.y() - padding),
-                Size(viewportSize.width() + padding, viewportSize.height() + padding)
+                Position(viewportTopLeft.x() - width, viewportTopLeft.y() - height),
+                Size(viewportSize.width() + width * 2, viewportSize.height() + height * 2)
             );
 
             // Must be done after updating tile positions
-            auto startingPosition = viewportTopLeft;
-            if (!layerInfo.tiles.empty()) {
-                auto it = std::min_element(
-                    layerInfo.tiles.begin(), layerInfo.tiles.end(),
-                    [&viewportTopLeft](const std::unique_ptr<LayerTile>& a, const std::unique_ptr<LayerTile>& b) {
-                        return a->rect.topLeft().ToPoint().distance(viewportTopLeft.ToPoint()) <
-                               b->rect.topLeft().ToPoint().distance(viewportTopLeft.ToPoint());
-                    }
-                );
-                if (viewportWithPadding.contains(it->get()->rect.topLeft().ToPoint())) {
-                    startingPosition = Position(it->get()->rect.topLeft());
-                }
-            }
-
-            if (viewportWithPadding.contains(startingPosition)) {
-                _Log_(
-                    "Starting position {} is inside viewport with padding {}", startingPosition.ToString(),
-                    viewportWithPadding.ToString()
-                );
-                _findOrCreateTile(startingPosition, layerInfo, layer);
-            } else
-                _Log_(
-                    "Starting position {} is !OUTSIDE! viewport with padding {}", startingPosition.ToString(),
-                    viewportWithPadding.ToString()
-                );
-
             _checkedPositionsForAddingTiles.clear();
+            if (layerInfo.tiles.empty()) _findOrCreateTile(viewportTopLeft, layerInfo, layer);
+
+            auto startingPosition = layerInfo.tiles.front()->rect.topLeft();
+
+            _Log_("Add Tiles To Fill Viewport from starting position {}", startingPosition.ToString());
             _addTilesToFillViewport(startingPosition, viewportWithPadding, layerInfo, layer);
-            _removeTilesOutsideOfViewport(viewportWithPadding, layerInfo);
+            _removeTilesOutsideOfViewport(viewport, layerInfo);
+
+            _Log_("CONFIGURE LAYER - there are now {} tiles", layerInfo.tiles.size());
 
             _scene->update();
         }

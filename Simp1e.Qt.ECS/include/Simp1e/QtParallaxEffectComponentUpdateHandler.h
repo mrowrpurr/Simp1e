@@ -39,7 +39,7 @@ namespace Simp1e {
 
             parallaxEffectComponent->ClearDirty();
 
-            _Log_("Parallax changed!");
+            // _Log_("Parallax changed!");
         }
 
         void SynchronizeEffectDataWithUI(

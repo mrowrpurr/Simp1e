@@ -25,7 +25,7 @@ namespace Simp1e {
 
             auto* entityManager = engine->GetEntities();
 
-            _Log_("PAINT IMAGE - PAINT IMAGE - PAINT IMAGE");
+            // _Log_("PAINT IMAGE - PAINT IMAGE - PAINT IMAGE");
 
             auto* sizeComponent = entityManager->GetComponent<ISizeComponent>(entity);
             if (!sizeComponent) {
@@ -61,10 +61,10 @@ namespace Simp1e {
                 return;
             }
 
-            _Log_(
-                "Painting image {} at {},{}", imageComponent->GetImagePath(), positionComponent->GetPosition().x(),
-                positionComponent->GetPosition().y()
-            );
+            // _Log_(
+            //     "Painting image {} at {},{}", imageComponent->GetImagePath(), positionComponent->GetPosition().x(),
+            //     positionComponent->GetPosition().y()
+            // );
             painter->drawPixmap(ToQPoint({0, 0}), *pixmap);
             // painter->drawPixmap(ToQPoint(positionComponent->GetPosition().ToPoint()), *pixmap);
         }

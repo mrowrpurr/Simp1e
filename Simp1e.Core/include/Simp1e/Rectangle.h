@@ -62,9 +62,20 @@ namespace Simp1e {
         }
 
         virtual bool intersects(const Rectangle& other) const {
-            return contains(other.topLeft()) || contains(other.topRight()) || contains(other.bottomLeft()) ||
-                   contains(other.bottomRight());
+            return !(
+                other.x() > x() + width() || x() > other.x() + other.width() || other.y() > y() + height() ||
+                y() > other.y() + other.height()
+            );
         }
+
+        virtual bool intersectsInside(const Rectangle& other) const {
+            return !(
+                other.x() >= x() + width() || x() >= other.x() + other.width() || other.y() >= y() + height() ||
+                y() >= other.y() + other.height()
+            );
+        }
+
+        virtual bool isNull() const { return width() == 0 && height() == 0; }
 
         std::string ToString() const {
             return string_format(
@@ -73,5 +84,7 @@ namespace Simp1e {
             );
         }
         operator std::string() const { return ToString(); }
+
+        bool operator==(const Rectangle& other) const { return _origin == other._origin && _size == other._size; }
     };
 }
