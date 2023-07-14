@@ -10,7 +10,6 @@
 #include <Simp1e/IEngine.h>
 #include <Simp1e/IFillColorComponent.h>
 #include <Simp1e/IImageComponent.h>
-#include <Simp1e/ILabelComponent.h>
 #include <Simp1e/IParallaxEffectComponent.h>
 #include <Simp1e/IPositionComponent.h>
 #include <Simp1e/IRectangleComponent.h>
@@ -32,7 +31,6 @@
 
 #include <QImageReader>
 #include <QKeyEvent>
-#include <QLabel>
 #include <QMenuBar>
 #include <QScrollBar>
 #include <QStatusBar>
@@ -63,9 +61,10 @@ namespace Simp1e {
 
         std::unordered_map<ComponentTypeHashKey, std::unique_ptr<IQtComponentUpdateHandler>> _componentUpdateHandlers;
 
-        // TODO: these are hacks. They shouldn't be fields like this.
-        QSimp1eGraphicsScene* _canvasScene;
-        QSimp1eGraphicsView*  _canvasView;
+        // TODO: global window / scene / view
+        QSimp1eGraphicsScene* _guiGlobalScene;
+        QSimp1eGraphicsView*  _guiGlobalView;
+        QMainWindow*          _guiGlobalWindow;
 
         std::unordered_set<std::unique_ptr<IFunctionPointer<void(QKeyEvent*)>>> _keyPressListeners;
 
@@ -79,20 +78,9 @@ namespace Simp1e {
                 entity, entity, _entityPaintFunctionPointer
             );
 
-            _canvasScene->addItem(component->GetQtSimp1eGraphicsItem());
+            _guiGlobalScene->addItem(component->GetQtSimp1eGraphicsItem());
 
             return component;
-        }
-
-        QWidget* GetParentWidget(Entity parentEntity) {
-            auto* qWidgetComponent = entityManager()->GetComponent<QWidgetComponent>(parentEntity);
-            if (!qWidgetComponent) return nullptr;
-            return qWidgetComponent->GetQWidget();
-        }
-
-        QLayout* GetParentLayout(Entity parentEntity) {
-            if (auto* parentWidget = GetParentWidget(parentEntity)) return parentWidget->layout();
-            return nullptr;
         }
 
         void OnWindowMenuItemClicked(Entity entity, IWindowMenuItemComponent* windowMenuItemComponent) {
@@ -106,6 +94,7 @@ namespace Simp1e {
             auto* qtMainWindowComponent =
                 entityManager()->AddComponent<QtMainWindowComponent>(entity, windowComponent->GetTitle());
             entityManager()->AddComponent<QWidgetComponent>(entity, qtMainWindowComponent->GetCentralQWidget());
+            _guiGlobalWindow = qtMainWindowComponent->GetQMainWindow();
         }
 
         void OnWindowMenuAdded(Entity entity, ComponentType componentType, void* component) {
@@ -134,41 +123,15 @@ namespace Simp1e {
             });
         }
 
-        void OnLabelAdded(Entity entity, ComponentType componentType, void* component) {
-            _Log_("-> LabelAdded");
-            auto* labelComponent = component_cast<ILabelComponent>(component);
-            if (auto* layout = GetParentLayout(labelComponent->GetParentEntity())) {
-                auto* qLabel = new QLabel();
-                qLabel->setText(labelComponent->GetText());
-                layout->addWidget(qLabel);
-            }
-        }
-
         void OnCanvasAdded(Entity entity, ComponentType componentType, void* component) {
             _Log_("-> CanvasAdded");
             auto* canvasComponent = component_cast<ICanvasComponent>(component);
-            if (auto* layout = GetParentLayout(canvasComponent->GetParentEntity())) {
-                // auto* testTempLabel = new QLabel{"CANVAS IS HERE"};
-                // layout->addWidget(testTempLabel);
-                auto* view  = new QSimp1eGraphicsView();
-                auto* scene = new QSimp1eGraphicsScene();
-                auto  size  = canvasComponent->GetSize();
-                if (!size.IsNull()) scene->setSceneRect(ToQRect(size));
-                view->setScene(scene);
-                //
-                view->move(0, 0);
-                view->horizontalScrollBar()->setValue(0);
-                view->verticalScrollBar()->setValue(0);
-                //
-                view->FitSceneToViewHeight();
-                // view->FitScreenToSystemHeight();
-                //
-                layout->addWidget(view);
-
-                // Save for graphical components to render on: (kinda gross, clean this up...)
-                _canvasScene = scene;
-                _canvasView  = view;
-            }
+            auto* view            = new QSimp1eGraphicsView();
+            auto* scene           = new QSimp1eGraphicsScene();
+            view->setScene(scene);
+            _guiGlobalWindow->layout()->addWidget(view);
+            _guiGlobalScene = scene;
+            _guiGlobalView  = view;
         }
 
         void OnPositionAdded(Entity entity, ComponentType componentType, void* component) {
@@ -185,16 +148,14 @@ namespace Simp1e {
 
         void OnRectangleAdded(Entity entity, ComponentType componentType, void* component) {
             _Log_("-> RectangleAdded");
-            if (!_canvasScene) return;
+            if (!_guiGlobalScene) return;
             addGraphicsItem(entity);
             auto* rectangleComponent = component_cast<IRectangleComponent>(component);
         }
 
-        // QGraphicsItem* theShip = nullptr;  // Cause there's only 1 image right now
-
         void OnImageAdded(Entity entity, ComponentType componentType, void* component) {
             _Log_("-> ImageAdded");
-            if (!_canvasScene) return;
+            if (!_guiGlobalScene) return;
             addGraphicsItem(entity)->GetQtSimp1eGraphicsItem();
             auto* imageComponent = component_cast<IImageComponent>(component);
             auto* qImageComponent =
@@ -203,9 +164,9 @@ namespace Simp1e {
 
         void OnParallaxEffectAdded(Entity entity, ComponentType componentType, void* component) {
             _Log_("-> ParallaxEffectAdded");
-            if (!_canvasScene) return;
+            if (!_guiGlobalScene) return;
             addGraphicsItem(entity);
-            entityManager()->AddComponent<QtParallaxEffectComponent>(entity, _canvasScene);
+            entityManager()->AddComponent<QtParallaxEffectComponent>(entity, _guiGlobalScene);
         }
 
         void UpdateWindow(Entity entity, void* component) {
@@ -231,8 +192,12 @@ namespace Simp1e {
     public:
         DEFINE_SYSTEM_TYPE("QtGUI")
 
+        // TODO: move all of these default handlers/painters/etc into includes which, when included, do a registration
+        // TODO: and/or a subclass of QtGuiSystem with various defaults.
+        //
+        // And a IQtGuiSystem maybe. I just want all the Register*() functions someplace by themselves.
         QtGuiSystem(IEngine* engine) : _engine(engine) {
-            QImageReader::setAllocationLimit(0);
+            QImageReader::setAllocationLimit(0);  // TODO: move this to the QSimp1eApp
 
             _entityPaintFunctionPointer = new_function_pointer(this, &QtGuiSystem::OnPaintGraphicsItem);
 
@@ -243,7 +208,6 @@ namespace Simp1e {
             entityEvents->RegisterForComponentAdded<IWindowMenuItemComponent>(
                 {this, &QtGuiSystem::OnWindowMenuItemAdded}
             );
-            entityEvents->RegisterForComponentAdded<ILabelComponent>({this, &QtGuiSystem::OnLabelAdded});
             entityEvents->RegisterForComponentAdded<ICanvasComponent>({this, &QtGuiSystem::OnCanvasAdded});
             entityEvents->RegisterForComponentAdded<IRectangleComponent>({this, &QtGuiSystem::OnRectangleAdded});
             entityEvents->RegisterForComponentAdded<IPositionComponent>({this, &QtGuiSystem::OnPositionAdded});
@@ -284,33 +248,6 @@ namespace Simp1e {
             RegisterComponentUpdateHandler(
                 ComponentTypeFromType<TComponent>(), new TComponentUpdater(std::forward<TArgs>(args)...)
             );
-        }
-
-        void OnKeyPress(IFunctionPointer<void(QKeyEvent*)>* functionPointer) {
-            if (_canvasView) _canvasView->OnKeyPress(functionPointer);
-        }
-
-        void OnViewportEvent(IFunctionPointer<void(QEvent*)>* callback) {
-            if (_canvasView) _canvasView->OnViewportEvent(callback);
-        }
-
-        void OnResize(IFunctionPointer<void()>* callback) {
-            if (_canvasView) _canvasView->OnResize(callback);
-        }
-
-        void OnAccelerometerReadingChanged(IFunctionPointer<void(QAccelerometerReading*)>* callback) {
-            if (_canvasView) _canvasView->OnAccelerometerReadingChanged(callback);
-        }
-
-        qreal _rotation = 0;
-
-        void Rotate(double angle) {
-            // _rotation -= angle;
-            if (_canvasView) _canvasView->rotate(angle);
-        }
-
-        void CenterOn(const Position& position) {
-            if (_canvasView) _canvasView->centerOn(ToQPointF(position));
         }
 
         void Update(IEngine* engine, double deltaTime) {

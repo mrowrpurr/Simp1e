@@ -12,26 +12,26 @@
 #include <unordered_set>
 
 //
-#include <QAccelerometer>
-#include <QSensorReading>
+// #include <QAccelerometer>
+// #include <QSensorReading>
 
 namespace Simp1e {
 
     class QSimp1eGraphicsView : public QGraphicsView {
-        QPoint                                                                              _lastPanPoint;
-        bool                                                                                _isPanning = false;
-        std::unordered_set<std::unique_ptr<IFunctionPointer<void(QKeyEvent*)>>>             _keyPressListeners;
-        std::unordered_set<std::unique_ptr<IFunctionPointer<void(QKeyEvent*)>>>             _keyReleaseListeners;
-        std::unordered_set<std::unique_ptr<IFunctionPointer<void(QEvent*)>>>                _viewportEventListeners;
-        std::unordered_set<std::unique_ptr<IFunctionPointer<void()>>>                       _resizeListeners;
-        QAccelerometer                                                                      accelerometer;
-        std::unordered_set<std::unique_ptr<IFunctionPointer<void(QAccelerometerReading*)>>> _accelerometerListeners;
+        QPoint                                                                  _lastPanPoint;
+        bool                                                                    _isPanning = false;
+        std::unordered_set<std::unique_ptr<IFunctionPointer<void(QKeyEvent*)>>> _keyPressListeners;
+        std::unordered_set<std::unique_ptr<IFunctionPointer<void(QKeyEvent*)>>> _keyReleaseListeners;
+        std::unordered_set<std::unique_ptr<IFunctionPointer<void(QEvent*)>>>    _viewportEventListeners;
+        std::unordered_set<std::unique_ptr<IFunctionPointer<void()>>>           _resizeListeners;
+        // QAccelerometer                                                                      accelerometer;
+        // std::unordered_set<std::unique_ptr<IFunctionPointer<void(QAccelerometerReading*)>>> _accelerometerListeners;
 
-        void accelerometerReadingChanged() {
-            auto* reading = accelerometer.reading();
-            _Log_("READING x:{} y:{} z:{}", reading->x(), reading->y(), reading->z());
-            for (auto& listener : _accelerometerListeners) listener->invoke(reading);
-        }
+        // void accelerometerReadingChanged() {
+        //     auto* reading = accelerometer.reading();
+        //     _Log_("READING x:{} y:{} z:{}", reading->x(), reading->y(), reading->z());
+        //     for (auto& listener : _accelerometerListeners) listener->invoke(reading);
+        // }
 
     public:
         QSimp1eGraphicsView(QWidget* parent = nullptr) : QGraphicsView(parent) {
@@ -44,10 +44,10 @@ namespace Simp1e {
             setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
             setRenderHint(QPainter::Antialiasing);
             setStyleSheet("background: black");  // Set via <FillColor> of a <Canvas>
-            QObject::connect(&accelerometer, &QAccelerometer::readingChanged, [this]() {
-                accelerometerReadingChanged();
-            });
-            accelerometer.start();
+            // QObject::connect(&accelerometer, &QAccelerometer::readingChanged, [this]() {
+            //     accelerometerReadingChanged();
+            // });
+            // accelerometer.start();
         }
 
         void FitScreenToSystemHeight() {
@@ -65,9 +65,9 @@ namespace Simp1e {
         }
 
         void FitSceneToViewHeight() {
-            auto sceneRect   = scene()->sceneRect();
-            auto scaleFactor = height() / sceneRect.height();
-            setTransform(QTransform::fromScale(scaleFactor, scaleFactor));
+            // auto sceneRect   = scene()->sceneRect();
+            // auto scaleFactor = height() / sceneRect.height();
+            // setTransform(QTransform::fromScale(scaleFactor, scaleFactor));
         }
 
         void OnKeyPress(IFunctionPointer<void(QKeyEvent*)>* callback) {
@@ -100,9 +100,9 @@ namespace Simp1e {
             _resizeListeners.insert(std::unique_ptr<IFunctionPointer<void()>>(callback));
         }
 
-        void OnAccelerometerReadingChanged(IFunctionPointer<void(QAccelerometerReading*)>* callback) {
-            _accelerometerListeners.insert(std::unique_ptr<IFunctionPointer<void(QAccelerometerReading*)>>(callback));
-        }
+        // void OnAccelerometerReadingChanged(IFunctionPointer<void(QAccelerometerReading*)>* callback) {
+        //     _accelerometerListeners.insert(std::unique_ptr<IFunctionPointer<void(QAccelerometerReading*)>>(callback));
+        // }
 
     protected:
         void resizeEvent(QResizeEvent* event) override {
