@@ -53,14 +53,22 @@ namespace Simp1e {
                 return;
             if (!size.IsNull() && !_originalPixmap->isNull()) {
                 if (size.width() == 0)
-                    size.SetWidth(_originalPixmap->width() * (size.height() / _originalPixmap->height()));
+                    size.SetWidth(_originalPixmap->width() * size.height() / _originalPixmap->height());
                 else if (size.height() == 0)
-                    size.SetHeight(
-                        _originalPixmap->height() * static_cast<int>(size.width() / _originalPixmap->width())
-                    );
+                    size.SetHeight(_originalPixmap->height() * size.width() / _originalPixmap->width());
             }
             _Log_("Resizing QPixmap to {}x{}", size.width(), size.height());
             _scaledPixmap = std::make_unique<QPixmap>(_originalPixmap->scaled(size.width(), size.height()));
+        }
+
+        Size GetSize() const {
+            if (GetImageRenderType() == ImageRenderType::Vector) {
+                _Log_("SVG (size) not supported yet");
+                return Size();
+            }
+            if (_scaledPixmap) return Size(_scaledPixmap->width(), _scaledPixmap->height());
+            else if (_originalPixmap) return Size(_originalPixmap->width(), _originalPixmap->height());
+            else return Size();
         }
 
         void Rotate(sreal rotation) {

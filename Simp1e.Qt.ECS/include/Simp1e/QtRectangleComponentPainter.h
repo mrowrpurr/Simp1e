@@ -37,7 +37,9 @@ namespace Simp1e {
                 _Log_("[Rectangle Painter] No size component found for entity {}", entity);
                 return;
             }
-            if (size->GetSize().IsNull()) {
+
+            Size rectSize = size->GetSize();
+            if (rectSize.IsNull()) {
                 _Log_("[Rectangle Painter] Size is null for entity {}", entity);
                 return;
             }

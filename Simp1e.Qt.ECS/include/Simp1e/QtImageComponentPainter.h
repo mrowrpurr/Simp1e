@@ -2,9 +2,13 @@
 
 #include <Simp1e/ComponentCast.h>
 #include <Simp1e/IImageComponent.h>
+#include <Simp1e/ILineColorComponent.h>
 #include <Simp1e/IPositionComponent.h>
 #include <Simp1e/ISizeComponent.h>
+#include <Simp1e/Rectangle.h>
+#include <Simp1e/ToQColor.h>
 #include <Simp1e/ToQPoint.h>
+#include <Simp1e/ToQRectF.h>
 #include <_Log_.h>
 
 #include "IQtComponentPainter.h"
@@ -56,20 +60,23 @@ namespace Simp1e {
 
             qImage->SetSize(sizeComponent->GetSize());
 
-            // qImage->Rotate(-13);  // TODO move to a rotation component
-
             auto* pixmap = qImage->GetPixmap();
             if (!pixmap) {
                 _Log_("[Image Painter] No pixmap found for entity {}", entity);
                 return;
             }
 
-            // _Log_(
-            //     "Painting image {} at {},{}", imageComponent->GetImagePath(), positionComponent->GetPosition().x(),
-            //     positionComponent->GetPosition().y()
-            // );
-            // painter->drawPixmap(ToQPoint({0, 0}), *pixmap);
+            _Log_(
+                "Painting image {} at {},{}", imageComponent->GetImagePath(), positionComponent->GetPosition().x(),
+                positionComponent->GetPosition().y()
+            );
             painter->drawPixmap(ToQPoint(positionComponent->GetPosition().ToPoint()), *pixmap);
+
+            auto* lineColor = entityManager->GetComponent<ILineColorComponent>(entity);
+            if (lineColor) {
+                painter->setPen(QPen(ToQColor(lineColor->GetColor()), 5.0, Qt::SolidLine));
+                painter->drawRect(ToQRectF(Rectangle(positionComponent->GetPosition().ToPoint(), qImage->GetSize())));
+            }
         }
     };
 }
