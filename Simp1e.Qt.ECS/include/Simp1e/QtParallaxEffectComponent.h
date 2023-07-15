@@ -28,7 +28,7 @@ namespace Simp1e {
 
             LayerTile(const Rectangle& rect, QPixmap& pixmap, IParallaxEffectLayer* layer) : rect(rect) {
                 pixmapItem = std::make_unique<QGraphicsPixmapItem>(pixmap);
-                pixmapItem->setPos(ToQPointF(rect.topLeft().ToPoint()));
+                pixmapItem->setPos(ToQPointF(rect.topLeft()));
                 pixmapItem->setZValue(-100);  // TODO: get the index!
                 pixmapItem->setOpacity(layer->opacity());
             }
@@ -73,7 +73,7 @@ namespace Simp1e {
             if (_checkedPositionsForAddingTiles.find(desiredPosition) != _checkedPositionsForAddingTiles.end()) return;
             _checkedPositionsForAddingTiles.insert(desiredPosition);
 
-            Rectangle desiredRect(desiredPosition, Size(layerInfo.pixmap.width(), layerInfo.pixmap.height()));
+            Rectangle desiredRect(desiredPosition.ToPoint(), Size(layerInfo.pixmap.width(), layerInfo.pixmap.height()));
             if (!viewport.intersects(desiredRect) && !viewport.contains(desiredRect)) return;
             if (_tileIntersectsAnyExistingLayer(desiredRect, layerInfo)) return;
 
@@ -86,8 +86,8 @@ namespace Simp1e {
 
         void _updateAllTilePositions(const Position& positionDelta, LayerInfo& layerInfo) {
             for (auto& tile : layerInfo.tiles) {
-                tile->rect.SetOrigin(tile->rect.origin() + positionDelta.ToPoint());
-                tile->pixmapItem->setPos(ToQPointF(tile->rect.topLeft().ToPoint()));
+                tile->rect.SetPoint(tile->rect.point() + positionDelta.ToPoint());
+                tile->pixmapItem->setPos(ToQPointF(tile->rect.topLeft()));
             }
         }
 
@@ -97,7 +97,7 @@ namespace Simp1e {
         ) {
             if (_checkedPositionsForAddingTiles.find(desiredPosition) != _checkedPositionsForAddingTiles.end()) return;
 
-            Rectangle desiredRect(desiredPosition, Size(layerInfo.pixmap.width(), layerInfo.pixmap.height()));
+            Rectangle desiredRect(desiredPosition.ToPoint(), Size(layerInfo.pixmap.width(), layerInfo.pixmap.height()));
             if (!realViewport.intersects(desiredRect) && !realViewport.contains(desiredRect))
                 return;  // It would be deleted!
 
@@ -141,7 +141,7 @@ namespace Simp1e {
         void ConfigureLayer(
             int index, const Size& viewportSize, const Position& viewportTopLeft, IParallaxEffectLayer* layer
         ) {
-            Rectangle viewport(viewportTopLeft, viewportSize);
+            Rectangle viewport(viewportTopLeft.ToPoint(), viewportSize);
             _Log_("TOP LEFT: {}", viewportTopLeft.ToString());
             _Log_("VIEWPORT: {}", viewport.ToString());
             auto&    layerInfo = _getLayerInfo(layer);
@@ -161,7 +161,7 @@ namespace Simp1e {
             auto      width  = layerInfo.pixmap.width();
             auto      height = layerInfo.pixmap.height();
             Rectangle viewportWithPadding(
-                Position(viewportTopLeft.x() - width * 2, viewportTopLeft.y() - height * 2),
+                Point(viewportTopLeft.x() - width * 2, viewportTopLeft.y() - height * 2),
                 Size(viewportSize.width() + width * 2, viewportSize.height() + height * 2)
             );
 

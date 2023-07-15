@@ -25,7 +25,7 @@ namespace Simp1e {
             auto* graphicsItem = graphicsItemComponent->GetQtSimp1eGraphicsItem();
             if (!graphicsItem) return;
 
-            auto rect = ToQRectF(size->GetSize());
+            auto rect = ToQRectF(Rectangle({0, 0}, size->GetSize()));
             if (rect != graphicsItem->GetBoundingRect()) graphicsItem->SetBoundingRect(rect);
             size->SetDirty(false);
             _Log_("UPDATED SIZE. Width: {} Height: {}", rect.width(), rect.height());

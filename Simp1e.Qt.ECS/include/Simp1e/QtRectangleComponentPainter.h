@@ -42,7 +42,7 @@ namespace Simp1e {
                 return;
             }
 
-            auto rect = ToQRectF(size->GetSize());
+            auto rect = ToQRectF(Rectangle({0, 0}, size->GetSize()));
 
             auto* fillColor = entityManager->GetComponent<IFillColorComponent>(entity);
             if (fillColor) painter->fillRect(rect, ToQColor(fillColor->GetColor()));

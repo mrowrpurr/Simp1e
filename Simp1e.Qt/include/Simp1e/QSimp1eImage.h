@@ -55,7 +55,9 @@ namespace Simp1e {
                 if (size.width() == 0)
                     size.SetWidth(_originalPixmap->width() * (size.height() / _originalPixmap->height()));
                 else if (size.height() == 0)
-                    size.SetHeight(_originalPixmap->height() * (size.width() / _originalPixmap->width()));
+                    size.SetHeight(
+                        _originalPixmap->height() * static_cast<int>(size.width() / _originalPixmap->width())
+                    );
             }
             _Log_("Resizing QPixmap to {}x{}", size.width(), size.height());
             _scaledPixmap = std::make_unique<QPixmap>(_originalPixmap->scaled(size.width(), size.height()));

@@ -8,37 +8,36 @@
 #include "sreal.h"
 
 namespace Simp1e {
-    class Point : public Vec2<sreal> {
+
+    template <typename T>
+    class PointT : public Vec2<T> {
     public:
-        struct Params {
-            sreal x;
-            sreal y;
-        };
+        PointT() = default;
+        PointT(T x = {}, T y = {}) : Vec2<T>(x, y) {}
 
-        Point() = default;
-        Point(sreal x, sreal y) : Vec2(x, y) {}
-        Point(const Params& params) : Vec2(params.x, params.y) {}
+        T x() const { return this->one(); }
+        T y() const { return this->two(); }
 
-        virtual sreal x() const { return one(); }
-        virtual sreal y() const { return two(); }
+        void SetX(T x) { SetOne(x); }
+        void SetY(T y) { SetTwo(y); }
 
-        virtual void SetX(sreal x) { SetOne(x); }
-        virtual void SetY(sreal y) { SetTwo(y); }
+        bool operator==(const PointT& other) const { return this->one() == other.one() && this->two() == other.two(); }
 
-        virtual bool operator==(const Point& other) const { return one() == other.one() && two() == other.two(); }
+        PointT operator+(const PointT& other) const {
+            return PointT(this->one() + other.one(), this->two() + other.two());
+        }
+        PointT operator-(const PointT& other) const { return PointT(one<T>() - other.one(), two<T>() - other.two()); }
+        PointT operator*(const PointT& other) const { return PointT(one<T>() * other.one(), two<T>() * other.two()); }
+        PointT operator/(const PointT& other) const { return PointT(one<T>() / other.one(), two<T>() / other.two()); }
 
-        virtual Point operator+(const Point& other) const { return Point(one() + other.one(), two() + other.two()); }
-        virtual Point operator-(const Point& other) const { return Point(one() - other.one(), two() - other.two()); }
-        virtual Point operator*(const Point& other) const { return Point(one() * other.one(), two() * other.two()); }
-        virtual Point operator/(const Point& other) const { return Point(one() / other.one(), two() / other.two()); }
-
-        virtual std::string ToString() const { return string_format("Point({}, {})", x(), y()); }
+        std::string ToString() const { return string_format("Point({}, {})", x(), y()); }
         operator std::string() const { return ToString(); }
 
-        virtual Point ToPoint() const { return *this; }
-
-        virtual sreal distance(const Point& other) const {
+        T distance(const PointT& other) const {
             return std::sqrt(std::pow(x() - other.x(), 2) + std::pow(y() - other.y(), 2));
         }
     };
+
+    using Point  = PointT<int>;
+    using PointF = PointT<sreal>;
 }

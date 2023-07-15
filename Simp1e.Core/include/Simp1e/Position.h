@@ -7,55 +7,53 @@
 #include "sreal.h"
 
 namespace Simp1e {
-    class Position : public Vec3<sreal> {
+
+    template <typename T>
+    class PositionT : public Vec3<T> {
     public:
-        struct Params {
-            sreal x;
-            sreal y;
-            sreal z;
-        };
+        PositionT(T x = {}, T y = {}, T z = {}) : Vec3<T>(x, y, z) {}
+        PositionT(const PointT<T>& point) : Vec3<T>(point.x(), point.y(), {}) {}
 
-        struct Hash {
-            size_t operator()(const Position& vec) const {
-                return std::hash<sreal>()(vec.x()) ^ std::hash<sreal>()(vec.y()) ^ std::hash<sreal>()(vec.z());
-            }
-        };
+        PointT<T> ToPoint() const { return Point(x(), y()); }
 
-        struct Equal {
-            bool operator()(const Position& left, const Position& right) const { return left == right; }
-        };
+        T x() const { return this->one(); }
+        T y() const { return this->two(); }
+        T z() const { return this->three(); }
 
-        Position() = default;
-        Position(sreal x, sreal y, sreal z = 0) : Vec3(x, y, z) {}
-        Position(const Params& params) : Vec3(params.x, params.y, params.z) {}
-        Position(const Point& point) : Vec3(point.x(), point.y(), 0) {}
+        void SetX(T x) { this->SetOne(x); }
+        void SetY(T y) { this->SetTwo(y); }
+        void SetZ(T z) { this->SetThree(z); }
 
-        virtual Point ToPoint() const { return Point(x(), y()); }
-
-        virtual sreal x() const { return one(); }
-        virtual sreal y() const { return two(); }
-        virtual sreal z() const { return three(); }
-
-        virtual void SetX(sreal x) { SetOne(x); }
-        virtual void SetY(sreal y) { SetTwo(y); }
-        virtual void SetZ(sreal z) { SetThree(z); }
-
-        virtual bool operator==(const Position& other) const {
+        bool operator==(const PositionT& other) const {
             return x() == other.x() && y() == other.y() && z() == other.z();
         }
 
-        std::string ToString() const { return string_format("Position({:.2f}, {:.2f}, {:.2f})", x(), y(), z()); }
+        std::string ToString() const { return string_format("Position({}, {}, {})", x(), y(), z()); }
         operator std::string() const { return ToString(); }
 
-        Position operator+(const Position& other) const {
-            return Position(one() + other.one(), two() + other.two(), three() + other.three());
+        PositionT operator+(const PositionT& other) const {
+            return PositionT(
+                one<T>() + other.template one<T>(), two<T>() + other.template two<T>(),
+                three<T>() + other.template three<T>()
+            );
         }
-        Position operator-(const Position& other) const {
-            return Position(one() - other.one(), two() - other.two(), three() - other.three());
+        PositionT operator-(const PositionT& other) const {
+            return PositionT(
+                one<T>() - other.template one<T>(), two<T>() - other.template two<T>(),
+                three<T>() - other.template three<T>()
+            );
         }
-        Position operator*(const Position& other) const {
-            return Position(one() * other.one(), two() * other.two(), three() * other.three());
+        PositionT operator*(const PositionT& other) const {
+            return PositionT(
+                one<T>() * other.template one<T>(), two<T>() * other.template two<T>(),
+                three<T>() * other.template three<T>()
+            );
         }
-        Position operator*(sreal scalar) const { return Position(one() * scalar, two() * scalar, three() * scalar); }
+        PositionT operator*(T scalar) const {
+            return PositionT(one<T>() * scalar, two<T>() * scalar, three<T>() * scalar);
+        }
     };
+
+    using Position  = PositionT<int>;
+    using PositionF = PositionT<sreal>;
 }

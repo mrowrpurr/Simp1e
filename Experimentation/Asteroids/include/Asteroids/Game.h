@@ -45,8 +45,10 @@ namespace Asteroids {
         void CreateCamera() {
             auto camera = entityManager().CreateEntity();
             entityManager().AddComponent<CameraComponent>(camera);
-            entityManager().AddComponent<PositionComponent>(camera, Position(1000, 1000));
-            entityManager().AddComponent<SizeComponent>(camera, Size(2000, 2000));
+            entityManager().AddComponent<PositionComponent>(camera, Position(500, 500));
+            entityManager().AddComponent<SizeComponent>(camera, Size(800, 800));
+            entityManager().AddComponent<RectangleComponent>(camera);
+            entityManager().AddComponent<LineColorComponent>(camera, Color::Magenta());
         }
 
         void CreateParallaxEffect() {
@@ -70,9 +72,11 @@ namespace Asteroids {
         void CreateShip() {
             auto ship = entityManager().CreateEntity();
             entityManager().AddComponent<SizeComponent>(ship, Size(0, 150));
-            entityManager().AddComponent<PositionComponent>(ship, Position(1000, 1000));
+            entityManager().AddComponent<PositionComponent>(ship, Position(900, 900));
             entityManager().AddComponent<RotationComponent>(ship);
             entityManager().AddComponent<ImageComponent>(ship, ":/ship.png");
+            entityManager().AddComponent<RectangleComponent>(ship);
+            entityManager().AddComponent<LineColorComponent>(ship, Color::White());
         }
 
         // TODO: load components from filesystem

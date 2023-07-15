@@ -4,28 +4,27 @@
 #include "sreal.h"
 
 namespace Simp1e {
-    class Size : public Vec2<sreal> {
+
+    template <typename T>
+    class SizeT : public Vec2<T> {
     public:
-        struct Params {
-            sreal width;
-            sreal height;
-        };
+        SizeT() = default;
+        SizeT(T width, T height) : Vec2<T>(width, height) {}
 
-        Size() = default;
-        Size(sreal width, sreal height) : Vec2(width, height) {}
-        Size(const Params& params) : Vec2(params.width, params.height) {}
+        T width() const { return this->one(); }
+        T height() const { return this->two(); }
 
-        virtual sreal width() const { return one(); }
-        virtual sreal height() const { return two(); }
+        void SetWidth(T width) { this->SetOne(width); }
+        void SetHeight(T height) { this->SetTwo(height); }
 
-        virtual void SetWidth(sreal width) { SetOne(width); }
-        virtual void SetHeight(sreal height) { SetTwo(height); }
+        bool IsNull() const { return width() == 0 && height() == 0; }
 
-        virtual bool IsNull() const { return width() == 0 && height() == 0; }
-
-        Size operator+(const Size& other) const { return Size(width() + other.width(), height() + other.height()); }
-        Size operator-(const Size& other) const { return Size(width() - other.width(), height() - other.height()); }
-        Size operator*(const Size& other) const { return Size(width() * other.width(), height() * other.height()); }
-        Size operator*(sreal scalar) const { return Size(width() * scalar, height() * scalar); }
+        SizeT operator+(const SizeT& other) const { return SizeT(width() + other.width(), height() + other.height()); }
+        SizeT operator-(const SizeT& other) const { return SizeT(width() - other.width(), height() - other.height()); }
+        SizeT operator*(const SizeT& other) const { return SizeT(width() * other.width(), height() * other.height()); }
+        SizeT operator*(T scalar) const { return SizeT(width() * scalar, height() * scalar); }
     };
+
+    using Size  = SizeT<int>;
+    using SizeF = SizeT<sreal>;
 }

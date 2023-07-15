@@ -8,85 +8,78 @@
 
 namespace Simp1e {
 
-    class Rectangle {
-        Point _origin;
-        Size  _size;
+    template <typename T>
+    class RectangleT {
+        PointT<T> _point;
+        SizeT<T>  _size;
 
     public:
-        struct Params {
-            Point::Params origin;
-            Size::Params  size;
-        };
+        RectangleT() = default;
+        RectangleT(const PointT<T>& point, const SizeT<T>& size) : _point(point), _size(size) {}
+        RectangleT(T x, T y, T width, T height) : _point(x, y), _size(width, height) {}
 
-        Rectangle() = default;
-        Rectangle(const Point& origin, const Size& size) : _origin(origin), _size(size) {}
-        // TODO: remove the Position one, it causes ambiguity with the Point one
-        Rectangle(const Position& origin, const Size& size) : _origin(origin.ToPoint()), _size(size) {}
-        Rectangle(sreal x, sreal y, sreal width, sreal height) : _origin(x, y), _size(width, height) {}
-        Rectangle(const Params& params) : _origin(params.origin), _size(params.size) {}
-        // TODO: remove the Size one, it causes ambiguity with the Point one
-        Rectangle(const Size& size) : _origin(0, 0), _size(size) {}
-        Rectangle(sreal width, sreal height) : _origin(0, 0), _size(width, height) {}
+        PointT<T> point() const { return _point; }
+        SizeT<T>  size() const { return _size; }
 
-        virtual Point origin() const { return _origin; }
-        virtual Size  size() const { return _size; }
+        T x() const { return _point.x(); }
+        T y() const { return _point.y(); }
+        T width() const { return _size.width(); }
+        T height() const { return _size.height(); }
 
-        virtual sreal x() const { return _origin.x(); }
-        virtual sreal y() const { return _origin.y(); }
-        virtual sreal width() const { return _size.width(); }
-        virtual sreal height() const { return _size.height(); }
+        void SetPoint(const PointT<T>& point) { _point = point; }
+        void SetSize(const SizeT<T>& size) { _size = size; }
 
-        virtual void SetOrigin(const Point& origin) { _origin = origin; }
-        virtual void SetTopLeft(const Point& topLeft) { SetOrigin(topLeft); }
+        PointT<T> topLeft() const { return _point; }
+        PointT<T> topRight() const { return PointT<T>(x() + width(), y()); }
+        PointT<T> bottomLeft() const { return PointT<T>(x(), y() + height()); }
+        PointT<T> bottomRight() const { return PointT<T>(x() + width(), y() + height()); }
+        PointT<T> center() const { return PointT<T>(x() + width() / 2, y() + height() / 2); }
 
-        virtual Point topLeft() const { return _origin; }
-        virtual Point topRight() const { return Point(x() + width(), y()); }
-        virtual Point bottomLeft() const { return Point(x(), y() + height()); }
-        virtual Point bottomRight() const { return Point(x() + width(), y() + height()); }
-        virtual Point center() const { return Point(x() + width() / 2, y() + height() / 2); }
-
-        virtual bool contains(const Point& point) const {
+        bool contains(const PointT<T>& point) const {
             return point.x() >= x() && point.x() <= x() + width() && point.y() >= y() && point.y() <= y() + height();
         }
-        virtual bool contains(const Position& position) const { return contains(position.ToPoint()); }
-        virtual bool contains(const Rectangle& rectangle) const {
+        bool contains(const Position& position) const { return contains(position.ToPoint()); }
+        bool contains(const RectangleT& rectangle) const {
             return contains(rectangle.topLeft()) && contains(rectangle.topRight()) &&
                    contains(rectangle.bottomLeft()) && contains(rectangle.bottomRight());
         }
 
-        virtual bool containsInside(const Point& point) const {
+        bool containsInside(const PointT<T>& point) const {
             return point.x() > x() && point.x() < x() + width() && point.y() > y() && point.y() < y() + height();
         }
-        virtual bool containsInside(const Position& position) const { return containsInside(position.ToPoint()); }
-        virtual bool containsInside(const Rectangle& rectangle) const {
+        bool containsInside(const Position& position) const { return containsInside(position.ToPoint()); }
+        bool containsInside(const RectangleT& rectangle) const {
             return containsInside(rectangle.topLeft()) && containsInside(rectangle.topRight()) &&
                    containsInside(rectangle.bottomLeft()) && containsInside(rectangle.bottomRight());
         }
 
-        virtual bool intersects(const Rectangle& other) const {
+        bool intersects(const RectangleT& other) const {
             return !(
                 other.x() > x() + width() || x() > other.x() + other.width() || other.y() > y() + height() ||
                 y() > other.y() + other.height()
             );
         }
 
-        virtual bool intersectsInside(const Rectangle& other) const {
+        bool intersectsInside(const RectangleT& other) const {
             return !(
                 other.x() >= x() + width() || x() >= other.x() + other.width() || other.y() >= y() + height() ||
                 y() >= other.y() + other.height()
             );
         }
 
-        virtual bool isNull() const { return width() == 0 && height() == 0; }
+        bool isNull() const { return width() == 0 && height() == 0; }
 
         std::string ToString() const {
             return string_format(
-                "Rectangle({}, {}, {}, {})", topLeft().ToString(), topRight().ToString(), bottomLeft().ToString(),
+                "RectangleT({}, {}, {}, {})", topLeft().ToString(), topRight().ToString(), bottomLeft().ToString(),
                 bottomRight().ToString()
             );
         }
         operator std::string() const { return ToString(); }
 
-        bool operator==(const Rectangle& other) const { return _origin == other._origin && _size == other._size; }
+        bool operator==(const RectangleT& other) const { return _point == other._point && _size == other._size; }
     };
+
+    using Rectangle  = RectangleT<int>;
+    using RectangleF = RectangleT<sreal>;
 }

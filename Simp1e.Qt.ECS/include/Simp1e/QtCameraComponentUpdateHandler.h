@@ -31,7 +31,7 @@ namespace Simp1e {
             if (!size) return;
             if (size->GetSize().IsNull()) return;
 
-            Rectangle rect(position->GetPosition(), size->GetSize());
+            Rectangle rect(position->GetPosition().ToPoint(), size->GetSize());
 
             _graphicsView->fitInView(ToQRectF(rect), Qt::KeepAspectRatio);
 

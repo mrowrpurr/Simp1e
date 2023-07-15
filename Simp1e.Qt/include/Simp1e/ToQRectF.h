@@ -5,7 +5,5 @@
 #include <QRectF>
 
 namespace Simp1e {
-    QRectF ToQRectF(const Rectangle& rect) {
-        return QRectF(rect.x(), rect.y(), rect.width(), rect.height());
-    }
+    QRectF ToQRectF(const Rectangle& rect) { return QRectF(rect.x(), rect.y(), rect.width(), rect.height()); }
 }

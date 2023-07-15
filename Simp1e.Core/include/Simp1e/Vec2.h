@@ -5,6 +5,7 @@
 #include <cmath>
 #include <functional>
 #include <string>
+#include <vector>
 
 namespace Simp1e {
 
@@ -14,38 +15,31 @@ namespace Simp1e {
         T _two = 0;
 
     public:
-        struct Params {
-            T one;
-            T two;
-        };
-
-        struct Hash {
-            size_t operator()(const Vec2& vec) const { return std::hash<T>()(vec.one()) ^ std::hash<T>()(vec.two()); }
-        };
-
-        struct Equal {
-            bool operator()(const Vec2& left, const Vec2& right) const { return left == right; }
-        };
-
         Vec2() = default;
         Vec2(T one, T two) : _one(one), _two(two) {}
-        Vec2(const Params& params) : _one(params.one), _two(params.two) {}
+        Vec2(const std::vector<T>& values) {
+            if (values.size() > 0) _one = values[0];
+            if (values.size() > 1) _two = values[1];
+        }
 
-        virtual T one() const { return _one; }
-        virtual T two() const { return _two; }
+        T one() const { return _one; }
+        T two() const { return _two; }
 
-        virtual void SetOne(T one) { _one = one; }
-        virtual void SetTwo(T two) { _two = two; }
+        void SetOne(T one) { _one = one; }
+        void SetTwo(T two) { _two = two; }
 
-        virtual bool operator==(const Vec2& other) const { return _one == other._one && _two == other._two; }
+        bool operator==(const Vec2& other) const { return _one == other._one && _two == other._two; }
 
         Vec2 operator+(const Vec2& other) const { return Vec2(_one + other._one, _two + other._two); }
         Vec2 operator-(const Vec2& other) const { return Vec2(_one - other._one, _two - other._two); }
         Vec2 operator*(const Vec2& other) const { return Vec2(_one * other._one, _two * other._two); }
         Vec2 operator*(T scalar) const { return Vec2(_one * scalar, _two * scalar); }
 
-        virtual std::string ToString() const { return string_format("Vec2({:.2f}, {:.2f})", _one, _two); }
-        virtual operator std::string() const { return ToString(); }
+        std::string ToString() const { return string_format("Vec2({}, {})", _one, _two); }
+        operator std::string() const { return ToString(); }
+
+        std::vector<T> ToVector() const { return {_one, _two}; }
+        operator std::vector<T>() const { return ToVector(); }
 
         T distance(T otherOne, T otherTwo) const {
             T one = _one - otherOne;
