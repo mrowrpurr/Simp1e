@@ -6,6 +6,7 @@
 #include <Simp1e/ComponentTypeHashKey.h>
 #include <Simp1e/DefineSystemType.h>
 #include <Simp1e/Direction.h>
+#include <Simp1e/ICameraComponent.h>
 #include <Simp1e/ICanvasComponent.h>
 #include <Simp1e/IEngine.h>
 #include <Simp1e/IFillColorComponent.h>
@@ -41,6 +42,7 @@
 
 #include "IQtComponentPainter.h"
 #include "IQtComponentUpdateHandler.h"
+#include "QtCameraComponentUpdateHandler.h"
 #include "QtImageComponentPainter.h"
 #include "QtParallaxEffectComponent.h"
 #include "QtParallaxEffectComponentUpdateHandler.h"
@@ -95,6 +97,8 @@ namespace Simp1e {
                 entityManager()->AddComponent<QtMainWindowComponent>(entity, windowComponent->GetTitle());
             entityManager()->AddComponent<QWidgetComponent>(entity, qtMainWindowComponent->GetCentralQWidget());
             _guiGlobalWindow = qtMainWindowComponent->GetQMainWindow();
+            //
+            qtMainWindowComponent->GetQMainWindow()->resize(1200, 900);
         }
 
         void OnWindowMenuAdded(Entity entity, ComponentType componentType, void* component) {
@@ -128,6 +132,8 @@ namespace Simp1e {
             auto* canvasComponent = component_cast<ICanvasComponent>(component);
             auto* view            = new QSimp1eGraphicsView();
             auto* scene           = new QSimp1eGraphicsScene();
+            auto* size            = entityManager()->GetComponent<ISizeComponent>(entity);
+            if (size) scene->setSceneRect(ToQRectF(Rectangle(Point{0, 0}, size->GetSize())));
             view->setScene(scene);
             _guiGlobalWindow->centralWidget()->layout()->addWidget(view);
             _guiGlobalScene = scene;
@@ -144,6 +150,14 @@ namespace Simp1e {
             _Log_("-> SizeAdded");
             auto* sizeComponent = component_cast<ISizeComponent>(component);
             sizeComponent->SetDirty(true);  // Start off in need of an update.
+        }
+
+        void OnCameraAdded(Entity entity, ComponentType componentType, void* component) {
+            _Log_("-> CameraAdded");
+            auto* cameraComponent = component_cast<ICameraComponent>(component);
+            cameraComponent->SetDirty(true);  // Start off in need of an update.
+            // Need to wait until we have the view before registering the update handler.
+            RegisterComponentUpdateHandler<ICameraComponent, QtCameraComponentUpdateHandler>(_guiGlobalView);
         }
 
         void OnRectangleAdded(Entity entity, ComponentType componentType, void* component) {
@@ -218,6 +232,7 @@ namespace Simp1e {
             entityEvents->RegisterForComponentAdded<IParallaxEffectComponent>(
                 {this, &QtGuiSystem::OnParallaxEffectAdded}
             );
+            entityEvents->RegisterForComponentAdded<ICameraComponent>({this, &QtGuiSystem::OnCameraAdded});
 
             RegisterComponentPainter<IRectangleComponent, QtRectangleComponentPainter>();
             RegisterComponentPainter<IImageComponent, QtImageComponentPainter>();
@@ -252,7 +267,19 @@ namespace Simp1e {
             );
         }
 
+        int iteration = 0;
+
         void Update(IEngine* engine, double deltaTime) {
+            iteration++;
+            _engine->GetEntities()->ForEach<ICameraComponent>(
+                new_function_pointer([this](Entity, ComponentType, ComponentPointer ptr) {
+                    if (iteration % 100 != 0) return;
+                    _Log_("Dirty Camera");
+                    auto* camera = component_cast<ICameraComponent>(ptr);
+                    if (camera) camera->SetDirty(true);
+                })
+            );
+
             for (auto& [componentTypeKey, componentUpdateHandler] : _componentUpdateHandlers) {
                 auto* updateHandler = componentUpdateHandler.get();
                 entityManager()->ForEachComponent(

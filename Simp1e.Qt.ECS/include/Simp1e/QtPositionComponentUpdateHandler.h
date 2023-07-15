@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Simp1e/ComponentCast.h>
 #include <Simp1e/IPositionComponent.h>
 #include <Simp1e/ISizeComponent.h>
 #include <Simp1e/ToQPointF.h>
@@ -14,11 +15,11 @@ namespace Simp1e {
     class QtPositionComponentUpdateHandler : public IQtComponentUpdateHandler {
     public:
         void Update(IEngine* engine, Entity entity, void* component) override {
-            auto* entityManager = engine->GetEntities();
-
-            auto* position = entityManager->GetComponent<IPositionComponent>(entity);
+            auto* position = component_cast<IPositionComponent>(component);
             if (!position) return;
             if (!position->IsDirty()) return;
+
+            auto* entityManager = engine->GetEntities();
 
             auto* graphicsItemComponent = entityManager->GetComponent<QtSimp1eGraphicsItemComponent>(entity);
             if (!graphicsItemComponent) return;

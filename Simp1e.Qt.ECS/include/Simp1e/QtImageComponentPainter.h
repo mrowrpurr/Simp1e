@@ -55,6 +55,7 @@ namespace Simp1e {
             }
 
             qImage->SetSize(sizeComponent->GetSize());
+
             // qImage->Rotate(-13);  // TODO move to a rotation component
 
             auto* pixmap = qImage->GetPixmap();

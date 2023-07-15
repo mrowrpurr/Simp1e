@@ -84,7 +84,7 @@ namespace Simp1e {
     protected:
         void resizeEvent(QResizeEvent* event) override {
             // _Log_("RESIZE");
-            FitSceneToViewHeight();
+            // FitSceneToViewHeight();
             // FitScreenToSystemHeight();
             for (auto& listener : _resizeListeners) listener->invoke();
             // auto topLeft = mapToScene(0, 0);

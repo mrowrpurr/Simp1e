@@ -73,6 +73,11 @@ namespace Simp1e {
         }
 
         template <typename T>
+        void ForEach(IFunctionPointer<void(Entity, ComponentType, ComponentPointer)>* callback) {
+            ForEachComponent(ComponentTypeFromType<T>(), callback);
+        }
+
+        template <typename T>
         void ForEach(FunctionPointer<void(Entity, ComponentType, ComponentPointer)> callback) {
             ForEachComponent(ComponentTypeFromType<T>(), &callback);
         }

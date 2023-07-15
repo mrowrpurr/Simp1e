@@ -39,12 +39,14 @@ namespace Asteroids {
         void CreateCanvas() {
             auto canvas = entityManager().CreateEntity();
             entityManager().AddComponent<CanvasComponent>(canvas);
+            entityManager().AddComponent<SizeComponent>(canvas);
         }
 
         void CreateCamera() {
             auto camera = entityManager().CreateEntity();
             entityManager().AddComponent<CameraComponent>(camera);
-            // TODO: position and size
+            entityManager().AddComponent<PositionComponent>(camera, Position(1000, 1000));
+            entityManager().AddComponent<SizeComponent>(camera, Size(2000, 2000));
         }
 
         void CreateParallaxEffect() {
@@ -68,7 +70,7 @@ namespace Asteroids {
         void CreateShip() {
             auto ship = entityManager().CreateEntity();
             entityManager().AddComponent<SizeComponent>(ship, Size(0, 150));
-            entityManager().AddComponent<PositionComponent>(ship);
+            entityManager().AddComponent<PositionComponent>(ship, Position(1000, 1000));
             entityManager().AddComponent<RotationComponent>(ship);
             entityManager().AddComponent<ImageComponent>(ship, ":/ship.png");
         }
@@ -77,6 +79,7 @@ namespace Asteroids {
         void LoadComponents(LocalEntityManager& entityManager) {
             CreateWindowEntity();
             CreateCanvas();
+            CreateCamera();
             CreateStars();
             CreateShip();
         }
