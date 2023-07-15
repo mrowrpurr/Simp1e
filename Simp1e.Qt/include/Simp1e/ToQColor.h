@@ -5,7 +5,5 @@
 #include <QColor>
 
 namespace Simp1e {
-    QColor ToQColor(const Color& color) {
-        return QColor(color.red(), color.green(), color.blue(), color.alpha());
-    }
+    QColor ToQColor(const Color& color) { return QColor(color.red(), color.green(), color.blue(), color.alpha()); }
 }

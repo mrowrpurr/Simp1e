@@ -26,6 +26,7 @@
 #include <Simp1e/QtMenuComponent.h>
 #include <Simp1e/QtSimp1eGraphicsItem.h>
 #include <Simp1e/QtSimp1eGraphicsItemComponent.h>
+#include <Simp1e/QtSimp1ePlatformDetection.h>
 #include <Simp1e/ToQRect.h>
 #include <Simp1e/ToQSize.h>
 #include <_Log_.h>
@@ -97,8 +98,13 @@ namespace Simp1e {
                 entityManager()->AddComponent<QtMainWindowComponent>(entity, windowComponent->GetTitle());
             entityManager()->AddComponent<QWidgetComponent>(entity, qtMainWindowComponent->GetCentralQWidget());
             _guiGlobalWindow = qtMainWindowComponent->GetQMainWindow();
-            //
-            qtMainWindowComponent->GetQMainWindow()->resize(1200, 900);
+#ifdef SIMP1E_DESKTOP
+            auto* size = entityManager()->GetComponent<ISizeComponent>(entity);
+            if (!size) _Log_("No window size specified");
+            if (size) _Log_("Resize main window to {}", size->GetSize().ToString());
+            if (size) qtMainWindowComponent->GetQMainWindow()->resize(ToQSize(size->GetSize()));
+#endif
+            qtMainWindowComponent->GetQMainWindow()->move(0, 0);
         }
 
         void OnWindowMenuAdded(Entity entity, ComponentType componentType, void* component) {

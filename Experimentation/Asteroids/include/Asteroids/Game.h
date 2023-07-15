@@ -33,6 +33,7 @@ namespace Asteroids {
 
         void CreateWindowEntity() {
             auto window = entityManager().CreateEntity();
+            entityManager().AddComponent<SizeComponent>(window, Size(1600, 1000));
             entityManager().AddComponent<WindowComponent>(window, "Asteroids (Simp1e prototype)");
         }
 
