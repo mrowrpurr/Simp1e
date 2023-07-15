@@ -23,6 +23,8 @@ namespace Simp1e {
             auto* imageComponent = component_cast<IImageComponent>(component);
             if (!imageComponent) return;  // TODO fix it so Painters() only get called for the right components
 
+            _Log_("Paint image for entity {}", entity);
+
             auto* entityManager = engine->GetEntities();
 
             // _Log_("PAINT IMAGE - PAINT IMAGE - PAINT IMAGE");

@@ -16,7 +16,6 @@
 #include <Simp1e/WindowComponent.h>
 #include <_Log_.h>
 
-#include <QAccelerometerReading>
 #include <QEvent>
 #include <QKeyEvent>
 #include <QTabletEvent>
@@ -32,48 +31,53 @@ namespace Asteroids {
 
         LocalEntityManager& entityManager() { return _engine.Entities(); }
 
-        Entity CreateWindowEntity() {
+        void CreateWindowEntity() {
             auto window = entityManager().CreateEntity();
             entityManager().AddComponent<WindowComponent>(window, "Asteroids (Simp1e prototype)");
-            return window;
         }
 
-        Entity CreateCanvas() {
+        void CreateCanvas() {
             auto canvas = entityManager().CreateEntity();
             entityManager().AddComponent<CanvasComponent>(canvas);
-            return canvas;
         }
 
-        Entity CreateCamera() {
+        void CreateCamera() {
             auto camera = entityManager().CreateEntity();
             entityManager().AddComponent<CameraComponent>(camera);
             // TODO: position and size
-            return camera;
         }
 
-        Entity CreateParallaxEffect() {
+        void CreateParallaxEffect() {
             auto parallaxEffect = entityManager().CreateEntity();
             entityManager().AddComponent<SizeComponent>(parallaxEffect);
             auto parallax = entityManager().AddComponent<ParallaxEffectComponent>(parallaxEffect);
             parallax->AddLayer("Layer1", ":/background-layer-1.jpg", 2.0f, 1.0f, 0.4f);
             parallax->AddLayer("Layer2", ":/background-layer-2.png", 0.4f, 3.0f, 0.7f);
             parallax->AddLayer("Layer3", ":/background-layer-3.png", 1.5f, 1.0f, 0.4f);
-            return parallaxEffect;
         }
 
-        Entity CreateShip() {
+        void CreateStars() {
+            auto starsBackground = entityManager().CreateEntity();
+            entityManager().AddComponent<SizeComponent>(starsBackground, 8000, 3330);
+            entityManager().AddComponent<PositionComponent>(starsBackground);
+            entityManager().AddComponent<ImageComponent>(starsBackground, ":/background-stars.png");
+            entityManager().AddComponent<RectangleComponent>(starsBackground);
+            entityManager().AddComponent<LineColorComponent>(starsBackground, Color::White());
+        }
+
+        void CreateShip() {
             auto ship = entityManager().CreateEntity();
-            entityManager().AddComponent<SizeComponent>(ship, Size(50, 75));
+            entityManager().AddComponent<SizeComponent>(ship, Size(0, 150));
             entityManager().AddComponent<PositionComponent>(ship);
             entityManager().AddComponent<RotationComponent>(ship);
             entityManager().AddComponent<ImageComponent>(ship, ":/ship.png");
-            return ship;
         }
 
         // TODO: load components from filesystem
         void LoadComponents(LocalEntityManager& entityManager) {
             CreateWindowEntity();
             CreateCanvas();
+            CreateStars();
             CreateShip();
         }
 

@@ -129,7 +129,7 @@ namespace Simp1e {
             auto* view            = new QSimp1eGraphicsView();
             auto* scene           = new QSimp1eGraphicsScene();
             view->setScene(scene);
-            _guiGlobalWindow->layout()->addWidget(view);
+            _guiGlobalWindow->centralWidget()->layout()->addWidget(view);
             _guiGlobalScene = scene;
             _guiGlobalView  = view;
         }
@@ -156,10 +156,12 @@ namespace Simp1e {
         void OnImageAdded(Entity entity, ComponentType componentType, void* component) {
             _Log_("-> ImageAdded");
             if (!_guiGlobalScene) return;
-            addGraphicsItem(entity)->GetQtSimp1eGraphicsItem();
+            addGraphicsItem(entity);
             auto* imageComponent = component_cast<IImageComponent>(component);
             auto* qImageComponent =
                 entityManager()->AddComponent<QtSimp1eImageComponent>(entity, imageComponent->GetImagePath());
+            auto* sizeComponent = entityManager()->GetComponent<ISizeComponent>(entity);
+            if (sizeComponent) qImageComponent->GetQSimp1eImage()->SetSize(sizeComponent->GetSize());
         }
 
         void OnParallaxEffectAdded(Entity entity, ComponentType componentType, void* component) {

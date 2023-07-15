@@ -26,9 +26,6 @@ namespace Simp1e {
             if (_imagePath.find(".svg") != std::string::npos)
                 _svg = std::make_unique<QGraphicsSvgItem>(_imagePath.c_str());
             else _originalPixmap = std::make_unique<QPixmap>(_imagePath.c_str());
-
-            if (_originalPixmap && _originalPixmap->isNull()) _Log_("Original pixmap was CREATED but is NULL");
-            else if (_originalPixmap) _Log_("Original pixmap was CREATED and is NOT NULL");
         }
 
         QPixmap*          GetPixmap() const { return _scaledPixmap ? _scaledPixmap.get() : _originalPixmap.get(); }
@@ -36,7 +33,7 @@ namespace Simp1e {
 
         ImageRenderType GetImageRenderType() const { return _svg ? ImageRenderType::Vector : ImageRenderType::Raster; }
 
-        void SetSize(const Size& size) {
+        void SetSize(Size size) {
             if (GetImageRenderType() == ImageRenderType::Vector) {
                 _Log_("SVG (resize) not supported yet");
                 return;
@@ -54,6 +51,12 @@ namespace Simp1e {
             if (_originalPixmap && _originalPixmap->width() == size.width() &&
                 _originalPixmap->height() == size.height())
                 return;
+            if (!size.IsNull() && !_originalPixmap->isNull()) {
+                if (size.width() == 0)
+                    size.SetWidth(_originalPixmap->width() * (size.height() / _originalPixmap->height()));
+                else if (size.height() == 0)
+                    size.SetHeight(_originalPixmap->height() * (size.width() / _originalPixmap->width()));
+            }
             _Log_("Resizing QPixmap to {}x{}", size.width(), size.height());
             _scaledPixmap = std::make_unique<QPixmap>(_originalPixmap->scaled(size.width(), size.height()));
         }
