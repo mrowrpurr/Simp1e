@@ -22,6 +22,18 @@ namespace Simp1e {
         void SetTwo(T two) { Vec2<T>::SetTwo(two); }
         void SetThree(T three) { _three = three; }
 
+        void AddToOne(T one) { Vec2<T>::AddToOne(one); }
+        void AddToTwo(T two) { Vec2<T>::AddToTwo(two); }
+        void AddToThree(T three) { _three += three; }
+
+        void SubtractFromOne(T one) { Vec2<T>::SubtractFromOne(one); }
+        void SubtractFromTwo(T two) { Vec2<T>::SubtractFromTwo(two); }
+        void SubtractFromThree(T three) { _three -= three; }
+
+        void MultiplyOne(T one) { Vec2<T>::MultiplyOne(one); }
+        void MultiplyTwo(T two) { Vec2<T>::MultiplyTwo(two); }
+        void MultiplyThree(T three) { _three *= three; }
+
         bool operator==(const Vec3& other) const { return Vec2<T>::operator==(other) && _three == other._three; }
 
         Vec3 operator+(const Vec3& other) const {
@@ -34,6 +46,8 @@ namespace Simp1e {
             return Vec3(one() * other.one(), two() * other.two(), three() * other.three());
         }
         Vec3 operator*(T scalar) const { return Vec3(one() * scalar, two() * scalar, three() * scalar); }
+
+        bool IsNull() const { return Vec2<T>::IsNull() && _three == T{}; }
 
         std::vector<T> ToVector() const { return {one(), two(), three()}; }
         operator std::vector<T>() const { return ToVector(); }

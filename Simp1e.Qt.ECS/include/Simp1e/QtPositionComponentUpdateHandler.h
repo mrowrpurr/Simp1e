@@ -18,6 +18,7 @@ namespace Simp1e {
             auto* position = component_cast<IPositionComponent>(component);
             if (!position) return;
             if (!position->IsDirty()) return;
+            _Log_("Position is dirty!");
 
             auto* entityManager = engine->GetEntities();
 
@@ -27,7 +28,16 @@ namespace Simp1e {
             if (!graphicsItem) return;
 
             auto pos = ToQPointF(position->GetPosition().ToPoint());
-            if (pos != graphicsItem->pos()) graphicsItem->setPos(pos);
+            if (pos != graphicsItem->pos()) {
+                _Log_("changing the position of the graphics item associated with this entity");
+                graphicsItem->setPos(pos);
+                graphicsItem->update();
+                // hmmm
+                graphicsItem->scene()->update();  // <--- grrrr whyyyy...
+                _Log_("Changed position of graphics item to {}", position->GetPosition().ToString());
+            } else {
+                _Log_("The position is the same as the existing graphics position");
+            }
             position->SetDirty(false);
             _Log_("UPDATED POSITION x:{} y:{}", pos.x(), pos.y());
         }

@@ -281,7 +281,7 @@ namespace Simp1e {
             iteration++;
             _engine->GetEntities()->ForEach<ICameraComponent>(
                 new_function_pointer([this](Entity, ComponentType, ComponentPointer ptr) {
-                    if (iteration % 100 != 0) return;
+                    if (iteration % 1000 != 0) return;
                     _Log_("Dirty Camera");
                     auto* camera = component_cast<ICameraComponent>(ptr);
                     if (camera) camera->SetDirty(true);

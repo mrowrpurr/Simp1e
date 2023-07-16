@@ -28,12 +28,23 @@ namespace Simp1e {
         void SetOne(T one) { _one = one; }
         void SetTwo(T two) { _two = two; }
 
+        void AddToOne(T one) { _one += one; }
+        void AddToTwo(T two) { _two += two; }
+
+        void SubtractFromOne(T one) { _one -= one; }
+        void SubtractFromTwo(T two) { _two -= two; }
+
+        void MultiplyOne(T one) { _one *= one; }
+        void MultiplyTwo(T two) { _two *= two; }
+
         bool operator==(const Vec2& other) const { return _one == other._one && _two == other._two; }
 
         Vec2 operator+(const Vec2& other) const { return Vec2(_one + other._one, _two + other._two); }
         Vec2 operator-(const Vec2& other) const { return Vec2(_one - other._one, _two - other._two); }
         Vec2 operator*(const Vec2& other) const { return Vec2(_one * other._one, _two * other._two); }
         Vec2 operator*(T scalar) const { return Vec2(_one * scalar, _two * scalar); }
+
+        bool IsNull() const { return _one == T{} && _two == T{}; }
 
         std::string ToString() const { return string_format("Vec2({}, {})", _one, _two); }
         operator std::string() const { return ToString(); }

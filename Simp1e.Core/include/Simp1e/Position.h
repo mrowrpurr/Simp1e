@@ -24,6 +24,18 @@ namespace Simp1e {
         void SetY(T y) { this->SetTwo(y); }
         void SetZ(T z) { this->SetThree(z); }
 
+        void AddToX(T x) { this->AddToOne(x); }
+        void AddToY(T y) { this->AddToTwo(y); }
+        void AddToZ(T z) { this->AddToThree(z); }
+
+        void SubtractFromX(T x) { this->SubtractFromOne(x); }
+        void SubtractFromY(T y) { this->SubtractFromTwo(y); }
+        void SubtractFromZ(T z) { this->SubtractFromThree(z); }
+
+        void MultiplyX(T x) { this->MultiplyOne(x); }
+        void MultiplyY(T y) { this->MultiplyTwo(y); }
+        void MultiplyZ(T z) { this->MultiplyThree(z); }
+
         bool operator==(const PositionT& other) const {
             return x() == other.x() && y() == other.y() && z() == other.z();
         }
@@ -32,25 +44,16 @@ namespace Simp1e {
         operator std::string() const { return ToString(); }
 
         PositionT operator+(const PositionT& other) const {
-            return PositionT(
-                one<T>() + other.template one<T>(), two<T>() + other.template two<T>(),
-                three<T>() + other.template three<T>()
-            );
+            return PositionT(this->one() + other.one(), this->two() + other.two(), this->three() + other.three());
         }
         PositionT operator-(const PositionT& other) const {
-            return PositionT(
-                one<T>() - other.template one<T>(), two<T>() - other.template two<T>(),
-                three<T>() - other.template three<T>()
-            );
+            return PositionT(this->one() - other.one(), this->two() - other.two(), this->three() - other.three());
         }
         PositionT operator*(const PositionT& other) const {
-            return PositionT(
-                one<T>() * other.template one<T>(), two<T>() * other.template two<T>(),
-                three<T>() * other.template three<T>()
-            );
+            return PositionT(this->one() * other.one(), this->two() * other.two(), this->three() * other.three());
         }
         PositionT operator*(T scalar) const {
-            return PositionT(one<T>() * scalar, two<T>() * scalar, three<T>() * scalar);
+            return PositionT(this->one() * scalar, this->two() * scalar, this->three() * scalar);
         }
     };
 

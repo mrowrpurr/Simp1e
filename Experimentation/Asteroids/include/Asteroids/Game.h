@@ -30,54 +30,33 @@ using namespace Simp1e;
 namespace Asteroids {
 
     class ShipMovementSystem {
-        IEngine* _engine;
-
-        FunctionPointer<void(KeyboardEvent*)> _onUp{this, &ShipMovementSystem::OnUp};
-        FunctionPointer<void(KeyboardEvent*)> _onDown{this, &ShipMovementSystem::OnDown};
-        FunctionPointer<void(KeyboardEvent*)> _onLeft{this, &ShipMovementSystem::OnLeft};
-        FunctionPointer<void(KeyboardEvent*)> _onRight{this, &ShipMovementSystem::OnRight};
-
-        void OnUp(KeyboardEvent* event) {
-            _Log_("UP!");
-            _Log_("KEY:{} pressed:{} repeat:{}", event->key(), event->pressed(), event->repeated());
-        }
-        void OnDown(KeyboardEvent*) { _Log_("DOWN!"); }
-        void OnLeft(KeyboardEvent*) { _Log_("LEFT!"); }
-        void OnRight(KeyboardEvent*) { _Log_("RIGHT!"); }
+        Entity ship;  // TODO note could lookup from singleton tag component instead
 
     public:
         DEFINE_SYSTEM_TYPE("Asteroids:ShipMovementSystem");
 
-        ShipMovementSystem(IEngine* engine) : _engine(engine) {
-            engine->GetInput()->GetKeyboardInputManager()->RegisterForKeyPressed(
-                FromKeyboardKey(KeyboardKey::Up), &_onUp
-            );
-            engine->GetInput()->GetKeyboardInputManager()->RegisterForKeyPressed(
-                FromKeyboardKey(KeyboardKey::Down), &_onDown
-            );
-            engine->GetInput()->GetKeyboardInputManager()->RegisterForKeyPressed(
-                FromKeyboardKey(KeyboardKey::Left), &_onLeft
-            );
-            engine->GetInput()->GetKeyboardInputManager()->RegisterForKeyPressed(
-                FromKeyboardKey(KeyboardKey::Right), &_onRight
-            );
-        }
+        ShipMovementSystem(Entity ship) : ship(ship) {}
 
-        ~ShipMovementSystem() {
-            auto* keyboardInputManager = _engine->GetInput()->GetKeyboardInputManager();
-            keyboardInputManager->UnregisterForKey(FromKeyboardKey(KeyboardKey::Up), &_onUp);
-            keyboardInputManager->UnregisterForKey(FromKeyboardKey(KeyboardKey::Down), &_onDown);
-            keyboardInputManager->UnregisterForKey(FromKeyboardKey(KeyboardKey::Left), &_onLeft);
-            keyboardInputManager->UnregisterForKey(FromKeyboardKey(KeyboardKey::Right), &_onRight);
-        }
+        void Update(IEngine* engine, float) {
+            auto* keyboardInputManager = engine->GetInput()->GetKeyboardInputManager();
 
-        void Update(IEngine*, float) {
-            //
-            // _Log_("SHIP MOVEMENT");
+            Point movementDelta;
+            if (keyboardInputManager->IsKeyPressed(FromKeyboardKey(KeyboardKey::Up))) movementDelta.SubtractFromY(1);
+            if (keyboardInputManager->IsKeyPressed(FromKeyboardKey(KeyboardKey::Down))) movementDelta.AddToY(1);
+            if (keyboardInputManager->IsKeyPressed(FromKeyboardKey(KeyboardKey::Left))) movementDelta.SubtractFromX(1);
+            if (keyboardInputManager->IsKeyPressed(FromKeyboardKey(KeyboardKey::Right))) movementDelta.AddToX(1);
+
+            if (!movementDelta.IsNull()) {
+                _Log_("NOT NULL");
+                auto* positionComponent = engine->GetEntities()->GetComponent<IPositionComponent>(ship);
+                if (positionComponent == nullptr) return;
+                positionComponent->SetPosition(positionComponent->GetPosition() + Position(movementDelta));
+            }
         }
     };
 
     class Game {
+        Entity      _ship;
         LocalEngine _engine;
         QtEngine    _qtEngine{&_engine};
 
@@ -130,6 +109,7 @@ namespace Asteroids {
             entityManager()->AddComponent<RotationComponent>(ship);
             entityManager()->AddComponent<ImageComponent>(ship, ":/ship.png");
             entityManager()->AddComponent<LineColorComponent>(ship, Color::Blue());
+            _ship = ship;
         }
 
         // TODO: load components from filesystem
@@ -145,7 +125,7 @@ namespace Asteroids {
             _engine.AddDefaultSystemGroups();
             _engine.GetSystemGroups()
                 ->GetGroup(DefaultSystemGroupTypes::InitializationGroup)
-                ->AddSystem<ShipMovementSystem>(&_engine);
+                ->AddSystem<ShipMovementSystem>(_ship);
         }
 
         void Setup() {

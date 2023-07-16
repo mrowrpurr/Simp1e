@@ -12,7 +12,6 @@ namespace Simp1e {
     template <typename T>
     class PointT : public Vec2<T> {
     public:
-        PointT() = default;
         PointT(T x = {}, T y = {}) : Vec2<T>(x, y) {}
 
         T x() const { return this->one(); }
@@ -20,6 +19,15 @@ namespace Simp1e {
 
         void SetX(T x) { SetOne(x); }
         void SetY(T y) { SetTwo(y); }
+
+        void AddToX(T x) { this->AddToOne(x); }
+        void AddToY(T y) { this->AddToTwo(y); }
+
+        void SubtractFromX(T x) { this->SubtractFromOne(x); }
+        void SubtractFromY(T y) { this->SubtractFromTwo(y); }
+
+        void MultiplyX(T x) { this->MultiplyOne(x); }
+        void MultiplyY(T y) { this->MultiplyTwo(y); }
 
         bool operator==(const PointT& other) const { return this->one() == other.one() && this->two() == other.two(); }
 

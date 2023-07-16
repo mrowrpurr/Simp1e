@@ -32,11 +32,9 @@ namespace Simp1e {
 
         EventResult::Value OnKeyEvent(QKeyEvent* event) {
             auto keyboardEvent = FromQKeyEvent(event);
-            _Log_(
-                "Qt OnKeyEvent key:{} pressed:{} repeat:{}", keyboardEvent.key(), keyboardEvent.pressed(),
-                keyboardEvent.repeated()
+            _engine->GetInput()->GetKeyboardInputManager()->SetKeyPressed(
+                keyboardEvent.key(), keyboardEvent.pressed(), keyboardEvent.repeated(), true
             );
-            _engine->GetInput()->GetKeyboardInputManager()->EmitKeyEvent(&keyboardEvent);
             return EventResult::Continue;
         }
 

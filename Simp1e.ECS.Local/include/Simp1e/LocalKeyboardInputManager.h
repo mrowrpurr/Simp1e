@@ -51,7 +51,7 @@ namespace Simp1e {
             return found->second;
         }
 
-        void EmitKeyEvent(KeyboardEvent* event) {
+        void EmitKeyEvent(KeyboardEvent* event) override {
             TriggerAnyKeyCallbacks(event);
             TriggerCallbacksForKey(event->key(), event);
             if (event->pressed()) TriggerPressedCallbacksForKey(event->key(), event);
