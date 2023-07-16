@@ -1,12 +1,15 @@
 #pragma once
 
 #include <Simp1e/DefaultSystemGroupTypes.h>
+#include <Simp1e/FromQKeyEvent.h>
 #include <Simp1e/IEngine.h>
+#include <Simp1e/IKeyboardEvent.h>
 #include <Simp1e/LocalSystemGroup.h>
 #include <Simp1e/QSimp1eApp.h>
 #include <Simp1e/QtGameLoop.h>
 #include <Simp1e/QtGuiSystem.h>
 #include <Simp1e/QtSystemGroupTypes.h>
+#include <_Log_.h>
 
 #include <QLabel>
 #include <memory>
@@ -27,6 +30,15 @@ namespace Simp1e {
             qtGroup->AddSystemPointer<QtGuiSystem>(_guiSystem.get());
         }
 
+        EventResult::Value OnKeyEvent(QKeyEvent* event) {
+            _Log_("QtEngine::OnKeyEvent()");
+            auto keyboardEvent = FromQKeyEvent(event);
+            _engine->GetEvents()->EmitEventPointer<KeyboardEvent>(&keyboardEvent);
+            return EventResult::Continue;
+        }
+
+        void SetupInputEventEmitting() { _app.OnKeyEvent({this, &QtEngine::OnKeyEvent}); }
+
     public:
         // TODO: Find a way to refactor into something that actually really makes proper use of Systems<> maybe?
         QtEngine(IEngine* engine)
@@ -34,6 +46,7 @@ namespace Simp1e {
               _gameLoop(std::make_unique<QtGameLoop>(engine)),
               _guiSystem(std::make_unique<QtGuiSystem>(engine)) {
             SetupSystems();
+            SetupInputEventEmitting();
         }
 
         ISystemGroup* GetQtRenderGroup() const {

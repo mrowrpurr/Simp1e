@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Simp1e/DefineEventType.h>
-#include <Simp1e/KeyboardKey.h>
 
 namespace Simp1e {
 
@@ -10,8 +9,8 @@ namespace Simp1e {
 
         virtual ~IKeyboardEvent() = default;
 
-        virtual KeyboardKey key() const      = 0;
-        virtual bool        pressed() const  = 0;
-        virtual bool        repeated() const = 0;
+        virtual int  key() const      = 0;
+        virtual bool pressed() const  = 0;
+        virtual bool repeated() const = 0;
     };
 }

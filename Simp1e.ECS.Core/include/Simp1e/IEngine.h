@@ -16,5 +16,7 @@ namespace Simp1e {
         virtual IEventManager*       GetEvents()       = 0;
         virtual ICommandManager*     GetCommands()     = 0;
         virtual ISystemGroupManager* GetSystemGroups() = 0;
+
+        // IInputManager
     };
 }

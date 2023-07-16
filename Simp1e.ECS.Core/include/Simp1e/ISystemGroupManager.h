@@ -12,7 +12,12 @@ namespace Simp1e {
     struct ISystemGroupManager {
         virtual ~ISystemGroupManager() = default;
 
+        // TODO: split this
         virtual void Update(IEngine* environment, double deltaTime) = 0;
+
+        // Update
+        // FixedUpdate
+        // FrameUpdate
 
         virtual ISystemGroup* AddGroup(SystemGroupType groupName)          = 0;
         virtual ISystemGroup* GetGroup(SystemGroupType systemGroupType)    = 0;
