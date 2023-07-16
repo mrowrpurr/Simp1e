@@ -25,8 +25,10 @@ namespace Simp1e {
 
         template <typename T>
         SystemPointer AddSystemPointer(T* system) {
+            auto* ptr = new VoidPointer(system);
+            ptr->disable_destruct_on_delete();
             return AddSystemPointer(
-                SystemTypeFromType<T>(), new VoidPointer(system),
+                SystemTypeFromType<T>(), ptr,
                 new_function_pointer([system](IEngine* engine, double timeDelta) { system->Update(engine, timeDelta); })
             );
         }
