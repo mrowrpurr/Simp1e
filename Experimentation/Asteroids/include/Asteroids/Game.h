@@ -4,8 +4,10 @@
 #include <Simp1e/CanvasComponent.h>
 #include <Simp1e/EventCast.h>
 #include <Simp1e/FillColorComponent.h>
+#include <Simp1e/FromKeyboardKey.h>
 #include <Simp1e/ImageComponent.h>
 #include <Simp1e/KeyboardEvent.h>
+#include <Simp1e/KeyboardKey.h>
 #include <Simp1e/LineColorComponent.h>
 #include <Simp1e/LocalEngine.h>
 #include <Simp1e/ParallaxEffectComponent.h>
@@ -26,6 +28,54 @@
 using namespace Simp1e;
 
 namespace Asteroids {
+
+    class ShipMovementSystem {
+        IEngine* _engine;
+
+        FunctionPointer<void(KeyboardEvent*)> _onUp{this, &ShipMovementSystem::OnUp};
+        FunctionPointer<void(KeyboardEvent*)> _onDown{this, &ShipMovementSystem::OnDown};
+        FunctionPointer<void(KeyboardEvent*)> _onLeft{this, &ShipMovementSystem::OnLeft};
+        FunctionPointer<void(KeyboardEvent*)> _onRight{this, &ShipMovementSystem::OnRight};
+
+        void OnUp(KeyboardEvent* event) {
+            _Log_("UP!");
+            _Log_("KEY:{} pressed:{} repeat:{}", event->key(), event->pressed(), event->repeated());
+        }
+        void OnDown(KeyboardEvent*) { _Log_("DOWN!"); }
+        void OnLeft(KeyboardEvent*) { _Log_("LEFT!"); }
+        void OnRight(KeyboardEvent*) { _Log_("RIGHT!"); }
+
+    public:
+        DEFINE_SYSTEM_TYPE("Asteroids:ShipMovementSystem");
+
+        ShipMovementSystem(IEngine* engine) : _engine(engine) {
+            engine->GetInput()->GetKeyboardInputManager()->RegisterForKeyPressed(
+                FromKeyboardKey(KeyboardKey::Up), &_onUp
+            );
+            engine->GetInput()->GetKeyboardInputManager()->RegisterForKeyPressed(
+                FromKeyboardKey(KeyboardKey::Down), &_onDown
+            );
+            engine->GetInput()->GetKeyboardInputManager()->RegisterForKeyPressed(
+                FromKeyboardKey(KeyboardKey::Left), &_onLeft
+            );
+            engine->GetInput()->GetKeyboardInputManager()->RegisterForKeyPressed(
+                FromKeyboardKey(KeyboardKey::Right), &_onRight
+            );
+        }
+
+        ~ShipMovementSystem() {
+            auto* keyboardInputManager = _engine->GetInput()->GetKeyboardInputManager();
+            keyboardInputManager->UnregisterForKey(FromKeyboardKey(KeyboardKey::Up), &_onUp);
+            keyboardInputManager->UnregisterForKey(FromKeyboardKey(KeyboardKey::Down), &_onDown);
+            keyboardInputManager->UnregisterForKey(FromKeyboardKey(KeyboardKey::Left), &_onLeft);
+            keyboardInputManager->UnregisterForKey(FromKeyboardKey(KeyboardKey::Right), &_onRight);
+        }
+
+        void Update(IEngine*, float) {
+            //
+            // _Log_("SHIP MOVEMENT");
+        }
+    };
 
     class Game {
         LocalEngine _engine;
@@ -83,7 +133,7 @@ namespace Asteroids {
         }
 
         // TODO: load components from filesystem
-        void LoadComponents(LocalEntityManager& entityManager) {
+        void LoadComponents() {
             CreateWindowEntity();
             CreateCanvas();
             CreateCamera();
@@ -91,17 +141,16 @@ namespace Asteroids {
             CreateShip();
         }
 
-        EventResult::Value OnKeyboardEvent(EventPointer event) {
-            auto* keyboardEvent = event_cast<KeyboardEvent>(event);
-            if (keyboardEvent->pressed()) _Log_("Pressed key {}", keyboardEvent->key());
-            return EventResult::Continue;
+        void SetupSystems() {
+            _engine.AddDefaultSystemGroups();
+            _engine.GetSystemGroups()
+                ->GetGroup(DefaultSystemGroupTypes::InitializationGroup)
+                ->AddSystem<ShipMovementSystem>(&_engine);
         }
 
-        void ListenForEvents() { eventManager()->RegisterListener<KeyboardEvent>({this, &Game::OnKeyboardEvent}); }
-
         void Setup() {
-            LoadComponents(_engine.Entities());
-            ListenForEvents();
+            LoadComponents();
+            SetupSystems();
         }
 
     public:

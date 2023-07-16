@@ -214,6 +214,8 @@ namespace Simp1e {
     public:
         DEFINE_SYSTEM_TYPE("QtGUI")
 
+        ~QtGuiSystem() { delete _entityPaintFunctionPointer; }
+
         // TODO: move all of these default handlers/painters/etc into includes which, when included, do a registration
         // TODO: and/or a subclass of QtGuiSystem with various defaults.
         //

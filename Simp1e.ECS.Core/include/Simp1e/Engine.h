@@ -7,18 +7,22 @@
 #include "IEngine.h"
 #include "IEntityManager.h"
 #include "IEventManager.h"
+#include "IInputManager.h"
 #include "ISystemGroupManager.h"
 
 // TODO - Add a JobManager
 
 namespace Simp1e {
 
-    template <typename EntityManagerT, typename SystemGroupManagerT, typename EventManagerT, typename CommandManagerT>
+    template <
+        typename EntityManagerT, typename SystemGroupManagerT, typename EventManagerT, typename CommandManagerT,
+        typename InputManagerT>
     class Engine : public IEngine {
         EntityManagerT      _entityManager;
         SystemGroupManagerT _systemGroupManager;
         EventManagerT       _eventManager;
         CommandManagerT     _commandManager;
+        InputManagerT       _inputManager;
 
         std::chrono::high_resolution_clock::time_point _mainLoopLastTime = std::chrono::high_resolution_clock::now();
 
@@ -36,10 +40,12 @@ namespace Simp1e {
         ISystemGroupManager* GetSystemGroups() override { return &_systemGroupManager; }
         IEventManager*       GetEvents() override { return &_eventManager; }
         ICommandManager*     GetCommands() override { return &_commandManager; }
+        IInputManager*       GetInput() override { return &_inputManager; }
 
         EntityManagerT&      Entities() { return _entityManager; }
         SystemGroupManagerT& SystemGroups() { return _systemGroupManager; }
         EventManagerT&       Events() { return _eventManager; }
         CommandManagerT&     Commands() { return _commandManager; }
+        InputManagerT&       Input() { return _inputManager; }
     };
 }

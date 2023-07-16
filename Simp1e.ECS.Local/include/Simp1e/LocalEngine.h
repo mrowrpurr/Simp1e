@@ -6,12 +6,14 @@
 #include "LocalCommandManager.h"
 #include "LocalEntityManager.h"
 #include "LocalEventManager.h"
+#include "LocalInputManager.h"
 #include "LocalSystemGroupManager.h"
 
 namespace Simp1e {
 
     class LocalEngine
-        : public Engine<LocalEntityManager, LocalSystemGroupManager, LocalEventManager, LocalCommandManager> {
+        : public Engine<
+              LocalEntityManager, LocalSystemGroupManager, LocalEventManager, LocalCommandManager, LocalInputManager> {
     public:
         void AddDefaultSystemGroups() {
             SystemGroups().AddGroup(DefaultSystemGroupTypes::InitializationGroup);

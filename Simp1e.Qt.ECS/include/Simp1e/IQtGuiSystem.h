@@ -10,7 +10,7 @@
 
 namespace Simp1e {
 
-    struct IQtGuiSystem {
+    struct UNUSED_IQtGuiSystem {
         DEFINE_SYSTEM_TYPE("QtGUI")
 
         virtual void Update(IEngine* engine, double deltaTime) = 0;

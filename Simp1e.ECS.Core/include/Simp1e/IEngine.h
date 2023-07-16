@@ -3,6 +3,7 @@
 #include "ICommandManager.h"
 #include "IEntityManager.h"
 #include "IEventManager.h"
+#include "IInputManager.h"
 #include "ISystemGroupManager.h"
 
 namespace Simp1e {
@@ -16,7 +17,6 @@ namespace Simp1e {
         virtual IEventManager*       GetEvents()       = 0;
         virtual ICommandManager*     GetCommands()     = 0;
         virtual ISystemGroupManager* GetSystemGroups() = 0;
-
-        // IInputManager
+        virtual IInputManager*       GetInput()        = 0;
     };
 }
