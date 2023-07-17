@@ -9,7 +9,7 @@
 
 namespace Simp1e {
     KeyboardEvent FromQKeyEvent(QKeyEvent* event) {
-        auto key      = FromKeyboardKey(FromQKeyValue(event->key()));
+        auto key      = FromKeyboardKey(FromQKeyValue(event->key(), event->modifiers(), event->nativeScanCode()));
         auto pressed  = event->type() == QEvent::Type::KeyPress;
         auto repeated = event->isAutoRepeat();
         return {key, pressed, repeated};

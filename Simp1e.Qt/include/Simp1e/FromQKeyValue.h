@@ -2,12 +2,32 @@
 
 #include <Simp1e/KeyboardKey.h>
 
+#include <QKeyCombination>
 #include <QKeyEvent>
 
 namespace Simp1e {
 
-    KeyboardKey FromQKeyValue(int key) {
+    KeyboardKey FromQKeyValue(
+        int key, Qt::KeyboardModifiers modifiers = {}, int nativeScanCode = 0, int rightCtrl = 285, int rightShift = 54,
+        int rightAlt = 312
+    ) {
         // Number keys
+        if (modifiers & Qt::KeypadModifier) {
+            if (key == Qt::Key_0) return KeyboardKey::NumPad0;
+            if (key == Qt::Key_1) return KeyboardKey::NumPad1;
+            if (key == Qt::Key_2) return KeyboardKey::NumPad2;
+            if (key == Qt::Key_3) return KeyboardKey::NumPad3;
+            if (key == Qt::Key_4) return KeyboardKey::NumPad4;
+            if (key == Qt::Key_5) return KeyboardKey::NumPad5;
+            if (key == Qt::Key_6) return KeyboardKey::NumPad6;
+            if (key == Qt::Key_7) return KeyboardKey::NumPad7;
+            if (key == Qt::Key_8) return KeyboardKey::NumPad8;
+            if (key == Qt::Key_9) return KeyboardKey::NumPad9;
+            if (key == Qt::Key_Asterisk) return KeyboardKey::NumPadMultiply;
+            if (key == Qt::Key_Plus) return KeyboardKey::NumPadAdd;
+            if (key == Qt::Key_Minus) return KeyboardKey::NumPadSubtract;
+            if (key == Qt::Key_Slash) return KeyboardKey::NumPadDivide;
+        }
         if (key == Qt::Key_0) return KeyboardKey::Key0;
         if (key == Qt::Key_1) return KeyboardKey::Key1;
         if (key == Qt::Key_2) return KeyboardKey::Key2;
@@ -18,19 +38,6 @@ namespace Simp1e {
         if (key == Qt::Key_7) return KeyboardKey::Key7;
         if (key == Qt::Key_8) return KeyboardKey::Key8;
         if (key == Qt::Key_9) return KeyboardKey::Key9;
-
-        // NumPad keys
-        if (key == Qt::Key_0 + Qt::KeypadModifier) return KeyboardKey::NumPad0;
-        if (key == Qt::Key_1 + Qt::KeypadModifier) return KeyboardKey::NumPad1;
-        if (key == Qt::Key_2 + Qt::KeypadModifier) return KeyboardKey::NumPad2;
-        if (key == Qt::Key_3 + Qt::KeypadModifier) return KeyboardKey::NumPad3;
-        if (key == Qt::Key_4 + Qt::KeypadModifier) return KeyboardKey::NumPad4;
-        if (key == Qt::Key_5 + Qt::KeypadModifier) return KeyboardKey::NumPad5;
-        if (key == Qt::Key_6 + Qt::KeypadModifier) return KeyboardKey::NumPad6;
-        if (key == Qt::Key_7 + Qt::KeypadModifier) return KeyboardKey::NumPad7;
-        if (key == Qt::Key_8 + Qt::KeypadModifier) return KeyboardKey::NumPad8;
-        if (key == Qt::Key_9 + Qt::KeypadModifier) return KeyboardKey::NumPad9;
-        if (key == Qt::Key_Period + Qt::KeypadModifier) return KeyboardKey::NumPadDecimal;
 
         // Function keys
         if (key == Qt::Key_F1) return KeyboardKey::F1;
@@ -74,6 +81,21 @@ namespace Simp1e {
         if (key == Qt::Key_Y) return KeyboardKey::Y;
         if (key == Qt::Key_Z) return KeyboardKey::Z;
 
+        if (key == Qt::Key_Control) {
+            if (nativeScanCode == rightCtrl) return KeyboardKey::RightCtrl;
+            return KeyboardKey::LeftCtrl;
+        }
+
+        if (key == Qt::Key_Shift) {
+            if (nativeScanCode == rightShift) return KeyboardKey::RightShift;
+            return KeyboardKey::LeftShift;
+        }
+
+        if (key == Qt::Key_Alt) {
+            if (nativeScanCode == rightAlt) return KeyboardKey::RightAlt;
+            return KeyboardKey::LeftAlt;
+        }
+
         // Other keys
         if (key == Qt::Key_Backspace) return KeyboardKey::Backspace;
         if (key == Qt::Key_Delete) return KeyboardKey::Delete;
@@ -93,18 +115,11 @@ namespace Simp1e {
         if (key == Qt::Key_Down) return KeyboardKey::Down;
         if (key == Qt::Key_Left) return KeyboardKey::Left;
         if (key == Qt::Key_Right) return KeyboardKey::Right;
-        if (key == Qt::Key_Asterisk + Qt::KeypadModifier) return KeyboardKey::NumPadMultiply;
-        if (key == Qt::Key_Plus + Qt::KeypadModifier) return KeyboardKey::NumPadAdd;
-        if (key == Qt::Key_Minus + Qt::KeypadModifier) return KeyboardKey::NumPadSubtract;
-        if (key == Qt::Key_Slash + Qt::KeypadModifier) return KeyboardKey::NumPadDivide;
         if (key == Qt::Key_NumLock) return KeyboardKey::NumLock;
         if (key == Qt::Key_ScrollLock) return KeyboardKey::ScrollLock;
         if (key == Qt::Key_Shift) return KeyboardKey::LeftShift;
-        if (key == Qt::Key_Shift + Qt::ShiftModifier) return KeyboardKey::RightShift;
         if (key == Qt::Key_Control) return KeyboardKey::LeftCtrl;
-        if (key == Qt::Key_Control + Qt::ControlModifier) return KeyboardKey::RightCtrl;
         if (key == Qt::Key_Alt) return KeyboardKey::LeftAlt;
-        if (key == Qt::Key_Alt + Qt::AltModifier) return KeyboardKey::RightAlt;
         if (key == Qt::Key_Semicolon) return KeyboardKey::Semicolon;
         if (key == Qt::Key_Plus) return KeyboardKey::Plus;
         if (key == Qt::Key_Comma) return KeyboardKey::Comma;

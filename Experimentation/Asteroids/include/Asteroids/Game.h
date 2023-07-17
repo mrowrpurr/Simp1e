@@ -39,6 +39,12 @@ namespace Asteroids {
         ShipMovementSystem(Entity ship, Entity camera) : ship(ship), camera(camera) {}
 
         void Update(IEngine* engine, float) {
+            auto accelerometerReading = engine->GetInput()->GetSensors()->ReadAccelerometer();
+            _Log_(
+                "Acclerometer x:{} y:{} z:{}", accelerometerReading.one(), accelerometerReading.two(),
+                accelerometerReading.three()
+            );
+
             auto* keyboardInputManager = engine->GetInput()->GetKeyboard();
             auto* rotationComponent    = engine->GetEntities()->GetComponent<IRotationComponent>(ship);
 
@@ -142,6 +148,16 @@ namespace Asteroids {
             CreateShip();
         }
 
+        std::unique_ptr<IFunctionPointer<Vec3<sreal>()>> _readSensorsFunction;
+
+        void SetupSensors() {
+#ifdef SIMP1E_MOBILE
+            _readSensorsFunction = unique_function_pointer(&_qtEngine, &QtEngine::GetAccelerometerReading);
+            _engine.Input().Sensors().SetAccelerometerReadFunction(_readSensorsFunction.get());
+            _qtEngine.UseAccelerometer();
+#endif
+        }
+
         void SetupSystems() {
             _engine.AddDefaultSystemGroups();
             _engine.GetSystemGroups()
@@ -150,6 +166,7 @@ namespace Asteroids {
         }
 
         void Setup() {
+            SetupSensors();
             LoadComponents();
             SetupSystems();
         }

@@ -38,7 +38,7 @@ namespace Simp1e {
             return EventResult::Continue;
         }
 
-        void SetupInputEventEmitting() { _app.OnKeyEvent({this, &QtEngine::OnKeyEvent}); }
+        void SetupEvents() { _app.OnKeyEvent({this, &QtEngine::OnKeyEvent}); }
 
     public:
         // TODO: Find a way to refactor into something that actually really makes proper use of Systems<> maybe?
@@ -47,7 +47,7 @@ namespace Simp1e {
               _gameLoop(std::make_unique<QtGameLoop>(engine)),
               _guiSystem(std::make_unique<QtGuiSystem>(engine)) {
             SetupSystems();
-            SetupInputEventEmitting();
+            SetupEvents();
         }
 
         ISystemGroup* GetQtRenderGroup() const {
@@ -55,6 +55,13 @@ namespace Simp1e {
         }
 
         QtGuiSystem* GetQtGuiSystem() const { return _guiSystem.get(); }
+
+        void UseAccelerometer(bool useAccelerometer = true) {
+            if (useAccelerometer) _app.StartAccelerometer();
+            else _app.StopAccelerometer();
+        }
+
+        Vec3<sreal> GetAccelerometerReading() { return _app.GetAccelerometerReading(); }
 
         void Run() {
             _gameLoop->Run();
