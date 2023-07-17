@@ -9,7 +9,7 @@ namespace Simp1e {
         T _three = 0;
 
     public:
-        Vec3(T one, T two, T three) : Vec2<T>(one, two), _three(three) {}
+        Vec3(T one = {}, T two = {}, T three = {}) : Vec2<T>(one, two), _three(three) {}
         Vec3(const std::vector<T>& values) : Vec2<T>(values) {
             if (values.size() > 2) _three = values[2];
         }

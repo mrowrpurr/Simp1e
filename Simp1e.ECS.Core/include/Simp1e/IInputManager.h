@@ -1,13 +1,15 @@
 #pragma once
 
 #include "IKeyboardInputManager.h"
+#include "ISensorInputManager.h"
 
 namespace Simp1e {
 
     struct IInputManager {
         virtual ~IInputManager() = default;
 
-        virtual IKeyboardInputManager* GetKeyboardInputManager() = 0;
+        virtual IKeyboardInputManager* GetKeyboard() = 0;
+        virtual ISensorInputManager*   GetSensors()  = 0;
 
         // Do something super simple to start with.
 

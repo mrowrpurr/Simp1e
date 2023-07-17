@@ -1,7 +1,5 @@
 #pragma once
 
-#include <_Log_.h>
-
 #include <chrono>
 
 #include "IEngine.h"

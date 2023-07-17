@@ -16,9 +16,9 @@ namespace Simp1e {
               LocalEntityManager, LocalSystemGroupManager, LocalEventManager, LocalCommandManager, LocalInputManager> {
     public:
         void AddDefaultSystemGroups() {
-            SystemGroups().AddGroup(DefaultSystemGroupTypes::InitializationGroup);
-            SystemGroups().AddGroup(DefaultSystemGroupTypes::SimulationGroup);
-            SystemGroups().AddGroup(DefaultSystemGroupTypes::PresentationGroup);
+            GetSystemGroups()->AddGroup(DefaultSystemGroupTypes::InitializationGroup);
+            GetSystemGroups()->AddGroup(DefaultSystemGroupTypes::SimulationGroup);
+            GetSystemGroups()->AddGroup(DefaultSystemGroupTypes::PresentationGroup);
         }
     };
 }

@@ -85,7 +85,7 @@ namespace Simp1e {
             auto* lineColor = entityManager->GetComponent<ILineColorComponent>(entity);
             if (lineColor) {
                 painter->setPen(QPen(ToQColor(lineColor->GetColor()), 5.0, Qt::SolidLine));
-                painter->drawRect(ToQRectF(Rectangle({0, 0}, qImage->GetSize())));
+                painter->drawRect(ToQRectF(Rectangle({0, 0}, qImage->GetActualSize())));
             }
         }
     };

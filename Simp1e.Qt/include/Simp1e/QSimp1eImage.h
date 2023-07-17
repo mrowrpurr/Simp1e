@@ -68,6 +68,12 @@ namespace Simp1e {
             if (!_rotating && _rotation != 0) RotateTo(_rotation);
         }
 
+        Size GetActualSize() {
+            if (_scaledPixmap) return Size(_scaledPixmap->width(), _scaledPixmap->height());
+            else if (_originalPixmap) return Size(_originalPixmap->width(), _originalPixmap->height());
+            else return {};
+        }
+
         Size GetSize() const {
             if (GetImageRenderType() == ImageRenderType::Vector) {
                 _Log_("SVG (size) not supported yet");
@@ -96,15 +102,22 @@ namespace Simp1e {
             auto image = GetPixmap()->toImage();
             //....
 
-            auto rotatedImage = QImage(image.size(), QImage::Format_ARGB32_Premultiplied);
+            // Calculate size of the bounding rectangle after rotation
+            double radAngle  = qDegreesToRadians(static_cast<double>(_rotation));
+            double sinVal    = std::abs(std::sin(radAngle));
+            double cosVal    = std::abs(std::cos(radAngle));
+            int    newWidth  = image.width() * cosVal + image.height() * sinVal;
+            int    newHeight = image.width() * sinVal + image.height() * cosVal;
+
+            auto rotatedImage = QImage(newWidth, newHeight, QImage::Format_ARGB32_Premultiplied);
             rotatedImage.fill(Qt::transparent);
 
             auto painter = QPainter(&rotatedImage);
             painter.setRenderHint(QPainter::Antialiasing);
             painter.setRenderHint(QPainter::SmoothPixmapTransform);
-            painter.translate(rotatedImage.size().width() / 2.0, rotatedImage.size().height() / 2.0);
+            painter.translate(rotatedImage.width() / 2.0, rotatedImage.height() / 2.0);
             painter.rotate(_rotation);
-            painter.translate(-image.size().width() / 2.0, -image.size().height() / 2.0);
+            painter.translate(-image.width() / 2.0, -image.height() / 2.0);
             painter.drawImage(0, 0, image);
             painter.end();
 

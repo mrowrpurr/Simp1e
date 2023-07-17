@@ -39,7 +39,7 @@ namespace Asteroids {
         ShipMovementSystem(Entity ship, Entity camera) : ship(ship), camera(camera) {}
 
         void Update(IEngine* engine, float) {
-            auto* keyboardInputManager = engine->GetInput()->GetKeyboardInputManager();
+            auto* keyboardInputManager = engine->GetInput()->GetKeyboard();
             auto* rotationComponent    = engine->GetEntities()->GetComponent<IRotationComponent>(ship);
 
             int rotationDelta = 0;
@@ -129,7 +129,7 @@ namespace Asteroids {
             entityManager()->AddComponent<PositionComponent>(ship, Position(100, 100));
             entityManager()->AddComponent<RotationComponent>(ship);
             entityManager()->AddComponent<ImageComponent>(ship, ":/ship.png");
-            entityManager()->AddComponent<LineColorComponent>(ship, Color::Blue());
+            entityManager()->AddComponent<LineColorComponent>(ship, Color::Blue(40));
             _ship = ship;
         }
 

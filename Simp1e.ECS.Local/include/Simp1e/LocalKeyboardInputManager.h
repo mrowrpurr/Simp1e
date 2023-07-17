@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Simp1e/IKeyboardEvent.h>
 #include <Simp1e/IKeyboardInputManager.h>
 #include <_Log_.h>
 
@@ -9,31 +10,31 @@
 namespace Simp1e {
 
     class LocalKeyboardInputManager : public IKeyboardInputManager {
-        std::unordered_map<int, bool>                                    _currentlyPressedKeys;
-        std::unordered_map<int, bool>                                    _currentlyPressedModifiers;
-        std::unordered_map<int, IFunctionPointer<void(KeyboardEvent*)>*> _keyCallbacks;
-        std::unordered_map<int, IFunctionPointer<void(KeyboardEvent*)>*> _keyPressedCallbacks;
-        std::unordered_map<int, IFunctionPointer<void(KeyboardEvent*)>*> _keyReleasedCallbacks;
-        std::unordered_set<IFunctionPointer<void(KeyboardEvent*)>*>      _anyKeyCallbacks;
-        std::unordered_set<IFunctionPointer<void(KeyboardEvent*)>*>      _anyKeyPressedCallbacks;
-        std::unordered_set<IFunctionPointer<void(KeyboardEvent*)>*>      _anyKeyReleasedCallbacks;
+        std::unordered_map<int, bool>                                     _currentlyPressedKeys;
+        std::unordered_map<int, bool>                                     _currentlyPressedModifiers;
+        std::unordered_map<int, IFunctionPointer<void(IKeyboardEvent*)>*> _keyCallbacks;
+        std::unordered_map<int, IFunctionPointer<void(IKeyboardEvent*)>*> _keyPressedCallbacks;
+        std::unordered_map<int, IFunctionPointer<void(IKeyboardEvent*)>*> _keyReleasedCallbacks;
+        std::unordered_set<IFunctionPointer<void(IKeyboardEvent*)>*>      _anyKeyCallbacks;
+        std::unordered_set<IFunctionPointer<void(IKeyboardEvent*)>*>      _anyKeyPressedCallbacks;
+        std::unordered_set<IFunctionPointer<void(IKeyboardEvent*)>*>      _anyKeyReleasedCallbacks;
 
-        inline void TriggerAnyKeyCallbacks(KeyboardEvent* event) {
+        inline void TriggerAnyKeyCallbacks(IKeyboardEvent* event) {
             for (auto& callback : _anyKeyCallbacks) callback->invoke(event);
         }
 
-        inline void TriggerCallbacksForKey(int key, KeyboardEvent* event) {
+        inline void TriggerCallbacksForKey(int key, IKeyboardEvent* event) {
             auto found = _keyCallbacks.find(key);
             if (found != _keyCallbacks.end()) found->second->invoke(event);
         }
 
-        inline void TriggerPressedCallbacksForKey(int key, KeyboardEvent* event) {
+        inline void TriggerPressedCallbacksForKey(int key, IKeyboardEvent* event) {
             auto found = _keyPressedCallbacks.find(key);
             if (found != _keyPressedCallbacks.end()) found->second->invoke(event);
             for (auto& callback : _anyKeyPressedCallbacks) callback->invoke(event);
         }
 
-        inline void TriggerReleasedCallbacksForKey(int key, KeyboardEvent* event) {
+        inline void TriggerReleasedCallbacksForKey(int key, IKeyboardEvent* event) {
             auto found = _keyReleasedCallbacks.find(key);
             if (found != _keyReleasedCallbacks.end()) found->second->invoke(event);
             for (auto& callback : _anyKeyReleasedCallbacks) callback->invoke(event);
@@ -52,7 +53,7 @@ namespace Simp1e {
             return found->second;
         }
 
-        void EmitKeyEvent(KeyboardEvent* event) override {
+        void EmitKeyboardEvent(IKeyboardEvent* event) override {
             TriggerAnyKeyCallbacks(event);
             TriggerCallbacksForKey(event->key(), event);
             if (event->pressed()) TriggerPressedCallbacksForKey(event->key(), event);
@@ -65,7 +66,7 @@ namespace Simp1e {
             else _currentlyPressedKeys.erase(key);
             if (triggerCallbacks) {
                 KeyboardEvent event{key, pressed, isAutoRepeat};
-                EmitKeyEvent(&event);
+                EmitKeyboardEvent(&event);
             }
         }
 
@@ -73,13 +74,13 @@ namespace Simp1e {
             _currentlyPressedModifiers[modifierKey] = pressed;
         }
 
-        IFunctionPointer<void(KeyboardEvent*)>* RegisterForKey(
-            int key, IFunctionPointer<void(KeyboardEvent*)>* callbackFunctionPointer
+        IFunctionPointer<void(IKeyboardEvent*)>* RegisterForKey(
+            int key, IFunctionPointer<void(IKeyboardEvent*)>* callbackFunctionPointer
         ) override {
             _keyCallbacks[key] = callbackFunctionPointer;
             return callbackFunctionPointer;
         }
-        void UnregisterForKey(int key, IFunctionPointer<void(KeyboardEvent*)>* callbackPointer) override {
+        void UnregisterForKey(int key, IFunctionPointer<void(IKeyboardEvent*)>* callbackPointer) override {
             auto found = _keyCallbacks.find(key);
             if (found == _keyCallbacks.end()) return;
             if (found->second != callbackPointer) return;
@@ -88,13 +89,13 @@ namespace Simp1e {
         void UnregisterForKey(int key) override { _keyCallbacks.erase(key); }
         void UnregisterForKey() override { _keyCallbacks.clear(); }
 
-        IFunctionPointer<void(KeyboardEvent*)>* RegisterForKeyPressed(
-            int key, IFunctionPointer<void(KeyboardEvent*)>* callbackFunctionPointer
+        IFunctionPointer<void(IKeyboardEvent*)>* RegisterForKeyPressed(
+            int key, IFunctionPointer<void(IKeyboardEvent*)>* callbackFunctionPointer
         ) override {
             _keyPressedCallbacks[key] = callbackFunctionPointer;
             return callbackFunctionPointer;
         }
-        void UnregisterForKeyPressed(int key, IFunctionPointer<void(KeyboardEvent*)>* callbackPointer) override {
+        void UnregisterForKeyPressed(int key, IFunctionPointer<void(IKeyboardEvent*)>* callbackPointer) override {
             auto found = _keyPressedCallbacks.find(key);
             if (found == _keyPressedCallbacks.end()) return;
             if (found->second != callbackPointer) return;
@@ -103,13 +104,13 @@ namespace Simp1e {
         void UnregisterForKeyPressed(int key) override { _keyPressedCallbacks.erase(key); }
         void UnregisterForKeyPressed() override { _keyPressedCallbacks.clear(); }
 
-        IFunctionPointer<void(KeyboardEvent*)>* RegisterForKeyReleased(
-            int key, IFunctionPointer<void(KeyboardEvent*)>* callbackFunctionPointer
+        IFunctionPointer<void(IKeyboardEvent*)>* RegisterForKeyReleased(
+            int key, IFunctionPointer<void(IKeyboardEvent*)>* callbackFunctionPointer
         ) override {
             _keyReleasedCallbacks[key] = callbackFunctionPointer;
             return callbackFunctionPointer;
         }
-        void UnregisterForKeyReleased(int key, IFunctionPointer<void(KeyboardEvent*)>* callbackPointer) override {
+        void UnregisterForKeyReleased(int key, IFunctionPointer<void(IKeyboardEvent*)>* callbackPointer) override {
             auto found = _keyReleasedCallbacks.find(key);
             if (found == _keyReleasedCallbacks.end()) return;
             if (found->second != callbackPointer) return;
@@ -118,35 +119,35 @@ namespace Simp1e {
         void UnregisterForKeyReleased(int key) override { _keyReleasedCallbacks.erase(key); }
         void UnregisterForKeyReleased() override { _keyReleasedCallbacks.clear(); }
 
-        IFunctionPointer<void(KeyboardEvent*)>* RegisterForAnyKey(
-            IFunctionPointer<void(KeyboardEvent*)>* callbackFunctionPointer
+        IFunctionPointer<void(IKeyboardEvent*)>* RegisterForAnyKey(
+            IFunctionPointer<void(IKeyboardEvent*)>* callbackFunctionPointer
         ) override {
             _anyKeyCallbacks.insert(callbackFunctionPointer);
             return callbackFunctionPointer;
         }
-        void UnregisterForAnyKey(IFunctionPointer<void(KeyboardEvent*)>* callbackPointer) override {
+        void UnregisterForAnyKey(IFunctionPointer<void(IKeyboardEvent*)>* callbackPointer) override {
             _anyKeyCallbacks.erase(callbackPointer);
         }
         void UnregisterForAnyKey() override { _anyKeyCallbacks.clear(); }
 
-        IFunctionPointer<void(KeyboardEvent*)>* RegisterForAnyKeyPressed(
-            IFunctionPointer<void(KeyboardEvent*)>* callbackFunctionPointer
+        IFunctionPointer<void(IKeyboardEvent*)>* RegisterForAnyKeyPressed(
+            IFunctionPointer<void(IKeyboardEvent*)>* callbackFunctionPointer
         ) override {
             _anyKeyPressedCallbacks.insert(callbackFunctionPointer);
             return callbackFunctionPointer;
         }
-        void UnregisterForAnyKeyPressed(IFunctionPointer<void(KeyboardEvent*)>* callbackPointer) override {
+        void UnregisterForAnyKeyPressed(IFunctionPointer<void(IKeyboardEvent*)>* callbackPointer) override {
             _anyKeyPressedCallbacks.erase(callbackPointer);
         }
         void UnregisterForAnyKeyPressed() override { _anyKeyPressedCallbacks.clear(); }
 
-        IFunctionPointer<void(KeyboardEvent*)>* RegisterForAnyKeyReleased(
-            IFunctionPointer<void(KeyboardEvent*)>* callbackFunctionPointer
+        IFunctionPointer<void(IKeyboardEvent*)>* RegisterForAnyKeyReleased(
+            IFunctionPointer<void(IKeyboardEvent*)>* callbackFunctionPointer
         ) override {
             _anyKeyReleasedCallbacks.insert(callbackFunctionPointer);
             return callbackFunctionPointer;
         }
-        void UnregisterForAnyKeyReleased(IFunctionPointer<void(KeyboardEvent*)>* callbackPointer) override {
+        void UnregisterForAnyKeyReleased(IFunctionPointer<void(IKeyboardEvent*)>* callbackPointer) override {
             _anyKeyReleasedCallbacks.erase(callbackPointer);
         }
         void UnregisterForAnyKeyReleased() override { _anyKeyReleasedCallbacks.clear(); }
