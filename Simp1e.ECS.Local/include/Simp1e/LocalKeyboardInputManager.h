@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Simp1e/IKeyboardInputManager.h>
+#include <_Log_.h>
 
 #include <unordered_map>
 #include <unordered_set>
@@ -59,6 +60,7 @@ namespace Simp1e {
         }
 
         void SetKeyPressed(int key, bool pressed, bool isAutoRepeat, bool triggerCallbacks) override {
+            _Log_("SetKeyPressed key:{} pressed:{} repeat:{}", key, pressed, isAutoRepeat);
             if (pressed) _currentlyPressedKeys[key] = pressed;
             else _currentlyPressedKeys.erase(key);
             if (triggerCallbacks) {
