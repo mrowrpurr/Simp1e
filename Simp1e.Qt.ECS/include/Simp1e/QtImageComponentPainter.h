@@ -79,12 +79,13 @@ namespace Simp1e {
                 "Painting image {} at {},{}", imageComponent->GetImagePath(), positionComponent->GetPosition().x(),
                 positionComponent->GetPosition().y()
             );
-            painter->drawPixmap(ToQPoint(positionComponent->GetPosition().ToPoint()), *pixmap);
+            painter->drawPixmap(QPointF{0, 0}, *pixmap);
+            // painter->drawPixmap(ToQPoint(positionComponent->GetPosition().ToPoint()), *pixmap);
 
             auto* lineColor = entityManager->GetComponent<ILineColorComponent>(entity);
             if (lineColor) {
                 painter->setPen(QPen(ToQColor(lineColor->GetColor()), 5.0, Qt::SolidLine));
-                painter->drawRect(ToQRectF(Rectangle(positionComponent->GetPosition().ToPoint(), qImage->GetSize())));
+                painter->drawRect(ToQRectF(Rectangle({0, 0}, qImage->GetSize())));
             }
         }
     };

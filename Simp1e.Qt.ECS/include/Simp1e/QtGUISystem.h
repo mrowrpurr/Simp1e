@@ -278,19 +278,7 @@ namespace Simp1e {
             );
         }
 
-        int iteration = 0;
-
         void Update(IEngine* engine, double deltaTime) {
-            iteration++;
-            _engine->GetEntities()->ForEach<ICameraComponent>(
-                new_function_pointer([this](Entity, ComponentType, ComponentPointer ptr) {
-                    if (iteration % 1000 != 0) return;
-                    _Log_("Dirty Camera");
-                    auto* camera = component_cast<ICameraComponent>(ptr);
-                    if (camera) camera->SetDirty(true);
-                })
-            );
-
             for (auto& [componentTypeKey, componentUpdateHandler] : _componentUpdateHandlers) {
                 auto* updateHandler = componentUpdateHandler.get();
                 entityManager()->ForEachComponent(

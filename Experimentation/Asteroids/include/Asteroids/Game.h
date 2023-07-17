@@ -30,12 +30,13 @@ using namespace Simp1e;
 namespace Asteroids {
 
     class ShipMovementSystem {
-        Entity ship;  // TODO note could lookup from singleton tag component instead
+        Entity ship;    // TODO note could lookup from singleton tag component instead
+        Entity camera;  // TODO Same deal...
 
     public:
         DEFINE_SYSTEM_TYPE("Asteroids:ShipMovementSystem");
 
-        ShipMovementSystem(Entity ship) : ship(ship) {}
+        ShipMovementSystem(Entity ship, Entity camera) : ship(ship), camera(camera) {}
 
         void Update(IEngine* engine, float) {
             auto* keyboardInputManager = engine->GetInput()->GetKeyboardInputManager();
@@ -55,12 +56,27 @@ namespace Asteroids {
                 auto  angleRadians      = (90.0 - rotation) * M_PI / 180.0;
                 Point positionDelta(cos(angleRadians) * movementDistance, sin(angleRadians) * -movementDistance);
                 positionComponent->SetPosition(positionComponent->GetPosition() + positionDelta);
+
+                // Update the camera position...
+                auto* cameraSize   = engine->GetEntities()->GetComponent<ISizeComponent>(camera);
+                auto  shipPosition = positionComponent->GetPosition();
+
+                // Center the ship in the camera view
+                Point cameraPosition(
+                    shipPosition.x() - cameraSize->GetSize().width() / 2,
+                    shipPosition.y() - cameraSize->GetSize().height() / 2
+                );
+                auto* cameraPositionComponent = engine->GetEntities()->GetComponent<IPositionComponent>(camera);
+                cameraPositionComponent->SetPosition(cameraPosition);
+                auto* cameraComponent = engine->GetEntities()->GetComponent<ICameraComponent>(camera);
+                cameraComponent->SetDirty(true);  // Currently how it works, TODO fix and base on the position change ?
             }
         }
     };
 
     class Game {
         Entity      _ship;
+        Entity      _camera;
         LocalEngine _engine;
         QtEngine    _qtEngine{&_engine};
 
@@ -86,6 +102,7 @@ namespace Asteroids {
             entityManager()->AddComponent<SizeComponent>(camera, Size(1000, 1000));
             entityManager()->AddComponent<RectangleComponent>(camera);
             entityManager()->AddComponent<LineColorComponent>(camera, Color::Magenta());
+            _camera = camera;
         }
 
         void CreateParallaxEffect() {
@@ -129,7 +146,7 @@ namespace Asteroids {
             _engine.AddDefaultSystemGroups();
             _engine.GetSystemGroups()
                 ->GetGroup(DefaultSystemGroupTypes::InitializationGroup)
-                ->AddSystem<ShipMovementSystem>(_ship);
+                ->AddSystem<ShipMovementSystem>(_ship, _camera);
         }
 
         void Setup() {
