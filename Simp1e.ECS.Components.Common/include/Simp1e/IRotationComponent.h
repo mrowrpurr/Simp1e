@@ -13,6 +13,7 @@ namespace Simp1e {
             Rotation = 1 << 0,
         };
 
+        virtual void  Rotate(sreal delta)         = 0;
         virtual sreal GetRotation() const         = 0;
         virtual void  SetRotation(sreal rotation) = 0;
     };

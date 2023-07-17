@@ -17,8 +17,8 @@ namespace Simp1e {
         T x() const { return this->one(); }
         T y() const { return this->two(); }
 
-        void SetX(T x) { SetOne(x); }
-        void SetY(T y) { SetTwo(y); }
+        void SetX(T x) { this->SetOne(x); }
+        void SetY(T y) { this->SetTwo(y); }
 
         void AddToX(T x) { this->AddToOne(x); }
         void AddToY(T y) { this->AddToTwo(y); }

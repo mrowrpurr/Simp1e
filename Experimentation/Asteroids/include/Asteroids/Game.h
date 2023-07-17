@@ -39,18 +39,22 @@ namespace Asteroids {
 
         void Update(IEngine* engine, float) {
             auto* keyboardInputManager = engine->GetInput()->GetKeyboardInputManager();
+            auto* rotationComponent    = engine->GetEntities()->GetComponent<IRotationComponent>(ship);
 
-            Point movementDelta;
-            if (keyboardInputManager->IsKeyPressed(FromKeyboardKey(KeyboardKey::Up))) movementDelta.SubtractFromY(1);
-            if (keyboardInputManager->IsKeyPressed(FromKeyboardKey(KeyboardKey::Down))) movementDelta.AddToY(1);
-            if (keyboardInputManager->IsKeyPressed(FromKeyboardKey(KeyboardKey::Left))) movementDelta.SubtractFromX(1);
-            if (keyboardInputManager->IsKeyPressed(FromKeyboardKey(KeyboardKey::Right))) movementDelta.AddToX(1);
+            int rotationDelta = 0;
+            if (keyboardInputManager->IsKeyPressed(FromKeyboardKey(KeyboardKey::Left))) rotationDelta = -1;
+            if (keyboardInputManager->IsKeyPressed(FromKeyboardKey(KeyboardKey::Right))) rotationDelta = 1;
+            if (rotationDelta != 0) rotationComponent->Rotate(rotationDelta);
 
-            if (!movementDelta.IsNull()) {
-                _Log_("NOT NULL");
+            auto movementDistance = 0.0;
+            if (keyboardInputManager->IsKeyPressed(FromKeyboardKey(KeyboardKey::Up))) movementDistance = 5.0;
+
+            if (movementDistance != 0) {
                 auto* positionComponent = engine->GetEntities()->GetComponent<IPositionComponent>(ship);
-                if (positionComponent == nullptr) return;
-                positionComponent->SetPosition(positionComponent->GetPosition() + Position(movementDelta));
+                auto  rotation          = rotationComponent->GetRotation();
+                auto  angleRadians      = (90.0 - rotation) * M_PI / 180.0;
+                Point positionDelta(cos(angleRadians) * movementDistance, sin(angleRadians) * -movementDistance);
+                positionComponent->SetPosition(positionComponent->GetPosition() + positionDelta);
             }
         }
     };

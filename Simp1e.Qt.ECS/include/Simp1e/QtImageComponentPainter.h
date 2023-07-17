@@ -4,6 +4,7 @@
 #include <Simp1e/IImageComponent.h>
 #include <Simp1e/ILineColorComponent.h>
 #include <Simp1e/IPositionComponent.h>
+#include <Simp1e/IRotationComponent.h>
 #include <Simp1e/ISizeComponent.h>
 #include <Simp1e/Rectangle.h>
 #include <Simp1e/ToQColor.h>
@@ -59,6 +60,14 @@ namespace Simp1e {
             }
 
             qImage->SetSize(sizeComponent->GetSize());
+
+            // auto* rotationComponent = entityManager->GetComponent<IRotationComponent>(entity);
+            // if (rotationComponent) {
+            //     _Log_("---------> Image Painter - Rotate to {}", rotationComponent->GetRotation());
+            //     qImage->RotateTo(rotationComponent->GetRotation());
+            // } else {
+            //     _Log_("---------> Entity {} has no rotation component", entity);
+            // }
 
             auto* pixmap = qImage->GetPixmap();
             if (!pixmap) {

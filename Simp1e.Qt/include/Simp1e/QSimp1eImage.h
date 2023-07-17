@@ -14,6 +14,9 @@
 namespace Simp1e {
 
     class QSimp1eImage {
+        bool                     _rotating = false;
+        Size                     _size;
+        int                      _rotation = 0;
         std::string              _imagePath;
         std::unique_ptr<QPixmap> _originalPixmap = nullptr;
         std::unique_ptr<QPixmap> _scaledPixmap   = nullptr;  // rename to something else, cause we scale and rotate
@@ -26,6 +29,7 @@ namespace Simp1e {
             if (_imagePath.find(".svg") != std::string::npos)
                 _svg = std::make_unique<QGraphicsSvgItem>(_imagePath.c_str());
             else _originalPixmap = std::make_unique<QPixmap>(_imagePath.c_str());
+            _size = Size(_originalPixmap->width(), _originalPixmap->height());
         }
 
         QPixmap*          GetPixmap() const { return _scaledPixmap ? _scaledPixmap.get() : _originalPixmap.get(); }
@@ -34,6 +38,7 @@ namespace Simp1e {
         ImageRenderType GetImageRenderType() const { return _svg ? ImageRenderType::Vector : ImageRenderType::Raster; }
 
         void SetSize(Size size) {
+            _size = size;
             if (GetImageRenderType() == ImageRenderType::Vector) {
                 _Log_("SVG (resize) not supported yet");
                 return;
@@ -46,19 +51,21 @@ namespace Simp1e {
                 _Log_("Original pixmap is null");
                 return;
             }
-            if (_scaledPixmap && _scaledPixmap->width() == size.width() && _scaledPixmap->height() == size.height())
-                return;
-            if (_originalPixmap && _originalPixmap->width() == size.width() &&
-                _originalPixmap->height() == size.height())
-                return;
             if (!size.IsNull() && !_originalPixmap->isNull()) {
                 if (size.width() == 0)
                     size.SetWidth(_originalPixmap->width() * size.height() / _originalPixmap->height());
                 else if (size.height() == 0)
                     size.SetHeight(_originalPixmap->height() * size.width() / _originalPixmap->width());
             }
+            if (_scaledPixmap && _scaledPixmap->width() == size.width() && _scaledPixmap->height() == size.height())
+                return;
+            if (_originalPixmap && _originalPixmap->width() == size.width() &&
+                _originalPixmap->height() == size.height())
+                return;
             _Log_("Resizing QPixmap to {}x{}", size.width(), size.height());
+            // TODO is this called too much here??????
             _scaledPixmap = std::make_unique<QPixmap>(_originalPixmap->scaled(size.width(), size.height()));
+            if (!_rotating && _rotation != 0) RotateTo(_rotation);
         }
 
         Size GetSize() const {
@@ -71,12 +78,24 @@ namespace Simp1e {
             else return Size();
         }
 
-        void Rotate(sreal rotation) {
+        void RotateTo(sreal rotation) { Rotate(rotation - _rotation); }
+
+        void Rotate(sreal angleDelta) {
             if (GetImageRenderType() == ImageRenderType::Vector) {
                 _Log_("SVG (rotate) not supported yet");
                 return;
             }
-            auto image        = GetPixmap()->toImage();
+            _rotation += angleDelta;
+
+            //....
+            _scaledPixmap.reset();
+            _scaledPixmap = nullptr;
+            _rotating     = true;
+            SetSize(_size);
+            _rotating  = false;
+            auto image = GetPixmap()->toImage();
+            //....
+
             auto rotatedImage = QImage(image.size(), QImage::Format_ARGB32_Premultiplied);
             rotatedImage.fill(Qt::transparent);
 
@@ -84,11 +103,12 @@ namespace Simp1e {
             painter.setRenderHint(QPainter::Antialiasing);
             painter.setRenderHint(QPainter::SmoothPixmapTransform);
             painter.translate(rotatedImage.size().width() / 2.0, rotatedImage.size().height() / 2.0);
-            painter.rotate(rotation);
+            painter.rotate(_rotation);
             painter.translate(-image.size().width() / 2.0, -image.size().height() / 2.0);
             painter.drawImage(0, 0, image);
             painter.end();
 
+            _Log_("Rotating QPixmap to {} degrees", _rotation);
             _scaledPixmap = std::make_unique<QPixmap>(QPixmap::fromImage(rotatedImage));
         }
     };

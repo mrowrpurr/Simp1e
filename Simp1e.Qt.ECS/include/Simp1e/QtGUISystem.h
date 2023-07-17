@@ -14,6 +14,7 @@
 #include <Simp1e/IParallaxEffectComponent.h>
 #include <Simp1e/IPositionComponent.h>
 #include <Simp1e/IRectangleComponent.h>
+#include <Simp1e/IRotationComponent.h>
 #include <Simp1e/ISizeComponent.h>
 #include <Simp1e/IWindowComponent.h>
 #include <Simp1e/IWindowMenuComponent.h>
@@ -49,6 +50,7 @@
 #include "QtParallaxEffectComponentUpdateHandler.h"
 #include "QtPositionComponentUpdateHandler.h"
 #include "QtRectangleComponentPainter.h"
+#include "QtRotationComponentUpdateHandler.h"
 #include "QtSimp1eImageComponent.h"
 #include "QtSizeComponentUpdateHandler.h"
 
@@ -246,6 +248,7 @@ namespace Simp1e {
             RegisterComponentPainter<IImageComponent, QtImageComponentPainter>();
 
             RegisterComponentUpdateHandler<IPositionComponent, QtPositionComponentUpdateHandler>();
+            RegisterComponentUpdateHandler<IRotationComponent, QtRotationComponentUpdateHandler>();
             RegisterComponentUpdateHandler<ISizeComponent, QtSizeComponentUpdateHandler>();
             RegisterComponentUpdateHandler<IParallaxEffectComponent, QtParallaxEffectComponentUpdateHandler>();
         }
