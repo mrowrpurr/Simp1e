@@ -15,6 +15,7 @@ namespace Simp1e {
     class QSimp1eApp : public QApplication {
         QEvent* _lastEvent;
         bool    _lastWasPress            = false;
+        int     _lastKey                 = 0;
         int     _mockArgcForQApplication = 0;
 
         std::vector<std::unique_ptr<IFunctionPointer<EventResult::Value(QKeyEvent*)>>> _keyboardEventListeners;
@@ -31,12 +32,14 @@ namespace Simp1e {
     protected:
         bool notify(QObject* receiver, QEvent* event) override {
             if (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease) {
-                auto isPress = event->type() == QEvent::KeyPress;
-                if (event == _lastEvent && isPress == _lastWasPress) {
+                auto  isPress  = event->type() == QEvent::KeyPress;
+                auto* keyEvent = static_cast<QKeyEvent*>(event);
+                if (event == _lastEvent && isPress == _lastWasPress && keyEvent->key() == _lastKey) {
                     return QApplication::notify(receiver, event);
                 } else {
                     _lastEvent    = event;
                     _lastWasPress = isPress;
+                    _lastKey      = keyEvent->key();
                 }
                 for (auto& listener : _keyboardEventListeners)
                     if (listener->invoke(static_cast<QKeyEvent*>(event))) return true;
