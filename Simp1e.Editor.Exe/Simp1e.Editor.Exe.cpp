@@ -1,4 +1,30 @@
+#include <string_format.h>
+#define _Log_(...) qDebug() << string_format(__VA_ARGS__)
 #include <_Log_.h>
+
+/*
+    TODO
+
+  [ ]  1(a). Load .dll with certain name pattern [Windows]
+  [ ]  1(b). Load .so with certain name pattern [Linux]
+  [ ]  1(c). Load .dylib with certain name pattern [MacOS]
+
+  [ ]  2(a). Show list of registered Service types provided by the .dll (simple registration)
+  [ ]  2(b). Can actually call a function on one of the Services (#update) from main .exe
+
+  [ ]  3(a). Show list of registered Components types provided by the .dll (simple registration)
+  [ ]  3(b). Can actually instantiate a Component of this type using a factory
+             and the component lives in the definining DLL space (or anywhere that works)
+  [ ]  3(b). Can populate field(s) of the Component
+
+  [ ]  4(a). Can instantiate a Component defined in a .dll from a JSON definition!
+
+  [ ]  5(a). Can setup service groups using Service defined in .dll
+
+  [ ]  6(a). A service can search for components of given types AND it can access
+             those components' fields (read/write) and call their methods
+
+*/
 
 #include <QApplication>
 #include <QFile>
@@ -50,6 +76,9 @@ int main(int argc, char** argv) {
     lbl_Version.setObjectName("WindowSubtitle");
     lbl_Version.setProperty("class", "subtitle");
     layout->addWidget(&lbl_Version, 0, Qt::AlignCenter);
+
+    QLabel lbl_Description{"< some loaded output goes here >"};
+    layout->addWidget(&lbl_Description);
 
     LoadFont(app, ":/Fonts/fredericka-the-great.regular.ttf");
     LoadFont(app, ":/Fonts/yoster-island.regular.ttf");
