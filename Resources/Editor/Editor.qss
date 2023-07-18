@@ -1,52 +1,10 @@
-#DataFilesSelectorWindow QLabel[class=title] {
-    font-size: 96px;
+QLabel[class=title] {
+    font-size: 64px;
     font-family: "Fredericka the Great";
 }
 
-QLineEdit[invalid=true] { color: red; }
-
-#DataFilesSelectorWindow QWidget {
+QLabel[class=subtitle] {
     font-family: "Yoster Island";
     font-size: 20px;
-}
-
-QWidget {
-    font-family: "Yoster Island";
-    font-size: 20px;
-}
-
-QPushButton[class=primary] {
-    background-color: #316ccc;
-    color: white;
-}
-
-QPushButton[class=primary]:hover {
-    background-color: #1f4f9e;
-}
-
-QPushButton[class=primary]:pressed {
-    background-color: #1f4f9e;
-}
-
-QPushButton[class=primary]:disabled {
-    background-color: #878787;
-    color: black;
-}
-
-QPushButton[class=secondary] {
-    background-color: #e0e0e0;
-    color: black;
-}
-
-QPushButton[class=secondary]:hover {
-    background-color: #c2c2c2;
-}
-
-QPushButton[class=secondary]:pressed {
-    background-color: #c2c2c2;
-}
-
-QPushButton[class=secondary]:disabled {
-    background-color: #616161;
-    color: black;
+    color: #666666;
 }
