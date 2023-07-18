@@ -38,13 +38,61 @@ namespace Asteroids {
 
         ShipMovementSystem(Entity ship, Entity camera) : ship(ship), camera(camera) {}
 
-        void Update(IEngine* engine, float) {
+        Point GetPositionDeltaFromAccelerometer(IEngine* engine) {
             auto accelerometerReading = engine->GetInput()->GetSensors()->ReadAccelerometer();
-            _Log_(
-                "Acclerometer x:{} y:{} z:{}", accelerometerReading.one(), accelerometerReading.two(),
-                accelerometerReading.three()
-            );
+            if (accelerometerReading.IsNull()) {
+                _Log_("No accelerometer reading");
+                return {};
+            }
 
+            _Log_("ACCELEROMETER: {}", accelerometerReading.ToString());
+
+            // Position laidFlatOffset(0, 0, 10);
+            // Position heldInHandOffset(-10, 0, 0);
+
+            auto movementTolerance = 1.0;
+            auto movementMax       = 5;
+
+            // Left: -10.0
+            // Right: 10.0
+            auto xDelta = accelerometerReading.y();  // The Y in landscape would change the X on the screen
+            if (xDelta < movementTolerance && xDelta > -movementTolerance) xDelta = 0;
+            auto xMovement = movementMax * xDelta;  // Make this one more sensitive
+
+            auto yDelta = accelerometerReading.x();  // The X in landscape would change the Y on the screen
+            if (yDelta < movementTolerance && yDelta > -movementTolerance) yDelta = 0;
+            auto yMovement = movementMax * yDelta;
+
+            return Point(xMovement, yMovement);
+        }
+
+        // Accelerometer version
+        void Update(IEngine* engine, float) {
+            auto delta = GetPositionDeltaFromAccelerometer(engine);
+            _Log_("MOVEMENT DELTA: {}", delta.ToString());
+
+            if (delta.IsNull()) return;
+
+            // Forget rotation for now, just move the ship and the camera...
+            auto* positionComponent = engine->GetEntities()->GetComponent<IPositionComponent>(ship);
+
+            positionComponent->SetPosition(positionComponent->GetPosition() + delta);
+
+            auto* cameraSize   = engine->GetEntities()->GetComponent<ISizeComponent>(camera);
+            auto  shipPosition = positionComponent->GetPosition();
+
+            // Center the ship in the camera view
+            Point cameraPosition(
+                shipPosition.x() - cameraSize->GetSize().width() / 2,
+                shipPosition.y() - cameraSize->GetSize().height() / 2
+            );
+            auto* cameraPositionComponent = engine->GetEntities()->GetComponent<IPositionComponent>(camera);
+            cameraPositionComponent->SetPosition(cameraPosition);
+            auto* cameraComponent = engine->GetEntities()->GetComponent<ICameraComponent>(camera);
+            cameraComponent->SetDirty(true);  // Currently how it works, TODO fix and base on the position change ?
+        }
+
+        void Update_Keyboard(IEngine* engine, float) {
             auto* keyboardInputManager = engine->GetInput()->GetKeyboard();
             auto* rotationComponent    = engine->GetEntities()->GetComponent<IRotationComponent>(ship);
 
@@ -60,7 +108,10 @@ namespace Asteroids {
                 auto* positionComponent = engine->GetEntities()->GetComponent<IPositionComponent>(ship);
                 auto  rotation          = rotationComponent->GetRotation();
                 auto  angleRadians      = (90.0 - rotation) * M_PI / 180.0;
+
+                //
                 Point positionDelta(cos(angleRadians) * movementDistance, sin(angleRadians) * -movementDistance);
+
                 positionComponent->SetPosition(positionComponent->GetPosition() + positionDelta);
 
                 // Update the camera position...
@@ -106,8 +157,8 @@ namespace Asteroids {
             entityManager()->AddComponent<CameraComponent>(camera);
             entityManager()->AddComponent<PositionComponent>(camera, Position(0, 0));
             entityManager()->AddComponent<SizeComponent>(camera, Size(1000, 1000));
-            entityManager()->AddComponent<RectangleComponent>(camera);
-            entityManager()->AddComponent<LineColorComponent>(camera, Color::Magenta());
+            // entityManager()->AddComponent<RectangleComponent>(camera);
+            // entityManager()->AddComponent<LineColorComponent>(camera, Color::Magenta(10));
             _camera = camera;
         }
 
@@ -148,7 +199,7 @@ namespace Asteroids {
             CreateShip();
         }
 
-        std::unique_ptr<IFunctionPointer<Vec3<sreal>()>> _readSensorsFunction;
+        std::unique_ptr<IFunctionPointer<PositionF()>> _readSensorsFunction;
 
         void SetupSensors() {
 #ifdef SIMP1E_MOBILE

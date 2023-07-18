@@ -2,9 +2,8 @@
 
 #include <Simp1e/EventCast.h>
 #include <Simp1e/EventResult.h>
+#include <Simp1e/Position.h>
 #include <Simp1e/QtSimp1ePlatformDetection.h>
-#include <Simp1e/Vec3.h>
-#include <Simp1e/sreal.h>
 #include <_Log_.h>
 #include <function_pointer.h>
 
@@ -54,7 +53,7 @@ namespace Simp1e {
 #endif
         }
 
-        Vec3<sreal> GetAccelerometerReading() {
+        PositionF GetAccelerometerReading() {
 #ifdef SIMP1E_MOBILE
             auto reading = _accelerometer.reading();
             return {reading->x(), reading->y(), reading->z()};

@@ -61,7 +61,7 @@ namespace Simp1e {
             else _app.StopAccelerometer();
         }
 
-        Vec3<sreal> GetAccelerometerReading() { return _app.GetAccelerometerReading(); }
+        PositionF GetAccelerometerReading() { return _app.GetAccelerometerReading(); }
 
         void Run() {
             _gameLoop->Run();
