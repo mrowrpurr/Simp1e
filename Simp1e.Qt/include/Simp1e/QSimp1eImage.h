@@ -84,7 +84,12 @@ namespace Simp1e {
             else return Size();
         }
 
-        void RotateTo(sreal rotation) { Rotate(rotation - _rotation); }
+        void RotateTo(sreal rotation) {
+            _rotation = rotation;
+            if (_rotation < 0) _rotation += 360;
+            if (_rotation >= 360) _rotation -= 360;
+            Rotate(0);
+        }
 
         void Rotate(sreal angleDelta) {
             if (GetImageRenderType() == ImageRenderType::Vector) {

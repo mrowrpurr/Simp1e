@@ -24,6 +24,7 @@
 #include <QKeyEvent>
 #include <QTabletEvent>
 #include <QTouchEvent>
+#include <cmath>
 
 using namespace Simp1e;
 
@@ -38,6 +39,24 @@ namespace Asteroids {
 
         ShipMovementSystem(Entity ship, Entity camera) : ship(ship), camera(camera) {}
 
+        // TODO: move angle and distance to Point struct
+
+        double calculateAngle(Point p1, Point p2) {
+            double dx           = p2.x() - p1.x();
+            double dy           = p2.y() - p1.y();
+            double angleRadians = std::atan2(dy, dx);
+            double angleDegrees = angleRadians * 180.0 / M_PI;
+            return angleDegrees;
+        }
+
+        double calculateDistance(Point p1, Point p2) {
+            double dx = p2.x() - p1.x();
+            double dy = p2.y() - p1.y();
+            return std::sqrt(dx * dx + dy * dy);
+        }
+
+        PositionF heldInHandOffset = PositionF(-6, 0, -1);
+
         Point GetPositionDeltaFromAccelerometer(IEngine* engine) {
             auto accelerometerReading = engine->GetInput()->GetSensors()->ReadAccelerometer();
             if (accelerometerReading.IsNull()) {
@@ -48,10 +67,12 @@ namespace Asteroids {
             _Log_("ACCELEROMETER: {}", accelerometerReading.ToString());
 
             // Position laidFlatOffset(0, 0, 10);
-            // Position heldInHandOffset(-10, 0, 0);
+            accelerometerReading = accelerometerReading + heldInHandOffset;
 
             auto movementTolerance = 1.0;
-            auto movementMax       = 5;
+            // auto movementMax       = 100;
+            // auto movementMax       = 100;
+            auto movementMax = 5;
 
             // Left: -10.0
             // Right: 10.0
@@ -66,8 +87,124 @@ namespace Asteroids {
             return Point(xMovement, yMovement);
         }
 
-        // Accelerometer version
+        PointF VelocityFromAccelerometer(IEngine* engine) {
+            auto accelerometerReading = engine->GetInput()->GetSensors()->ReadAccelerometer();
+            if (accelerometerReading.IsNull()) {
+                _Log_("No accelerometer reading");
+                return {};
+            }
+            // accelerometerReading   = accelerometerReading + heldInHandOffset;
+            // auto movementTolerance = 1.0;
+
+            // Calculate horizontal velocity (x)
+            auto xSpeed = std::abs(accelerometerReading.y()) / 10.0;  // 0 to 10
+
+            // Calculate vertical velocity (y)
+            auto ySpeed = std::abs(accelerometerReading.x()) / 10.0;  // 0 to 10
+
+            _Log_("Reading for SPEED: {}", accelerometerReading.ToString());
+            _Log_("SPEED: {}", PointF(xSpeed, ySpeed).ToString());
+            return PointF(xSpeed, ySpeed);
+
+            // 0, 0, 10
+            // 5, 0, 8
+
+            // fwd = 5 to 0
+            // back = 5 to 10
+            // left = x, 0 to -10
+            // right = x, 0 to 10
+        }
+
+        // FAKE ROTATION VERSION
         void Update(IEngine* engine, float) {
+            //
+            auto delta = GetPositionDeltaFromAccelerometer(engine);
+            _Log_("MOVEMENT DELTA: {}", delta.ToString());
+
+            if (delta.IsNull()) return;
+
+            // Forget rotation for now, just move the ship and the camera...
+            auto* positionComponent = engine->GetEntities()->GetComponent<IPositionComponent>(ship);
+
+            positionComponent->SetPosition(positionComponent->GetPosition() + delta);
+
+            auto* cameraSize   = engine->GetEntities()->GetComponent<ISizeComponent>(camera);
+            auto  shipPosition = positionComponent->GetPosition();
+
+            // Center the ship in the camera view
+            Point cameraPosition(
+                shipPosition.x() - cameraSize->GetSize().width() / 2,
+                shipPosition.y() - cameraSize->GetSize().height() / 2
+            );
+            auto* cameraPositionComponent = engine->GetEntities()->GetComponent<IPositionComponent>(camera);
+            cameraPositionComponent->SetPosition(cameraPosition);
+            auto* cameraComponent = engine->GetEntities()->GetComponent<ICameraComponent>(camera);
+            cameraComponent->SetDirty(true);  // Currently how it works, TODO fix and base on the position change ?
+        }
+
+        // Accelerometer version
+        void Update_REAL_ROTATION(IEngine* engine, float) {
+            auto positionDeltaPoint = GetPositionDeltaFromAccelerometer(engine);
+            _Log_("MOVEMENT DELTA: {}", positionDeltaPoint.ToString());
+
+            if (positionDeltaPoint.IsNull()) return;
+
+            auto velocityFromAccelerometer = VelocityFromAccelerometer(engine);
+
+            auto* rotationComponent                    = engine->GetEntities()->GetComponent<IRotationComponent>(ship);
+            auto* positionComponent                    = engine->GetEntities()->GetComponent<IPositionComponent>(ship);
+            auto  shipCurrentPoint                     = positionComponent->GetPosition().ToPoint();
+            auto  calculatedNewPositionWithoutRotation = shipCurrentPoint + positionDeltaPoint;
+
+            auto angle = calculateAngle(shipCurrentPoint, calculatedNewPositionWithoutRotation) + 180;
+            _Log_(
+                "Angle from {} to {} ---> {}", shipCurrentPoint.ToString(),
+                calculatedNewPositionWithoutRotation.ToString(), angle
+            );
+            // if (angle < -3.0) angle = -3.0;
+            // else if (angle > 3.0) angle = 3.0;
+            auto currentRotation = rotationComponent->GetRotation();
+            auto difference      = angle - currentRotation;
+            if (difference > 3.0) angle = currentRotation + 3.0;
+            else if (difference < -3.0) angle = currentRotation - 3.0;
+            if (angle != 0) rotationComponent->RotateTo(angle);
+
+            auto movementDistance = std::abs(calculateDistance(shipCurrentPoint, positionDeltaPoint));
+            if (movementDistance > 10.0) movementDistance = 10.0;
+
+            if (movementDistance != 0) {
+                auto* positionComponent = engine->GetEntities()->GetComponent<IPositionComponent>(ship);
+                // auto  angleRadians      = rotationComponent->GetRotation();
+                auto rotation     = rotationComponent->GetRotation();
+                auto angleRadians = (90.0 - rotation) * M_PI / 180.0;
+
+                //
+                Point positionDelta(
+                    cos(angleRadians) * (50 * velocityFromAccelerometer.x()),
+                    sin(angleRadians) * (50 * -velocityFromAccelerometer.y())
+                );
+                // Point positionDelta(cos(angleRadians) * movementDistance, sin(angleRadians) * -movementDistance);
+
+                positionComponent->SetPosition(positionComponent->GetPosition() + positionDelta);
+
+                // Update the camera position...
+                auto* cameraSize   = engine->GetEntities()->GetComponent<ISizeComponent>(camera);
+                auto  shipPosition = positionComponent->GetPosition();
+
+                // Center the ship in the camera view
+                Point cameraPosition(
+                    shipPosition.x() - cameraSize->GetSize().width() / 2,
+                    shipPosition.y() - cameraSize->GetSize().height() / 2
+                );
+                auto* cameraPositionComponent = engine->GetEntities()->GetComponent<IPositionComponent>(camera);
+                cameraPositionComponent->SetPosition(cameraPosition);
+                auto* cameraComponent = engine->GetEntities()->GetComponent<ICameraComponent>(camera);
+                cameraComponent->SetDirty(true);  // Currently how it works, TODO fix and base on the position change ?
+            }
+        }
+
+        // Accelerometer version
+        void Update_NoRotate_Mobile(IEngine* engine, float) {
             auto delta = GetPositionDeltaFromAccelerometer(engine);
             _Log_("MOVEMENT DELTA: {}", delta.ToString());
 

@@ -13,6 +13,13 @@ namespace Simp1e {
         RotationComponent() = default;
         RotationComponent(sreal rotation) : _rotation(rotation) {}
 
+        void RotateTo(sreal rotation) override {
+            _rotation = rotation;
+            if (_rotation > 360) _rotation -= 360;
+            if (_rotation < 0) _rotation += 360;
+            _Log_("[RotationComponent] RotateTo: {}", _rotation);
+            SetDirtyFlag(Fields::Rotation);
+        }
         void Rotate(sreal delta) override {
             _rotation += delta;
             _Log_("[RotationComponent] Rotate: {}", _rotation);
