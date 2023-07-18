@@ -124,12 +124,33 @@ namespace Asteroids {
             if (delta.IsNull()) return;
 
             // Forget rotation for now, just move the ship and the camera...
+            auto* rotationComponent = engine->GetEntities()->GetComponent<IRotationComponent>(ship);
             auto* positionComponent = engine->GetEntities()->GetComponent<IPositionComponent>(ship);
+            auto  shipCurrentPoint  = positionComponent->GetPosition().ToPoint();
 
+            // Just lazily set it to the delta
             positionComponent->SetPosition(positionComponent->GetPosition() + delta);
 
             auto* cameraSize   = engine->GetEntities()->GetComponent<ISizeComponent>(camera);
             auto  shipPosition = positionComponent->GetPosition();
+
+            // Let's fake some rotation now
+            //////////////
+            auto angle = calculateAngle(shipCurrentPoint, (shipCurrentPoint + delta)) + 90;
+            _Log_(
+                "Angle from {} to {} ---> {}", shipCurrentPoint.ToString(), (shipCurrentPoint + delta).ToString(), angle
+            );
+
+            // if (angle < -3.0) angle = -3.0;
+            // else if (angle > 3.0) angle = 3.0;
+
+            // auto currentRotation = rotationComponent->GetRotation();
+            // auto difference      = angle - currentRotation;
+            // if (difference > 3.0) angle = currentRotation + 3.0;
+            // else if (difference < -3.0) angle = currentRotation - 3.0;
+
+            if (angle != 0) rotationComponent->RotateTo(angle);
+            ////////////////
 
             // Center the ship in the camera view
             Point cameraPosition(
