@@ -8,7 +8,11 @@ namespace Simp1e {
     ILibraryLoader* GetLibraryLoader() { return new WindowsLibraryLoader(); }
 }
 #elif __linux__
-constexpr auto LibraryFileExtension = ".so";
+namespace Simp1e {
+    constexpr auto LibraryFileExtension = ".so";
+}
 #elif __APPLE__
-constexpr auto LibraryFileExtension = ".dylib";
+namespace Simp1e {
+    constexpr auto LibraryFileExtension = ".dylib";
+}
 #endif
