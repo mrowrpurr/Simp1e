@@ -71,10 +71,11 @@ function add_qt()
         add_includedirs(path.join(qt_include, "QtCore"))
         add_includedirs(path.join(qt_include, "QtGui"))
         add_includedirs(path.join(qt_include, "QtWidgets"))
+        add_includedirs(path.join(qt_include, "QtSvgWidgets"))
 
         -- link
         add_linkdirs(qt_lib)
-        add_links("Qt6Core", "Qt6Gui", "Qt6Widgets")
+        add_links("Qt6Core", "Qt6Gui", "Qt6Widgets", "Qt6SvgWidgets")
 
     else
         print("Unsupported host platform")

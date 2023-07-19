@@ -1,11 +1,11 @@
 function add_requires_for_logging()
-    add_requires("_Log_", "spdlog")
+    add_requires("mrowr_log", "spdlog")
 end
 
 function add_logging()
-    add_packages("_Log_", {public = true})
+    add_packages("mrowr_log", {public = true})
 end
 
 function add_logging_runtime()
-    add_packages("_Log_", "spdlog")
+    add_packages("mrowr_log", "spdlog")
 end

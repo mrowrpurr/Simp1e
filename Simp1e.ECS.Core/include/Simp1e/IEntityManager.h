@@ -59,7 +59,7 @@ namespace Simp1e {
 
         template <typename T>
         bool Remove(Entity entity) {
-            RemoveComponent(entity, ComponentTypeFromType<T>());
+            return RemoveComponent(entity, ComponentTypeFromType<T>());
         }
 
         template <typename T>

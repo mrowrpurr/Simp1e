@@ -34,9 +34,15 @@ namespace Simp1e {
         PointT operator+(const PointT& other) const {
             return PointT(this->one() + other.one(), this->two() + other.two());
         }
-        PointT operator-(const PointT& other) const { return PointT(one<T>() - other.one(), two<T>() - other.two()); }
-        PointT operator*(const PointT& other) const { return PointT(one<T>() * other.one(), two<T>() * other.two()); }
-        PointT operator/(const PointT& other) const { return PointT(one<T>() / other.one(), two<T>() / other.two()); }
+        PointT operator-(const PointT& other) const {
+            return PointT(this->one() - other.one(), this->two() - other.two());
+        }
+        PointT operator*(const PointT& other) const {
+            return PointT(this->one() * other.one(), this->two() * other.two());
+        }
+        PointT operator/(const PointT& other) const {
+            return PointT(this->one() / other.one(), this->two() / other.two());
+        }
 
         std::string ToString() const { return string_format("Point({}, {})", x(), y()); }
         operator std::string() const { return ToString(); }

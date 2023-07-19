@@ -11,5 +11,10 @@ target("Asteroids")
     )
     add_logging_runtime()
     add_string_formatting()
-    add_files("Asteroids.cpp", "Asteroids.qrc")
+    add_files("Asteroids.cpp")
     add_includedirs("include")
+    if is_host("linux") then
+        add_files("Asteroids_Linux.qrc")
+    else
+        add_files("Asteroids.qrc")
+    end

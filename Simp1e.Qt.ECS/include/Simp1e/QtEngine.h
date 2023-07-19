@@ -6,13 +6,14 @@
 #include <Simp1e/IKeyboardEvent.h>
 #include <Simp1e/LocalSystemGroup.h>
 #include <Simp1e/QSimp1eApp.h>
-#include <Simp1e/QtGameLoop.h>
-#include <Simp1e/QtGuiSystem.h>
-#include <Simp1e/QtSystemGroupTypes.h>
 #include <_Log_.h>
 
 #include <QLabel>
 #include <memory>
+
+#include "QtGameLoop.h"
+#include "QtGuiSystem.h"
+#include "QtSystemGroupTypes.h"
 
 namespace Simp1e {
 
