@@ -15,7 +15,6 @@ namespace Simp1e::Editor {
 
     public:
         LogoWindow(QWidget* parent = nullptr) {
-            setWindowTitle("Simp1e");
             IDs();
             Classes();
             Layout();

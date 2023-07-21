@@ -4,8 +4,11 @@
 
 namespace Simp1e::Editor {
 
-    class EntityListWindow : QWidget {
+    class EntityListWindow : public QWidget {
     public:
-        EntityListWindow(QWidget* parent = nullptr);
+        EntityListWindow(QWidget* parent = nullptr) {
+            setObjectName("EntityListWindow");
+            setWindowTitle("Entity List");
+        }
     };
 }
