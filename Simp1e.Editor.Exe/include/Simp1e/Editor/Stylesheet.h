@@ -4,8 +4,9 @@
 
 namespace Simp1e::Editor {
 
-    auto GetStylesheet() {
+    QString GetStylesheet() {
         QFile file(":/Editor.qss");
         if (file.open(QFile::ReadOnly)) return QLatin1String(file.readAll()).toString();
+        return {};
     }
 }

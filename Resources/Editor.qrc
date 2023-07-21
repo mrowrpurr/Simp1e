@@ -7,5 +7,6 @@
     <file>Fonts/fredericka-the-great.regular.ttf</file>
     <file>Fonts/yoster-island.regular.ttf</file>
     <file>Fonts/dpcomic.regular.ttf</file>
+    <file>Data/ECS.Data.Example1.json</file>
 </qresource>
 </RCC>
