@@ -1,0 +1,6 @@
+target("Simp1e.ECS.NativeAPI.Client")
+    set_kind("headeronly")
+    add_deps("Simp1e.ECS.NativeAPI")
+    add_logging()
+    add_includedirs("include", {public = true})
+    add_headerfiles("include/(**.h)")

@@ -1,5 +1,11 @@
-4.30.22
+- [ ] Can load Entities (Components) from .json
+- [ ] Can create Entities (Components) from .json [Prefab]
+- [ ] Can create Systems from .json
 
-[ ] Editor runs and says Hello
-[ ] Editor shows logo
-[ ] Editor ...
+FOCUS ON THE .JSON :)
+
+After the above:
+
+- [ ] "Mod" can somehow change entity
+- [ ] "Mod" can somehow change system
+

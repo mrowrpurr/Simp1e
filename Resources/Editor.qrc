@@ -6,5 +6,6 @@
     <file alias="icon.png">Images/Logo/Simp1e 256.png</file>
     <file>Fonts/fredericka-the-great.regular.ttf</file>
     <file>Fonts/yoster-island.regular.ttf</file>
+    <file>Fonts/dpcomic.regular.ttf</file>
 </qresource>
 </RCC>

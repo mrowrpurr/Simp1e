@@ -1,4 +1,4 @@
-QLabel[class=title] {
+#LogoWindow QLabel[class=title] {
     font-size: 64px;
     font-family: "Fredericka the Great";
 }
@@ -7,4 +7,9 @@ QLabel[class=subtitle] {
     font-family: "Yoster Island";
     font-size: 20px;
     color: #666666;
+}
+
+QTextEdit {
+    font-family: "DPComic";
+    font-size: 30px;
 }
