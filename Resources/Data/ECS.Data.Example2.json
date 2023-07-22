@@ -1,0 +1,34 @@
+{
+    "__file__": {
+        "name": "ECS.Data.Example2.json",
+        "nextId": 2
+    },
+    "prefab": {
+        "[ECS.Data.Example1.json]::Outlined Rectangle": {
+            "components": {
+                "LineColor:": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 255
+                },
+            }
+        }
+    },
+    "entity": {
+        "[ECS.Data.Example1.json]::2": {
+            "components": {
+                "LineColor": {
+                    "r": 255
+                }
+            }
+        },
+        "1": {
+            "prefab": "Outlined Circle",
+            "components": {
+                "LineColor": {
+                    "r": 255
+                }
+            }
+        }
+    }
+}

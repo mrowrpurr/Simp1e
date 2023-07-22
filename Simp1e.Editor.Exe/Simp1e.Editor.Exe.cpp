@@ -3,12 +3,12 @@
 
 #include "Simp1e/Editor/App.h"
 #include "Simp1e/Editor/AppWindow.h"
-#include "Simp1e/Editor/ComponentListWindow.h"
+#include "Simp1e/Editor/AvailableComponentsListWindow.h"
+#include "Simp1e/Editor/AvailableSystemsListWindow.h"
 #include "Simp1e/Editor/DataFileLoaderTestWindow.h"
 #include "Simp1e/Editor/EntityListWindow.h"
 #include "Simp1e/Editor/LogoWindow.h"
 #include "Simp1e/Editor/PrefabListWindow.h"
-#include "Simp1e/Editor/SystemListWindow.h"
 
 using namespace Simp1e::Editor;
 
@@ -27,13 +27,15 @@ void OnDataFileLoad(std::string path) {
 }
 
 int main() {
-    App                      app;
-    AppWindow                appWindow;
-    LogoWindow               logoWindow;
-    ComponentListWindow      componentListWindow;
-    EntityListWindow         entityListWindow;
-    PrefabListWindow         prefabListWindow;
-    SystemListWindow         systemListWindow;
+    App              app;
+    AppWindow        appWindow;
+    LogoWindow       logoWindow;
+    EntityListWindow entityListWindow;
+    PrefabListWindow prefabListWindow;
+
+    AvailableComponentsListWindow AvailableComponentsListWindow;
+    AvailableSystemsListWindow    AvailableSystemsListWindow;
+
     DataFileLoaderTestWindow dataFileLoaderTestWindow;
 
     logoWindow.OnDoStuff(DoStuff);
@@ -43,8 +45,8 @@ int main() {
     appWindow.DockWidget(&logoWindow, Qt::TopDockWidgetArea);
     appWindow.DockWidget(&entityListWindow, Qt::LeftDockWidgetArea);
     appWindow.DockWidget(&prefabListWindow, Qt::LeftDockWidgetArea);
-    appWindow.DockWidget(&componentListWindow, Qt::RightDockWidgetArea);
-    appWindow.DockWidget(&systemListWindow, Qt::RightDockWidgetArea);
+    appWindow.DockWidget(&AvailableComponentsListWindow, Qt::RightDockWidgetArea);
+    appWindow.DockWidget(&AvailableSystemsListWindow, Qt::RightDockWidgetArea);
 
     appWindow.show();
     return app.exec();

@@ -1,5 +1,55 @@
 {
-    "systemsOrSomething": [],
-    "prefabsOrSomething": [],
-    "entitiesOrSomething": []
+    "__file__": {
+        "name": "ECS.Data.Example1.json",
+        "nextId": 3
+    },
+    "prefab": {
+        "Outlined Rectangle": {
+            "components": {
+                "Position:": {},
+                "LineColor:": {},
+                "Rectangle": {}
+            }
+        },
+        "Outlined Circle": {
+            "components": {
+                "Position:": {},
+                "LineColor:": {},
+                "Circle": {}
+            }
+        }
+    },
+    "entity": {
+        "1": {
+            "prefab": "Outlined Rectangle",
+            "components": {
+                "LineColor": {
+                    "r": 255,
+                    "g": 0,
+                    "b": 255
+                }
+            }
+        },
+        "2": {
+            "prefab": "Outlined Circle",
+            "components": {
+                "LineColor": {
+                    "r": 0,
+                    "g": 255,
+                    "b": 0
+                }
+            }
+        }
+    },
+    "system": {
+        "FooSystem": {
+            "group": "Initialization",
+            "data": {
+                "foo": "bar"
+            }
+        }
+    },
+    "service": {
+        "nothing to see here yet": {}
+    }
 }

@@ -8,5 +8,6 @@
     <file>Fonts/yoster-island.regular.ttf</file>
     <file>Fonts/dpcomic.regular.ttf</file>
     <file>Data/ECS.Data.Example1.json</file>
+    <file>Data/ECS.Data.Example2.json</file>
 </qresource>
 </RCC>
